@@ -94,7 +94,7 @@
 		<PushedTexture file="Interface/Buttons/UI-Quickslot-Depress" />
 		<Frames>
 			<Cooldown name="$parent_Cooldown" parentKey="cooldown" inherits="CooldownFrameTemplate" hidden="true" setAllPoints="true"/>
-			<Frame parentKey="CurseBar" frameStrata="HIGH" alpha="0">
+			<Frame parentKey="CurseBar" alpha="0">
 				<Size x="36" y="36"/>
 				<Anchors>
 					<Anchor point="CENTER"></Anchor>
@@ -107,7 +107,7 @@
 					  <AbsInset left="0" right="0" top="0" bottom="0"/> 
 				   </BackgroundInsets>
 				</Backdrop>
-			</Frame>			
+			</Frame>	
 		</Frames>
 		<Attributes>
 			<Attribute name="type" value="spell" />
@@ -191,7 +191,7 @@
 			<Attribute name="type1" value="target" />
 		</Attributes>
 		<Frames>
-			<Frame parentKey="CurseBar"  frameStrata="MEDIUM" alpha="0">
+			<Frame parentKey="CurseBar" alpha="0">
 				<Size x="124" y="32"/>
 				<Anchors>
 					<Anchor point="CENTER"></Anchor>
@@ -205,6 +205,21 @@
 				   </BackgroundInsets>
 				</Backdrop>
 			</Frame>
+			<Frame parentKey="AggroBar" alpha="0">
+				<Size x="110" y="20"/>
+				<Anchors>
+					<Anchor point="CENTER"></Anchor>
+				</Anchors>			
+					<Backdrop edgeFile="Interface/Tooltips/UI-Tooltip-Border" tile="true" > 
+					<EdgeSize>
+						<AbsValue val="12"/> 
+					</EdgeSize>
+				   <BackgroundInsets>
+					  <AbsInset left="0" right="0" top="0" bottom="0"/> 
+				   </BackgroundInsets>
+				</Backdrop>
+			</Frame>				
+			
 			<Frame name="$parent_Buff1" inherits="HealiumBuffTemplate">
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="LEFT">
@@ -259,7 +274,7 @@
 					</Anchor>
 				</Anchors>				
 			</Frame>				
-			<StatusBar parentKey="HealthBar" minValue="0" maxValue="100" defaultValue="100" frameStrata="LOW">
+			<StatusBar parentKey="HealthBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="2">
 				<Size x="111" y="23"/>
 				<Anchors>
 					<Anchor point="TOPLEFT">
@@ -273,8 +288,24 @@
 				<Scripts >
 					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
 				</Scripts>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture parentKey="RoleIcon" file="Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES" hidden="false">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="-2" y="-1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>				
+					</Layer>
+				</Layers>
 			</StatusBar>
-			<StatusBar parentKey="ManaBar" minValue="0" maxValue="100" defaultValue="100" frameStrata="LOW">
+			<StatusBar parentKey="ManaBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="3">
 				<Size x="5" y="23"/>
 				<Layers>
 					<Layer level="BACKGROUND" setAllPoints="true">

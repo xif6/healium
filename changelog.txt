@@ -1,3 +1,12 @@
+1.2.0 
+* Removed all logic that causes buttons to grey out.
+* Removed all frame strata settings.  This caused some parts of the Healium UI to sometimes incorrectly appear in front of or behind other UI elements.
+* Power Word: Shield now bases its cooldown on the target unit's Weakened Soul debuff.  -- Should make many priests happy!
+* Swift Mend now bases its greyed state on the target unit's Rejuvination and Regrowth buffs.  -- Should make many druids happy!
+* Added Show Threat option
+* Added Show Roles option
+* Added Unleash Elements for Shamen
+
 1.1.6
 * Fix Healium buffs tooltip was generating a LUA error.  This error was caused in 1.1.5.
 

@@ -89,6 +89,7 @@ function Healium_InitSpells(class, race)
 		AddSpell(61295)		-- Riptide		
 		AddSpell(974)		-- Earth Shield
 		AddSpell(16188)		-- Nature's Swiftness
+		AddSpell(73680)		-- Unleash Elements
 			
 		-- Shaman Cleanse Spirit
 		Cures[SpellName(51886)] = { 

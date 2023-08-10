@@ -486,6 +486,9 @@ function HealiumUnitFrames_Button_OnAttributeChanged(self, name, value)
 			Healium_UpdateUnitHealth(newUnit, self)
 			Healium_UpdateUnitMana(newUnit, self)
 			Healium_UpdateUnitBuffs(newUnit, self)
+			Healium_UpdateUnitThreat(newUnit, self)
+			Healium_UpdateUnitRole(newUnit, self)
+			Healium_UpdateSpecialBuffs(newUnit)
 		end
 
 		if oldUnit then
@@ -732,7 +735,7 @@ function Healium_UpdateUnitBuffs(unit, frame)
 
 	if Healium.ShowBuffs then
 		for i=1, 100, 1 do
-			local name, rank, icon, count, debuffType, duration, expirationTime, source, isStealable = UnitBuff(unit, i, true)
+			local name, rank, icon, count, debuffType, duration, expirationTime, source, isStealable = UnitBuff(unit, i)
 			if name  then
 				if (duration > 0) and (source == "player") then
 

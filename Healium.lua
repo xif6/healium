@@ -5,7 +5,7 @@
 -- Color control characters |CAARRGGBB  then |r resets to normal, where AA == Alpha, RR = Red, GG = Green, BB = blue
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 1.1.6|r"
+local AddonVersion = "|cFFFFFF00 1.2.0|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 
@@ -21,9 +21,14 @@ local MaxRangeCheckPeriod = 2  -- 2 = .5Hz
 local DefaultRangeCheckPeriod = .5
 local DefaultButtonCount = 5
 
--- locale safe versions of respeccing spell names
+-- locale safe versions of spell names
 local ActivatePrimarySpecSpellName = GetSpellInfo(63645)
 local ActivateSecondarySpecSpellName = GetSpellInfo(63644) 
+local PWSName = GetSpellInfo(17) -- Power Word: Shield
+local WeakendSoulName = GetSpellInfo(6788) -- Weakend Soul
+local SwiftMendName = GetSpellInfo(18562) -- Swift Mend
+local RejuvinationName = GetSpellInfo(774) -- Rejuvenation
+local RegrowthName = GetSpellInfo(8936) -- Regrowth
 
 -- Healium holds per character settings
 Healium = {
@@ -53,6 +58,8 @@ Healium = {
   EnableDebufButtonHighlighting = true,			-- Whether or not to highlight buttons which are assigned a spell that can cure a debuff on a player
   EnableDebufHealthbarColoring = false,			-- Whether or not to color the heatlhbar of a player when they have a debuf which you can cure
   ShowMana = true,								-- Whether or not to show mana
+  ShowThreat = true,							-- Whether or not to show the threat warnings
+  ShowRole = true,								-- Whether or not to show the role icon
 }
 
 -- HealiumGlobal is the variable that holds all Heliuam settings that are not character specific
@@ -147,15 +154,20 @@ function Healium_OnLoad(self)
 --	self:RegisterEvent("PLAYER_ALIVE")	
 	self:RegisterEvent("RAID_TARGET_UPDATE")
 	self:RegisterEvent("UNIT_NAME_UPDATE")
+	self:RegisterEvent("UNIT_AURA")
+end
+
+local function Healium_ShowHidePercentage(frame)
+	if Healium.ShowPercentage and (frame.HasRole == nil) then
+		frame.HPText:Show()
+	else
+		frame.HPText:Hide()
+	end
 end
 
 function Healium_UpdatePercentageVisibility()
 	for _, k in ipairs(Healium_Frames) do
-		if Healium.ShowPercentage then
-			k.HPText:Show()
-		else
-			k.HPText:Hide()
-		end
+		Healium_ShowHidePercentage(k)
 	end
 end
 
@@ -288,17 +300,103 @@ function Healium_UpdateManaBarVisibility(frame)
 end
 
 function Healium_UpdateShowBuffs()
-	if Healium.ShowBuffs then 
-		HealiumFrame:RegisterEvent("UNIT_AURA")
-	else
-		HealiumFrame:UnregisterEvent("UNIT_AURA")
-	end
+--	if Healium.ShowBuffs then 
+--		HealiumFrame:RegisterEvent("UNIT_AURA")
+--	else
+--		HealiumFrame:UnregisterEvent("UNIT_AURA")
+--	end
 	
 	for _, k in ipairs(Healium_ShownFrames) do
 		if (k.TargetUnit) then
 			Healium_UpdateUnitBuffs(k.TargetUnit, k)
 		end
 	end	
+end
+
+function Healium_UpdateUnitThreat(UnitName, NamePlate)
+	if not NamePlate then return end
+	if not UnitExists(UnitName) then return end
+	
+	if Healium.ShowThreat == nil then
+		NamePlate.AggroBar:SetAlpha(0)	
+		return
+	end
+	
+	local status = UnitThreatSituation(UnitName)
+
+	if status and status > 1 then 
+		local r, g, b = GetThreatStatusColor(status)
+		NamePlate.AggroBar:SetBackdropBorderColor(r,g,b,1)
+		NamePlate.AggroBar:SetAlpha(1)
+	else
+		NamePlate.AggroBar:SetAlpha(0)
+	end
+end
+
+function Healium_UpdateShowThreat()
+	if Healium.ShowThreat then
+		HealiumFrame:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE")
+	else
+		HealiumFrame:UnregisterEvent("UNIT_THREAT_SITUATION_UPDATE")
+	end
+
+	for _, k in ipairs(Healium_Frames) do
+		if (k.TargetUnit) then
+			if Healium.ShowThreat then	
+				Healium_UpdateUnitThreat(k.TargetUnit, k)
+			else
+				k.AggroBar:SetAlpha(0)				
+			end
+		end
+	end
+end
+
+function Healium_UpdateUnitRole(UnitName, NamePlate)
+	if not NamePlate then return end
+	if not UnitExists(UnitName) then return end
+	
+	local icon = NamePlate.HealthBar.RoleIcon
+	
+	if not Healium.ShowRole then
+		icon:Hide()
+		NamePlate.HasRole = nil
+		Healium_ShowHidePercentage(NamePlate)
+		return
+	end
+	
+	local role = UnitGroupRolesAssigned(UnitName);	
+	
+	if ( role == "TANK" or role == "HEALER" or role == "DAMAGER") then
+		NamePlate.HasRole = true
+		icon:SetTexCoord(GetTexCoordsForRoleSmallCircle(role))
+		icon:Show()
+	else
+--		icon:SetTexCoord(GetTexCoordsForRoleSmallCircle("TANK"))	
+--		icon:Show()
+		NamePlate.HasRole = nil
+		icon:Hide()
+	end
+	
+	Healium_ShowHidePercentage(NamePlate)	
+end
+
+local function Healium_UpdateRoles()
+
+	for _, k in ipairs(Healium_Frames) do
+		if (k.TargetUnit) then
+			Healium_UpdateUnitRole(k.TargetUnit, k)
+		end
+	end
+end
+
+function Healium_UpdateShowRole()
+	if Healium.ShowRole then
+		HealiumFrame:RegisterEvent("PARTY_MEMBERS_CHANGED")
+	else
+		HealiumFrame:UnregisterEvent("PARTY_MEMBERS_CHANGED")
+	end
+	
+	Healium_UpdateRoles()
 end
 
 local function GetSpellID(spell)
@@ -339,6 +437,74 @@ local function Healium_UpdateSpells()
 	Healium_UpdateButtonSpells()
 end
 
+-- does special checks for specific buffs/debuffs
+function Healium_UpdateSpecialBuffs(unit)
+
+	if HealiumClass == "PRIEST" then 
+		local Profile = Healium_GetProfile()
+		
+		for i=1, Profile.ButtonCount, 1 do				
+		
+			-- special check for Power Word: Shield		
+			if Profile.SpellNames[i] == PWSName then 
+				local units = Healium_Units[unit]
+
+				if units then 	
+					local name, _, _, _, _, weakendSoulduration, expirationTime, _, _, _, spellID = UnitDebuff(unit, WeakendSoulName)
+
+					if name then 
+						local startTime = expirationTime - weakendSoulduration										
+				
+						for _, frame in pairs(units) do 
+							local button = frame.buttons[i]
+							if button and button:IsShown() then
+								button.cooldown:SetCooldown(startTime, weakendSoulduration)
+							end
+						end
+					end
+				end
+			end
+		end
+		return
+	end
+	
+	if HealiumClass == "DRUID" then
+		local Profile = Healium_GetProfile()
+		
+		for i=1, Profile.ButtonCount, 1 do				
+		
+			-- special check for Swift Mend	
+			if Profile.SpellNames[i] == SwiftMendName then 
+				local units = Healium_Units[unit]
+
+				if units then 	
+--					local start, duration, enable = GetSpellCooldown(Healium_ButtonIDs[i], SpellBookFrame.bookType)				
+					local rejuvName, _, _, _, _, rejuvDuration, rejuvExpirationTime = UnitBuff(unit, RejuvinationName)
+					local regrowthName, _, _, _, _, regrowthDuration, regrowthExpirationTime = UnitBuff(unit, RegrowthName)
+
+					local enabled = rejuvName or regrowthName
+					
+					for _, frame in pairs(units) do 
+						local button = frame.buttons[i]
+						if button then
+							if enabled then 
+								button.icon.disabled = nil
+								button.icon:SetVertexColor(1.0, 1.0, 1.0)
+							else
+								button.icon.disabled = true
+								button.icon:SetVertexColor(0.4, 0.4, 0.4)
+							end
+						end
+					end
+					
+
+				end
+			end
+		end
+		return
+		
+	end
+end
 
 -- Efficient cooldowns
 function Healium_UpdateButtonCooldownsByColumn(column)
@@ -346,7 +512,7 @@ function Healium_UpdateButtonCooldownsByColumn(column)
 	if Healium_ButtonIDs[column] then
 		local start, duration, enable = GetSpellCooldown(Healium_ButtonIDs[column], SpellBookFrame.bookType)
 		
-		for _,j in pairs(Healium_Units) do
+		for unit, j in pairs(Healium_Units) do
 			for x,y in pairs(j) do
 				local button = y.buttons[column]
 				if button then 
@@ -355,6 +521,7 @@ function Healium_UpdateButtonCooldownsByColumn(column)
 					end
 				end
 			end
+			Healium_UpdateSpecialBuffs(unit)
 		end
 	end
 end
@@ -368,6 +535,8 @@ local function Healium_UpdateButtonCooldowns()
 end
 
 function Healium_UpdateButtonIcon(button, texture)
+	button.icon.disabled = nil
+	
 	if InCombatLockdown() then
 		return
 	end
@@ -503,7 +672,17 @@ end
 function Healium_RangeCheckButton(button)
     if (button.id) then
         local isUsable, noMana = IsUsableSpell(button.id, BOOKTYPE_SPELL)
-          
+
+		if noMana then
+			button.icon:SetVertexColor(0.5, 0.5, 1.0)
+		else
+			if not button.icon.disabled then 
+				button.icon:SetVertexColor(1.0, 1.0, 1.0)
+			end
+		end
+		
+	
+--[[
         if isUsable then
       	 button.icon:SetVertexColor(1.0, 1.0, 1.0)
       	elseif noMana then
@@ -511,7 +690,7 @@ function Healium_RangeCheckButton(button)
       	else
       	  button.icon:SetVertexColor(0.3, 0.3, 0.3)
       	end
-      	
+--]]      	
        	local inRange = IsSpellInRange(button.id, BOOKTYPE_SPELL, button:GetParent().TargetUnit)
       		
 		if SpellHasRange(button.id, BOOKTYPE_SPELL)  then
@@ -565,6 +744,14 @@ local function InitVariables()
 	
 	if Healium.ShowMana == nil then
 		Healium.ShowMana = true
+	end
+	
+	if Healium.ShowThreat == nil then
+		Healium.ShowThreat = true
+	end
+	
+	if Healium.ShowRole == nil then
+		Healium.ShowRole = true
 	end
 	
 	if Healium.ShowPercentage == nil then 
@@ -691,7 +878,7 @@ function Healium_OnEvent(self, event, ...)
 	-------------------------------------------------------------
 	-- [[ Update Unit Health Display Whenever Their HP Changes ]]
 	-------------------------------------------------------------
-    if (event == "UNIT_HEALTH" ) then
+    if event == "UNIT_HEALTH" then
 --		if (not HealiumActive) then return 0 end
 		
 		if Healium_Units[arg1] then
@@ -702,7 +889,7 @@ function Healium_OnEvent(self, event, ...)
 		return
 	end
 
-    if (event == "UNIT_POWER" ) then
+    if event == "UNIT_POWER" then
 		if (arg2 == "MANA") and Healium_Units[arg1] then
 			for _,v  in pairs(Healium_Units[arg1]) do
 				Healium_UpdateUnitMana(arg1, v)
@@ -711,10 +898,22 @@ function Healium_OnEvent(self, event, ...)
 		return
 	end
 	
-	if (event == "UNIT_AURA") then
+	if event == "UNIT_AURA" then
 		if Healium_Units[arg1] then
 			for _,v  in pairs(Healium_Units[arg1]) do
-				Healium_UpdateUnitBuffs(arg1, v)
+				if Healium.ShowBuffs then 
+					Healium_UpdateUnitBuffs(arg1, v)
+				end
+				Healium_UpdateSpecialBuffs(arg1)
+			end
+		end
+		return
+	end
+	
+	if event == "UNIT_THREAT_SITUATION_UPDATE" and Healium.ShowThreat then
+		if Healium_Units[arg1] then
+			for _,v  in pairs(Healium_Units[arg1]) do
+				Healium_UpdateUnitThreat(arg1, v)
 			end
 		end
 		return
@@ -727,7 +926,7 @@ function Healium_OnEvent(self, event, ...)
 		
 	if event == "PLAYER_REGEN_ENABLED" then
 		for _,v in ipairs(Healium_FixNameplates) do
-			if (not Healium.ShowPercentage) then v.HPText:Hide() end		
+			Healium_ShowHidePercentage(v)
 
 			if v.fixCreateButtons then 
 				Healium_CreateButtonsForNameplate(v)
@@ -770,6 +969,8 @@ function Healium_OnEvent(self, event, ...)
 		Healium_UpdateShowMana()
 		Healium_UpdateShowBuffs()
 		Healium_UpdateFriends()
+		Healium_UpdateShowThreat()
+		Healium_UpdateShowRole()
 		
 		for i=1, 8, 1 do
 			Healium_ShowHideGroupFrame(i)
@@ -863,7 +1064,11 @@ function Healium_OnEvent(self, event, ...)
 			end
 		end
 		return
-
+	end
+	
+	if event == "PARTY_MEMBERS_CHANGED" and Healium.ShowRole then
+		Healium_UpdateRoles()
+		return
 	end
 end
 
