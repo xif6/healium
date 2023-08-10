@@ -5,7 +5,7 @@
 -- Color control characters |CAARRGGBB  then |r resets to normal, where AA == Alpha, RR = Red, GG = Green, BB = blue
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 2.0.0|r"
+local AddonVersion = "|cFFFFFF00 2.0.1|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 
@@ -91,7 +91,7 @@ Healium_AddonColor = "|cFF55AAFF"
 Healium_AddonColoredName = Healium_AddonColor .. Healium_AddonName .. "|r"
 Healium_MaxClassSpells = 20 -- For now this is manually set to the max number of class specific spells in Healium_Spell.Name which currently is priest
 
-Healium_Type_Spell = 0
+Healium_Type_Spell = 0  -- note that nil also means Spell!  This is because we don't init the Spelltypes table.
 Healium_Type_Macro = 1
 Healium_Type_Item = 2
 
@@ -701,7 +701,7 @@ function Healium_UpdateButtonAttributes()
 	for i=1, Healium_MaxButtons, 1 do
 	
 		-- update spell IDs
-		if (Profile.SpellTypes[i]) == nil or (Profile.SpellTypes[i] == Healium_Type_Spell) then 
+		if (Profile.SpellTypes[i] == nil) or (Profile.SpellTypes[i] == Healium_Type_Spell) then 
 			local name = Profile.SpellNames[i]
 			if name then 
 				Profile.IDs[i] = GetSpellID(name)
@@ -762,7 +762,7 @@ end
 function Healium_RangeCheckButton(button)
 	local Profile = Healium_GetProfile()
 	
-	if Profile.SpellTypes[button.index] == Healium_Type_Spell then 
+	if (Profile.SpellTypes[button.index] == nil) or (Profile.SpellTypes[button.index] == Healium_Type_Spell) then 
 		if (button.id) then
 			local isUsable, noMana = IsUsableSpell(button.id, BOOKTYPE_SPELL)
 

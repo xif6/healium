@@ -6,7 +6,6 @@ function Healium_HealButton_OnLoad(self)
 end
 
 function Healium_HealButton_OnUpdate(self, elapsed)
---	if ( (not HealiumActive) or (not Healium.DoRangeChecks) ) then return 0 end 
 	if ( not Healium.DoRangeChecks ) then return 0 end 	
 	self.TimeSinceLastUpdate = self.TimeSinceLastUpdate + elapsed 	
 

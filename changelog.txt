@@ -1,3 +1,6 @@
+2.0.1
+* Fixed bug new in 2.0.0: Spells did not range check unless you re-assigned them.
+
 2.0.0
 * Support wow version 4.1
 * Added support for Macros and Items.  You must use Drag and Drop to configure them both, as neither macros nor items appear in the Healium menus.  
