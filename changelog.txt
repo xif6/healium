@@ -1,3 +1,6 @@
+1.1.2
+* Fixed issues caused when Enable Clique Support is on.  This caused heal buttons to not appear, among other things.
+
 1.1.1 
 * Added back Natures Swiftness for Shamen
 * Added back Wild Growth for Druids

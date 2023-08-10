@@ -378,28 +378,28 @@ function HealiumUnitFrames_Button_OnLoad(self)
 	table.insert(Healium_Frames, self)
 
 	if Healium.EnableClique then
-		ClickCastselfs[self] = true
+		ClickCastFrames[self] = true
 	end
 
-	-- configure buff selfs
+	-- configure buff frames
 	self.buffs = { }
 
-	local selfname = self:GetName()
+	local framename = self:GetName()
 	for i=1, MaxBuffs, 1 do
-		local buffself = _G[selfname.."_Buff"..i]
-		local name = buffself:GetName()
-		buffself.icon = _G[name.."Icon"]
-		buffself.cooldown = _G[name.."Cooldown"]
-		buffself.count = _G[name.."Count"]
-		buffself.border = _G[name.."Border"]
-		buffself.id = i
-		self.buffs[i] = buffself
+		local buffframe = _G[framename.."_Buff"..i]
+		local name = buffframe:GetName()
+		buffframe.icon = _G[name.."Icon"]
+		buffframe.cooldown = _G[name.."Cooldown"]
+		buffframe.count = _G[name.."Count"]
+		buffframe.border = _G[name.."Border"]
+		buffframe.id = i
+		self.buffs[i] = buffframe
 	end
 
 	if InCombatLockdown() then
 		self.fixCreateButtons = true
 		table.insert(Healium_FixNameplates, self)
-		Healium_DebugPrint("Unit self created during combat. Its buttons will not be available until combat ends.")
+		Healium_DebugPrint("Unit frame created during combat. Its buttons will not be available until combat ends.")
 	else
 		if (not Healium.ShowPercentage) then self.HPText:Hide() end
 		Healium_CreateButtonsForNameplate(self)
