@@ -1,3 +1,7 @@
+2.0.2 
+* Fixed bug new in 2.0.0: Toggle frames caused a LUA error.
+* Cooldowns for macros
+
 2.0.1
 * Fixed bug new in 2.0.0: Spells did not range check unless you re-assigned them.
 

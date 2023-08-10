@@ -5,7 +5,7 @@
 -- Color control characters |CAARRGGBB  then |r resets to normal, where AA == Alpha, RR = Red, GG = Green, BB = blue
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 2.0.1|r"
+local AddonVersion = "|cFFFFFF00 2.0.2|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 
@@ -68,7 +68,7 @@ Healium = {
   ShowRaidIcons = true,							-- Whether or not to show raid icons
 }
 
--- HealiumGlobal is the variable that holds all Heliuam settings that are not character specific
+-- HealiumGlobal is the variable that holds all Healium settings that are not character specific
 HealiumGlobal = {
   Friends = { },								-- List of healium friends
 }
@@ -82,6 +82,7 @@ Healium.Profiles is a table of tables with this signature
 	SpellTypes -- One of the Healium_Type_ (new in Healium 2.0)
 	IDs -- item ID when SpelType is Healium_Type_Item
 }
+TODO refactor Healium.Profiles to instead contain a single table named Spells which contain a variable for each of the above tables 
 ]]
 
 -- Global Constants
@@ -577,8 +578,12 @@ local function GetCooldown(Profile, column)
 	if Profile.IDs[column] ~= nill then 
 		
 		if Profile.SpellTypes[column] == Healium_Type_Macro then 
-			-- no cooldowns for macros, currently
-			enable = false
+			local name = GetMacroSpell(Profile.SpellNames[column])
+			if name then 
+				start, duration, enable = GetSpellCooldown(name)
+			else
+				enable = false
+			end
 		elseif Profile.SpellTypes[column] == Healium_Type_Item then
 			-- Handle "item" cooldowns
 			GetItemInfo(Profile.SpellNames[column])
