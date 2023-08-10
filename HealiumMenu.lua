@@ -18,7 +18,6 @@ local function ShowFriendsFrame()
 	Healium_ShowHideFriendsFrame(true)
 end
 
-
 local function SetButtonCount(info, arg1)
 	if InCombatLockdown() then
 		Healium_Warn("Can't update button count while in combat!")
@@ -40,7 +39,7 @@ local function SetCurrentSpell(info, btnIndex, spellIndex)
 	Profile.SpellIcons[btnIndex] = Healium_Spell.Icon[spellIndex]
 	
 	UIDropDownMenu_SetText(HealiumDropDown[btnIndex], Profile.SpellNames[btnIndex])	
-
+	
 	Healium_UpdateButtonIcons()
 	Healium_UpdateButtonSpells()
 end

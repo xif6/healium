@@ -45,13 +45,13 @@ function Healium_GetSoundPath(sound)
 			return j[sound]
 		end
 	end
-
+	
 	return nil
 end
 
 function Healium_InitDebuffSound()
 	DebuffSoundPath = Healium_GetSoundPath(Healium.DebufAudioFile)
-
+	
 	if DebuffSoundPath == nil then
 		Healium.DebufAudioFile = "Horde Bell"
 		DebuffSoundPath = Healium_GetSoundPath(Healium.DebufAudioFile)
@@ -59,26 +59,28 @@ function Healium_InitDebuffSound()
 end
 
 function Healium_PlayDebuffSound()
-	PlaySoundFile(DebuffSoundPath)
+	PlaySoundFile(DebuffSoundPath)	
 end
 
+--[[
 local function initialConfigFunction(frame)
-	-- The only thing you are especially allowed to do in the initialConfigFunction() is to change attributes.
+	-- The only thing you are especially allowed to do in the initialConfigFunction() is to change attributes.  
 	-- CreateFrame(), :Show(), :Hide() etc will taint in combat still
 
+	Healium_DebugPrint("Inital Config")	
 	frame.buttons = { }
-	frame:RegisterForClicks("AnyUp")
-
+	frame:RegisterForClicks("AnyUp")	
+	
 	table.insert(Healium_Frames, frame)
-
+	
 	if Healium.EnableClique then
-		ClickCastFrames[frame] = true
+		ClickCastFrames[frame] = true	
 	end
 
 	-- configure buff frames
-	frame.buffs = { }
+	frame.buffs = { }	
 
-	local framename = frame:GetName()
+	local framename = frame:GetName()	
 	for i=1, MaxBuffs, 1 do
 		local buffFrame = _G[framename.."_Buff"..i]
 		local name = buffFrame:GetName()
@@ -95,13 +97,12 @@ local function initialConfigFunction(frame)
 		table.insert(Healium_FixNameplates, frame)
 		Healium_DebugPrint("Unit Frame created during combat. Its buttons will not be available until combat ends.")
 	else
-		if (not Healium.ShowPercentage) then frame.HPText:Hide() end
-		Healium_CreateButtonsForNameplate(frame)
+		if (not Healium.ShowPercentage) then frame.HPText:Hide() end	
+		Healium_CreateButtonsForNameplate(frame)			
 	end
-
-
---	Healium_DebugPrint("Inital Config")
 end
+--]]
+
 
 local function CreateButton(ButtonName,ParentFrame,xoffset)
 	local button = CreateFrame("Button", ButtonName, ParentFrame, "HealiumHealButtonTemplate")
@@ -113,7 +114,7 @@ end
 function Healium_CreateButtonsForNameplate(frame)
 	local x = xSpacing
 	local Profile = Healium_GetProfile()
-
+	
 	for i=1, Healium_MaxButtons, 1 do
 		name = frame:GetName()
 		button = CreateButton(name.."_Heal"..i, frame, x)
@@ -124,45 +125,44 @@ function Healium_CreateButtonsForNameplate(frame)
 
 		-- set spell attribute for button
 		local spell = Profile.SpellNames[i]
-		Healium_UpdateButtonSpell(button, spell, Healium_ButtonIDs[i], false)
-
+		Healium_UpdateButtonSpell(button, spell, Healium_ButtonIDs[i], false)		
+		
 		-- set icon for button
-		local texture = Profile.SpellIcons[i]
+		local texture = Profile.SpellIcons[i]	
 		Healium_UpdateButtonIcon(button, texture)
-
-		if (i > Profile.ButtonCount) then
+	
+		if (i > Profile.ButtonCount) then 
 			button:Hide()
-
+			
 			if button:IsShown() then
 				Healium_Warn("Failed to hide heal button")
 			end
 		else
 			button:Show()
-
+			
 			if not button:IsShown() then
-				Healium_Warn("Failed to show heal button")
+				Healium_Warn("Failed to show heal button")			
 			end
 		end
-	end
+	end	
 end
 
 local function SetHeaderAttributes(frame)
-	frame.initialConfigFunction = initialConfigFunction
-
+--	frame.initialConfigFunction = initialConfigFunction
 	frame:SetAttribute("showPlayer", "true")
 	frame:SetAttribute("maxColumns", 1)
 	frame:SetAttribute("columnAnchorPoint", "LEFT")
 	frame:SetAttribute("point", "TOP")
 	frame:SetAttribute("template", "HealiumUnitFrames_ButtonTemplate")
 	frame:SetAttribute("templateType", "Button")
-	frame:SetAttribute("unitsPerColumn", 5)
+	frame:SetAttribute("unitsPerColumn", 5) 
 end
 
 local function CreateHeader(TemplateName, FrameName, ParentFrame)
 	local f = CreateFrame("Frame", FrameName, ParentFrame, TemplateName)
 	ParentFrame.hdr = f
-	f:SetPoint("TOPLEFT", ParentFrame, "BOTTOMLEFT")
-	SetHeaderAttributes(f)
+	f:SetPoint("TOPLEFT", ParentFrame, "BOTTOMLEFT")	
+	SetHeaderAttributes(f)			
 	return f
 end
 
@@ -187,9 +187,9 @@ end
 
 local function CreateUnitFrame(FrameName, Caption, IsPet, Group)
 	local uf = CreateFrame("Frame", FrameName, UIParent, "HealiumUnitFrameTemplate")
-	table.insert(UnitFrames, uf)
+	table.insert(UnitFrames, uf) 	
 	uf.CaptionBar.Caption:SetText(Caption)
-	UpdateCloseButton(uf)
+	UpdateCloseButton(uf)	
 	UpdateHideCaption(uf)
 	return uf
 end
@@ -197,40 +197,40 @@ end
 local function CreatePetHeader(FrameName, ParentFrame)
 	local h = CreateHeader("SecureGroupPetHeaderTemplate", FrameName, ParentFrame)
 	h:SetAttribute("filterOnPet", "true")
-	h:SetAttribute("unitsPerColumn", 40) -- allow pets frame to show more than 5
-	h:SetAttribute("showSolo", "true")
-	h:SetAttribute("showRaid", "true")
-	h:SetAttribute("showParty", "true")
+	h:SetAttribute("unitsPerColumn", 40) -- allow pets frame to show more than 5	
+	h:SetAttribute("showSolo", "true")	
+	h:SetAttribute("showRaid", "true")	
+	h:SetAttribute("showParty", "true")	
 	h:Show()
 	return h
 end
 
 local function CreateGroupHeader(FrameName, ParentFrame, Group)
 	local h = CreateHeader("SecureGroupHeaderTemplate", FrameName, ParentFrame)
-	h:SetAttribute("groupFilter", Group)
-	h:SetAttribute("showRaid", "true")
+	h:SetAttribute("groupFilter", Group)	
+	h:SetAttribute("showRaid", "true")	
 	h:Show()
 	return h
 end
 
 local function CreateTanksHeader(FrameName, ParentFrame)
 	local h = CreateHeader("SecureGroupHeaderTemplate", FrameName, ParentFrame)
-	h:SetAttribute("groupFilter", "MAINTANK")
-	h:SetAttribute("showRaid", "true")
+	h:SetAttribute("groupFilter", "MAINTANK")	
+	h:SetAttribute("showRaid", "true")	
 	h:Show()
 	return h
 end
 
 local function CreatePartyHeader(FrameName, ParentFrame)
 	local h = CreateHeader("SecureGroupHeaderTemplate", FrameName, ParentFrame)
-	h:SetAttribute("showSolo", "true")
+	h:SetAttribute("showSolo", "true")		
 	h:Show()
 	return h
 end
 
 local function CreateMeHeader(FrameName, ParentFrame)
 	local h = CreateHeader("SecureGroupHeaderTemplate", FrameName, ParentFrame)
-	h:SetAttribute("showSolo", "true")
+	h:SetAttribute("showSolo", "true")		
 	h:SetAttribute("nameList", UnitName("Player"))
 	h:Show()
 	return h
@@ -238,9 +238,9 @@ end
 
 local function CreateFriendsHeader(FrameName, ParentFrame)
 	local h = CreateHeader("SecureGroupHeaderTemplate", FrameName, ParentFrame)
-	h:SetAttribute("showSolo", "true")
-	h:SetAttribute("showRaid", "true")
-	h:SetAttribute("showParty", "true")
+	h:SetAttribute("showSolo", "true")	
+	h:SetAttribute("showRaid", "true")	
+	h:SetAttribute("showParty", "true")	
 	h:SetAttribute("unitsPerColumn", 20) -- allow friends frame to show more than 5
 	h:Show()
 	return h
@@ -306,22 +306,22 @@ end
 
 function HealiumUnitFrames_OnMouseDown(self, button)
 	if button == "LeftButton" and not Healium.LockFrames then
-		self:StartMoving()
+		self:StartMoving()	
 	end
-
+	
 	if button == "RightButton" then
-		ToggleDropDownMenu(1, nil, HealiumMenu, self, 0, 0)
+		ToggleDropDownMenu(1, nil, HealiumMenu, self, 0, 0)	
 	end
 end
 
 function HealiumUnitFrames_OnMouseUp(self, button)
 	if button == "LeftButton" then
-		self:StopMovingOrSizing()
+		self:StopMovingOrSizing()	
 	end
-
+	
 	if button == "RightButton" then
-
-	end
+	
+	end	
 end
 
 function HealiumUnitFrames_ShowHideFrame(self, show)
@@ -330,49 +330,81 @@ function HealiumUnitFrames_ShowHideFrame(self, show)
 		Healium_ShowPartyCheck:SetChecked(Healium.ShowPartyFrame)
 		return
 	end
-
+	
 	if self == PetsFrame then
 		Healium.ShowPetsFrame = show
 		Healium_ShowPetsCheck:SetChecked(Healium.ShowPetsFrame)
 		return
 	end
-
+	
 	if self == MeFrame then
 		Healium.ShowMeFrame = show
 		Healium_ShowMeCheck:SetChecked(Healium.ShowMeFrame)
 		return
 	end
-
+	
 	if self == FriendsFrame then
 		Healium.ShowFriendsFrame = show
 		Healium_ShowFriendsCheck:SetChecked(Healium.ShowFriendsFrame)
 		return
 	end
-
+	
 	if self == TanksFrame then
 		Healium.ShowTanksFrame = show
 		Healium_ShowTanksCheck:SetChecked(Healium.ShowTanksFrame)
 		return
 	end
-
+	
 	for i,j in ipairs(GroupFrames) do
 		if self == j then
 			Healium.ShowGroupFrames[i] = show
-			Healium_ShowGroup1Check:SetChecked(Healium.ShowGroupFrames[1])
-			Healium_ShowGroup2Check:SetChecked(Healium.ShowGroupFrames[2])
-			Healium_ShowGroup3Check:SetChecked(Healium.ShowGroupFrames[3])
-			Healium_ShowGroup4Check:SetChecked(Healium.ShowGroupFrames[4])
-			Healium_ShowGroup5Check:SetChecked(Healium.ShowGroupFrames[5])
-			Healium_ShowGroup6Check:SetChecked(Healium.ShowGroupFrames[6])
-			Healium_ShowGroup7Check:SetChecked(Healium.ShowGroupFrames[7])
-			Healium_ShowGroup8Check:SetChecked(Healium.ShowGroupFrames[8])
+			Healium_ShowGroup1Check:SetChecked(Healium.ShowGroupFrames[1])		
+			Healium_ShowGroup2Check:SetChecked(Healium.ShowGroupFrames[2])				
+			Healium_ShowGroup3Check:SetChecked(Healium.ShowGroupFrames[3])				
+			Healium_ShowGroup4Check:SetChecked(Healium.ShowGroupFrames[4])				
+			Healium_ShowGroup5Check:SetChecked(Healium.ShowGroupFrames[5])				
+			Healium_ShowGroup6Check:SetChecked(Healium.ShowGroupFrames[6])				
+			Healium_ShowGroup7Check:SetChecked(Healium.ShowGroupFrames[7])				
+			Healium_ShowGroup8Check:SetChecked(Healium.ShowGroupFrames[8])				
 			return
 		end
-	end
+	end	
 end
 
 function HealiumUnitFrames_Button_OnLoad(self)
-	self.initialConfigFunction = HealiumUnitFrames_Header_Initial_Config
+	self.buttons = { }
+	self:RegisterForClicks("AnyUp")	
+	
+	table.insert(Healium_Frames, self)
+	
+	if Healium.EnableClique then
+		ClickCastFrames[self] = true	
+	end
+
+	-- configure buff frames
+	self.buffs = { }	
+
+	local framename = self:GetName()	
+	for i=1, MaxBuffs, 1 do
+		local buffframe = _G[framename.."_Buff"..i]
+		local name = buffframe:GetName()
+		buffframe.icon = _G[name.."Icon"]
+		buffframe.cooldown = _G[name.."Cooldown"]
+		buffframe.count = _G[name.."Count"]
+		buffframe.border = _G[name.."Border"]
+		buffframe.id = i
+		self.buffs[i] = buffframe
+	end
+
+	if InCombatLockdown() then
+		self.fixCreateButtons = true
+		table.insert(Healium_FixNameplates, self)
+		Healium_DebugPrint("Unit frame created during combat. Its buttons will not be available until combat ends.")
+	else
+		if (not Healium.ShowPercentage) then self.HPText:Hide() end	
+		Healium_CreateButtonsForNameplate(self)			
+	end
+
 	self:RegisterForDrag("RightButton")
 end
 
@@ -388,98 +420,118 @@ function HealiumUnitFames_CheckPowerType(UnitName, NamePlate)
 	else
 		local powerColor = PowerBarColor[powerType];
 		NamePlate.ManaBar:SetStatusBarColor( powerColor.r, powerColor.g, powerColor.b )
-		NamePlate.showMana = true
+		NamePlate.showMana = true		
 	end
 
 	return true
 end
 
+
+
 function HealiumUnitFrames_Button_OnShow(self)
 	table.insert(Healium_ShownFrames, self)
-
-	local unit = self:GetAttribute("unit")
-
-	if unit then
-		self.TargetUnit = unit
-
-		for i=1, Healium_MaxButtons, 1 do
-			local button = self.buttons[i]
-			if not button then break end
-
-			-- update cooldowns
-			local id = Healium_ButtonIDs[i]
-
-			if id then
-				local start, duration, enable = GetSpellCooldown(Healium_ButtonIDs[i], BOOKTYPE_SPELL)
-				CooldownFrame_SetTimer(button.cooldown, start, duration, enable)
-			end
-		end
-
-
-		local name = UnitName(unit)
-
-		if name then
-			self.name:SetText(strupper(name))
-		else
-			self.name:SetText("")
-		end
-
-		if not Healium_Units[unit] then
-			Healium_Units[unit] = { }
-		end
-
-		table.insert(Healium_Units[unit], self)
-
-		for i =1, MaxBuffs, 1 do
-			self.buffs[i].unit = unit
-		end
-
-		HealiumUnitFames_CheckPowerType(unit, self)
-
-		Healium_UpdateUnitHealth(unit, self)
-		Healium_UpdateUnitMana(unit, self)
-		Healium_UpdateUnitBuffs(unit, self)
-	end
-end
+end	
 
 function HealiumUnitFrames_Button_OnHide(self)
-
 	Healium_ShownFrames[self] = nil
-
+	
 	local parent = self:GetParent():GetParent()
 	if parent.childismoving then
-		parent:StopMovingOrSizing()
+		parent:StopMovingOrSizing()		
 		parent.childismoving = nil
 	end
-	local unit = self.TargetUnit
-	if unit then
-		if Healium_Units[unit] then
-			for i,v in ipairs(Healium_Units[unit]) do
-				if v == self then
-					table.remove(Healium_Units[unit], i)
-					break
+
+end	
+
+function HealiumUnitFrames_Button_OnAttributeChanged(self, name, value)
+	if name == "unit" or name == "unitsuffix" then
+		local newUnit = SecureButton_GetUnit(self)
+		local oldUnit = self.TargetUnit
+		
+--		if newUnit == oldUnit then
+--			return
+--		end
+		
+		if newUnit then
+			for i=1, Healium_MaxButtons, 1 do		
+				local button = self.buttons[i]
+				if not button then break end
+				
+				-- update cooldowns
+				local id = Healium_ButtonIDs[i]
+				
+				if id then 
+					local start, duration, enable = GetSpellCooldown(Healium_ButtonIDs[i], BOOKTYPE_SPELL)
+					CooldownFrame_SetTimer(button.cooldown, start, duration, enable)			
+				end
+			end
+
+			--if self:IsVisible() then 
+				local playerName= UnitName(newUnit)
+				self.name:SetText(strupper(playerName))
+			--end
+
+			if not Healium_Units[newUnit] then
+				Healium_Units[newUnit] = { }
+			end
+			
+			table.insert(Healium_Units[newUnit], self)
+
+			for i =1, MaxBuffs, 1 do
+				self.buffs[i].unit = newUnit
+			end
+			
+			HealiumUnitFames_CheckPowerType(newUnit, self)
+			
+			Healium_UpdateUnitHealth(newUnit, self)
+			Healium_UpdateUnitMana(newUnit, self)
+			Healium_UpdateUnitBuffs(newUnit, self)		
+			Healium_UpdateUnitThreat(newUnit, self)
+			Healium_UpdateUnitRole(newUnit, self)
+			Healium_UpdateSpecialBuffs(newUnit)
+		end
+		
+		if oldUnit then
+			if Healium_Units[oldUnit] then
+				for i,v in ipairs(Healium_Units[oldUnit]) do
+					if v == self then
+						table.remove(Healium_Units[oldUnit], i)
+						break
+					end
 				end
 			end
 		end
-		self.TargetUnit = nil
+	
+		self.TargetUnit = newUnit
 	end
-
 end
 
 function HealiumUnitFrames_Button_OnMouseDown(self, button)
 	if button == "RightButton" and not Healium.LockFrames then
 		local parent = self:GetParent():GetParent()
 		parent.childismoving = true
-		parent:StartMoving()
+		parent:StartMoving()	
 	end
 end
 
 function HealiumUnitFrames_Button_OnMouseUp(self, button)
 	if button == "RightButton" then
 		local parent = self:GetParent():GetParent()
-		parent:StopMovingOrSizing()
+		parent:StopMovingOrSizing()		
 		parent.childismoving = nil
+	end	
+end
+
+local function IsAnyUnitFrameVisible()
+	local visible
+	
+	for _,j in pairs(UnitFrames) do
+		if j:IsShown() then 
+			return true
+		end
 	end
+
+	return nil
 end
 
 function Healium_ToggleAllFrames()
@@ -487,7 +539,7 @@ function Healium_ToggleAllFrames()
 		Healium_Warn("Can't toggle frames while in combat.")
 		return
 	end
-
+	
 	local hide = false
 
 	if PartyFrame:IsShown() then hide = true end
@@ -502,58 +554,65 @@ function Healium_ToggleAllFrames()
 			break
 		end
 	end
-
+	
 	if hide then
 		PartyFrameWasShown = PartyFrame:IsShown()
-		PetsFrameWasShown = PetsFrame:IsShown()
+		PetsFrameWasShown = PetsFrame:IsShown()	
 		MeFrameWasShown = MeFrame:IsShown()
 		FriendsFrameWasShown = FriendsFrame:IsShown()
 		TanksFrameWasShown = TanksFrame:IsShown()
-
+	
 		PartyFrame:Hide()
 		PetsFrame:Hide()
 		MeFrame:Hide()
 		FriendsFrame:Hide()
 		TanksFrame:Hide()
-
+		
 		for i,j in ipairs(GroupFrames) do
 			GroupFramesWasShown[i] = j:IsShown()
 			j:Hide()
 		end
-
+		
 		return
 	end
-
+	
+	-- after this point, we know we are showing frames
+	
 	if PartyFrameWasShown then
 		PartyFrame:Show()
 	end
-
+	
 	if PetsFrameWasShown then
 		PetsFrame:Show()
 	end
-
+	
 	if MeFrameWasShown then
 		MeFrame:Show()
 	end
-
+	
 	if FriendsFrameWasShown then
 		FriendsFrame:Show()
 	end
-
+	
 	if TanksFrameWasShown then
 		TanksFrame:Show()
 	end
-
+	
 	for i,j in ipairs(GroupFramesWasShown) do
 		if j then
 			GroupFrames[i]:Show()
 		end
 	end
+	
+	if IsAnyUnitFrameVisible() == nil then
+		PartyFrame:Show()
+		PetsFrame:Show()
+	end
 end
 
 function Healium_ShowHidePartyFrame(show)
 	if (show ~= nil) then Healium.ShowPartyFrame = show end
-
+	
 	if Healium.ShowPartyFrame then
 		PartyFrame:Show()
 	else
@@ -563,7 +622,7 @@ end
 
 function Healium_ShowHidePetsFrame(show)
 	if (show ~= nil) then Healium.ShowPetsFrame = show end
-
+	
 	if Healium.ShowPetsFrame then
 		PetsFrame:Show()
 	else
@@ -573,7 +632,7 @@ end
 
 function Healium_ShowHideMeFrame(show)
 	if (show ~= nil) then Healium.ShowMeFrame = show end
-
+	
 	if Healium.ShowMeFrame then
 		MeFrame:Show()
 	else
@@ -583,7 +642,7 @@ end
 
 function Healium_ShowHideFriendsFrame(show)
 	if (show ~= nil) then Healium.ShowFriendsFrame = show end
-
+	
 	if Healium.ShowFriendsFrame then
 		FriendsFrame:Show()
 	else
@@ -594,7 +653,7 @@ end
 
 function Healium_ShowHideTanksFrame(show)
 	if (show ~= nil) then Healium.ShowTanksFrame = show end
-
+	
 	if Healium.ShowTanksFrame then
 		TanksFrame:Show()
 	else
@@ -604,7 +663,7 @@ end
 
 function Healium_ShowHideGroupFrame(group, show)
 	if (show ~= nil) then Healium.ShowGroupFrames[group] = show end
-
+	
 	if Healium.ShowGroupFrames[group] then
 		GroupFrames[group]:Show()
 	else
@@ -621,7 +680,7 @@ end
 
 function Healium_ShowAllRaidFramesWithMembers()
 end
-
+		
 function Healium_Show10ManRaidFrames()
 	GroupFrames[1]:Show()
 	GroupFrames[2]:Show()
@@ -645,47 +704,47 @@ function Healium_CreateUnitFrames()
 	if Healium.ShowPartyFrame then
 		PartyFrame:Show()
 	end
-
+	
 	PetsFrame = CreatePetUnitFrame("HealiumPetFrame", "Pets")
 	if Healium.ShowPetsFrame then
 		PetsFrame:Show()
 	end
-
+	
 	MeFrame = CreateMeUnitFrame("HealiumMeFrame", "Me")
 	if Healium.ShowMeFrame then
 		MeFrame:Show()
-	end
+	end	
 
 	FriendsFrame = CreateFriendsUnitFrame("HealiumFriendsFrame", "Friends")
 	if Healium.ShowFriendsFrame then
 		FriendsFrame:Show()
-	end
-
+	end	
+	
 	TanksFrame = CreateTanksUnitFrame("HealiumTanksFrame", "Tanks")
 	if Healium.ShowTanksFrame then
 		TanksFrame:Show()
-	end
-
+	end	
+	
 	for i=1, 8, 1 do
 		GroupFrames[i] = CreateGroupUnitFrame("HealiumGroup" .. i .. "Frame", "Group " .. i, tostring(i))
 		GroupFramesWasShown[i]  = false
-	end
-
+	end	
+	
 end
 
 
 function Healium_SetScale()
 	local Scale = Healium.Scale
-
+	
 	PartyFrame:SetScale(Scale)
-	PetsFrame:SetScale(Scale)
+	PetsFrame:SetScale(Scale)	
 	MeFrame:SetScale(Scale)
 	FriendsFrame:SetScale(Scale)
 	TanksFrame:SetScale(Scale)
-
+	
 	for i,j in ipairs(GroupFrames) do
 		j:SetScale(Scale)
-	end
+	end	
 end
 
 function Healium_UpdateUnitBuffs(unit, frame)
@@ -695,32 +754,32 @@ function Healium_UpdateUnitBuffs(unit, frame)
 
 	if Healium.ShowBuffs then
 		for i=1, 100, 1 do
-			local name, rank, icon, count, debuffType, duration, expirationTime, source, isStealable = UnitBuff(unit, i, true)
-			if name  then
+			local name, rank, icon, count, debuffType, duration, expirationTime, source, isStealable = UnitBuff(unit, i)
+			if name  then 
 				if (duration > 0) and (source == "player") then
-
+					
 					local armed = false
-
+					
 					for j=1, Profile.ButtonCount, 1 do
 						if Profile.SpellNames[j] == name then
 							armed = true
 							break
 						end
 					end
-
+					
 					if armed == true then
 						local buffFrame = frame.buffs[buffIndex]
 
 						buffFrame:SetID(i)
 						buffFrame.icon:SetTexture(icon)
-
+						
 						if count > 1 then
 							buffFrame.count:SetText(count)
 							buffFrame.count:Show()
 						else
 							buffFrame.count:Hide()
 						end
-
+						
 						if duration and duration > 0 then
 							local startTime = expirationTime - duration
 							buffFrame.cooldown:SetCooldown(startTime, duration)
@@ -728,13 +787,13 @@ function Healium_UpdateUnitBuffs(unit, frame)
 						else
 							buffFrame.cooldown:Hide()
 						end
-
+						
 						buffFrame:Show()
-						buffIndex = buffIndex + 1
+						buffIndex = buffIndex + 1					
 						if buffIndex > MaxBuffs then
 							break
-						end
-
+						end			
+						
 					end
 				end
 			else
@@ -747,34 +806,34 @@ function Healium_UpdateUnitBuffs(unit, frame)
 	for i = buffIndex, MaxBuffs, 1 do
 		frame.buffs[i]:Hide()
 	end
-
+	
 	-- Handle affliction notification
 	if Healium.EnableDebufs then
-
+	
 		local foundDebuff = false
-		local debuffTypes = { }
-
+		local debuffTypes = { } 
+		
 		for i = 1, 40, 1 do
 			local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitDebuff(unit, i)
-
+			
 			if name == nil then
 				break
 			end
-
+			
 			if debuffType ~= nil then
 				if Healium_CanCureDebuff(debuffType) then
 					foundDebuff = true
 					debuffTypes[debuffType] = true
-					local debuffColor = DebuffTypeColor[debuffType] or DebuffTypeColor["none"];
+					local debuffColor = DebuffTypeColor[debuffType] or DebuffTypeColor["none"];					
 					frame.hasDebuf = true
 					frame.debuffColor = debuffColor
-
+					
 					if Healium.EnableDebufHealthbarHighlighting then
 						frame.CurseBar:SetBackdropBorderColor(debuffColor.r, debuffColor.g, debuffColor.b)
 						frame.CurseBar:SetAlpha(1)
-					end
-
-					if Healium.EnableDebufAudio then
+					end	
+					
+					if Healium.EnableDebufAudio then 
 						local now = GetTime()
 
 						if UnitInRange(unit) then
@@ -787,16 +846,16 @@ function Healium_UpdateUnitBuffs(unit, frame)
 				end
 			end
 		end
-
+		
 		if (not foundDebuff) and frame.hasDebuf then
 			frame.CurseBar:SetAlpha(0)
 			frame.hasDebuf = nil
 		end
-
-		if Healium.EnableDebufButtonHighlighting then
-			Healium_ShowDebuffButtons(Profile, frame, debuffTypes)
+		
+		if Healium.EnableDebufButtonHighlighting then 
+			Healium_ShowDebuffButtons(Profile, frame, debuffTypes)		
 		end
-
+		
 		Healium_UpdateUnitHealth(unit, frame)
 	end
 end
@@ -806,7 +865,7 @@ function Healium_UpdateEnableDebuffs()
 		if j.hasDebuf then
 			frame.CurseBar:SetAlpha(0)
 			frame.hasDebuf = nil
-
+			
 			for i=1, Healium_MaxButtons, 1 do
 				local button = frame.button[i]
 				if button then
@@ -814,12 +873,12 @@ function Healium_UpdateEnableDebuffs()
 					button.curseBar.hasDebuf = nil
 				end
 			end
-		end
+		end	
 	end
 end
 
 function Healium_HealthStatusBar_OnLoad(self)
-	-- This is done to ensure the status bar doesn't block
+	-- This is done to ensure the status bar doesn't block 
 	-- the name text
 	self:SetFrameLevel(self:GetFrameLevel() - 1)
 
@@ -830,13 +889,13 @@ function Healium_ManaStatusBar_OnLoad(self)
 	self:SetRotatesTexture(true)
 	self:SetOrientation("VERTICAL")
 	self:SetFrameLevel(self:GetFrameLevel() - 1)
---	self:SetBackdropColor(1.0, 0.0, 0.0)
+--	self:SetBackdropColor(1.0, 0.0, 0.0)	
 end
 
 function Healium_UpdateEnableClique()
 	for _,k in ipairs(Healium_Frames) do
 		if Healium.EnableClique then
-			ClickCastFrames[k] = true
+			ClickCastFrames[k] = true	
 		else
 			ClickCastFrames[k] = nil
 			k:SetAttribute("type1", "target")
@@ -864,5 +923,5 @@ function Healium_UpdateFriends()
 	end
 	Healium_DebugPrint("namesList: " ..names)
 	FriendsFrame.hdr:SetAttribute("nameList", names)
---	Healium_DebugPrint("Friends header is shown: " .. FriendsFrame.hdr:IsShown())
+--	Healium_DebugPrint("Friends header is shown: " .. FriendsFrame.hdr:IsShown())	
 end

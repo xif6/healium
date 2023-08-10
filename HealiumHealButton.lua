@@ -21,7 +21,7 @@ function Healium_HealButton_OnEnter(frame, motion)
     if (frame.id) then
 		if (not Healium.ShowToolTips) then return end	
 		GameTooltip_SetDefaultAnchor(GameTooltip, frame)
-		GameTooltip:SetSpell(frame.id, SpellBookFrame.bookType)
+		GameTooltip:SetSpellBookItem (frame.id, SpellBookFrame.bookType)
 		local unit = frame:GetParent().TargetUnit
 		if not UnitExists(unit) then return end
 		local Name = UnitName(unit)
@@ -63,7 +63,7 @@ local function Drag(self)
 			end
 			
 			if (self.index > 0) and (self.index <= Healium_MaxButtons) then
-				local spellName = GetSpellName(info1, BOOKTYPE_SPELL )		
+				local spellName = GetSpellBookItemName(info1, BOOKTYPE_SPELL )		
 				if IsPassiveSpell(info1, BOOKTYPE_SPELL) then
 					local link = GetSpellLink(info1, BOOKTYPE_SPELL)
 					Healium_Warn(link .. " is a passive spell and cannot be used in " .. Healium_AddonName)
@@ -84,7 +84,7 @@ local function Drag(self)
 
 				-- if shift is held down put old spell on cursor
 				if IsShiftKeyDown() and (OldSpellName ~= nil) then
-					PickupSpell(OldSpellName)
+					PickupSpellBookItem(OldSpellName)
 				end
 			end
 		else
@@ -94,6 +94,7 @@ local function Drag(self)
 		Healium_DebugPrint("Button received a drag but did not have a spell")
 	end
 end 
+
 -- drag stop
 function Healium_HealButton_OnReceiveDrag(self)
 	Healium_DebugPrint("Healium_HealButton_OnReceiveDrag() called")
@@ -108,12 +109,12 @@ function Healium_HealButton_OnDragStart(self)
 	local Profile = Healium_GetProfile()
 	
 	if (self.index > 0) and (self.index <= Healium_MaxButtons) then	
-		PickupSpell(Profile.SpellNames[self.index])
+		PickupSpellBookItem(Profile.SpellNames[self.index])
 	end
 end
 
 function Healium_HealButton_PreClick(self)
-	Healium_DebugPrint("Healium_HealButton_PreClick() called")
+--	Healium_DebugPrint("Healium_HealButton_PreClick() called")
 
 	if CursorHasSpell() then
 		local info, spellid = GetCursorInfo()
@@ -124,10 +125,10 @@ function Healium_HealButton_PreClick(self)
 end
 
 function Healium_HealButton_PostClick(self)
-	Healium_DebugPrint("Healium_HealButton_PostClick() called")
+--	Healium_DebugPrint("Healium_HealButton_PostClick() called")
 
 	if self.dragspellid then
-		PickupSpell(self.dragspellid, BOOKTYPE_SPELL)
+		PickupSpellBookItem(self.dragspellid, BOOKTYPE_SPELL)
 		Drag(self)
 		self.dragspellid = nil
 	end
