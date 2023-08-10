@@ -3,7 +3,7 @@
  xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
  
 <!-- The main frame template -->	
-	<Frame name="HealiumUnitFrameTemplate"  virtual="true" movable="true" parent="UIParent" hidden="true" enableMouse="true">
+	<Frame name="HealiumUnitFrameTemplate" virtual="true" movable="true" parent="UIParent" hidden="false" enableMouse="true">
         <Size>
             <AbsDimension x="120" y="30"/>
         </Size>
@@ -12,16 +12,15 @@
             </Anchor>
         </Anchors>
 		<Frames>
-			<Frame parentKey="CaptionBar" enableMouse="true">
+			<Frame parentKey="CaptionBar" enableMouse="true" hidden="false">
 				<Size>
 					<AbsDimension x="120" y="30"/>
 				</Size>			
 				<Anchors>
-					<Anchor point="CENTER">
-						<Offset></Offset>					
+					<Anchor point="CENTER">			
 					</Anchor>
 				</Anchors>			
-				<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground"  edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+				<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground"  edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true"> 
 					<EdgeSize>
 						<AbsValue val="16"/> 
 					</EdgeSize>
@@ -46,11 +45,9 @@
 					</Layer>			
 				</Layers>
 				<Frames>
-					<Button parentKey="CloseButton" inherits="UIPanelCloseButton">
+					<Button parentKey="CloseButton" inherits="UIPanelCloseButton"> -->
 						<Anchors>
 							<Anchor point="TOPRIGHT">
-								<Offset>
-								</Offset>					
 							</Anchor>
 						</Anchors>
 						<Scripts>

@@ -52,7 +52,7 @@ local function DropDownMenu_Init(self,level)
 	local info = UIDropDownMenu_CreateInfo() 
 	
 	local DropDown = self
-	UIDropDownMenu_SetSelectedValue(DropDown , nil)
+--	UIDropDownMenu_SetSelectedValue(DropDown , nil)
 	local spell = UIDropDownMenu_GetText(DropDown)
 	
 	for k, v in ipairs (Healium_Spell.Name) do
@@ -83,7 +83,7 @@ local function SoundDropDownMenu_Init(self, level)
 	level = level or 1  
 	local info = UIDropDownMenu_CreateInfo() 
 	
-	UIDropDownMenu_SetSelectedValue(self , nil)
+--	UIDropDownMenu_SetSelectedValue(self , nil)
 	local sound = UIDropDownMenu_GetText(self)
 	
 	for k, v in ipairs (Healium_Sounds) do

@@ -5,7 +5,7 @@
 -- Color control characters |CAARRGGBB  then |r resets to normal, where AA == Alpha, RR = Red, GG = Green, BB = blue
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 1.0.2|r"
+local AddonVersion = "|cFFFFFF00 1.1.0|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 
@@ -249,10 +249,10 @@ end
 
 function Healium_UpdateShowMana()
 	if Healium.ShowMana then
-		HealiumFrame:RegisterEvent("UNIT_MANA")
+		HealiumFrame:RegisterEvent("UNIT_POWER")
 		HealiumFrame:RegisterEvent("UNIT_DISPLAYPOWER")		
 	else
-		HealiumFrame:UnregisterEvent("UNIT_MANA")	
+		HealiumFrame:UnregisterEvent("UNIT_POWER")	
 		HealiumFrame:UnregisterEvent("UNIT_DISPLAYPOWER")				
 	end
 
@@ -301,22 +301,24 @@ end
 local function GetSpellID(spell)
     local i = 1
     local spellID
-    local highestRank
     while true do
-        local spellName = GetSpellName(i, SpellBookFrame.bookType)
+        local spellName = GetSpellBookItemName(i, SpellBookFrame.bookType)
         if (not spellName) then
             break
         end
         if (spellName == spell) then
-            spellID = i
-            highestRank = spellRank
+			local slotType = GetSpellBookItemInfo(i, SpellBookFrame.bookType)		
+			if (slotType == "FUTURESPELL") then 
+				break
+			end
+            return i
         end
         i = i + 1
         if (i > 300) then
             break
         end
     end            
-    return spellID, highestRank
+    return nil
 end
 
 -- Loops through Healium_Spell.Name[] and updates it's corresponding .ID[] and .Icon[]
@@ -697,8 +699,8 @@ function Healium_OnEvent(self, event, ...)
 		return
 	end
 
-    if (event == "UNIT_MANA" ) then
-		if Healium_Units[arg1] then
+    if (event == "UNIT_POWER" ) then
+		if (arg2 == "MANA") and Healium_Units[arg1] then
 			for _,v  in pairs(Healium_Units[arg1]) do
 				Healium_UpdateUnitMana(arg1, v)
 			end

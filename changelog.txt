@@ -1,6 +1,9 @@
+1.1.0 
+* Update to work with wow 4.0.1
+
 1.0.2
 * Healium Friends frame is not always shown by default regardless of setting
-* Configurating buttons from Healium menu now updates the corresponding dropdown in config panel
+* Configuration buttons from Healium menu now updates the corresponding dropdown in config panel
 * Added Show Friends menu option to Healium menu
 
 1.0.1

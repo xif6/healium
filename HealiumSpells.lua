@@ -31,73 +31,72 @@ end
 function Healium_InitSpells(class, race)
 	
 	-- Init spell list
+	-- DONE FOR CATA
 	if (class == "DRUID") then 
 		AddSpell(774)		-- Rejuvenation
 		AddSpell(8936)		-- Regrowth
 		AddSpell(33763)		-- Lifebloom
 		AddSpell(5185)		-- Healing Touch
-		AddSpell(5375)		-- Swiftmend
+		AddSpell(18562)		-- Swiftmend
 		AddSpell(50464)		-- Nourish
 		AddSpell(53248)		-- Wild Growth
 		AddSpell(29166)		-- Innervate
 		AddSpell(20484)		-- Rebirth
-		AddSpell(2782)		-- Remove Curse (Druid)
-		AddSpell(8946)      -- Cure Poison 
-		AddSpell(2893)		-- Abolish Poison
+		AddSpell(2782)		-- Remove Corruption
 		
-		-- Druid  Remove Curse		
-		Cures[SpellName(2782)] = { CanCureCurse = true }
-		
-		-- Druid Abolish Poison
-		Cures[SpellName(2893)] = { CanCurePoison = true } 
-		
-		-- Druid Cure Poison
-		Cures[SpellName(8946)] = { CanCurePoison = true } 
+		-- Druid Remove Corruption
+		Cures[SpellName(2782)] = { 
+			CanCurePoison = true, 
+			CanCureCurse = true,
+			CanCureMagicFunc = function() 
+				-- Druid Nature's Cure talent
+				return select(5, GetTalentInfo(3,17)) > 0
+			end
+		}
 	end
 
+	-- DONE FOR CATA
 	if (class == "PRIEST") then 
 		AddSpell(139)		-- Renew
 		AddSpell(2061)		-- Flash Heal
-		AddSpell(2050)		-- Lesser Heal
-		AddSpell(2054)		-- Heal
+		AddSpell(2050)		-- Heal
 		AddSpell(2060)		-- Greater Heal
 		AddSpell(32546)		-- Binding Heal
 		AddSpell(596)		-- Prayer of Healing
 		AddSpell(33076)		-- Prayer of Mending
 		AddSpell(34861)		-- Circle of Healing
 		AddSpell(17)		-- Power Word: Shield
-		AddSpell(552)		-- Abolish Disease
 		AddSpell(528)		-- Cure Disease
 		AddSpell(527)		-- Dispel Magic
 		AddSpell(47788)		-- Guardian Spirit
 		AddSpell(47540)		-- Penance
+		AddSpell(88625)		-- Holy Word: Chastise
 		
-		-- Priest Abolish Disease
-		Cures[SpellName(552)] = { CanCureDisease = true }
-			
 		-- Priest Cure Disease
-		Cures[SpellName(528)] = { CanCureDisease = true}
+		Cures[SpellName(528)] = { CanCureDisease = true }
 			
 		-- Priest Dispel Magic
 		Cures[SpellName(527)]  = { CanCureMagic = true }
 	end
 
+	-- DONE FOR CATA
 	if (class == "SHAMAN") then
-		AddSpell(8004)		-- Lesser Healing Wave
+		AddSpell(51886)		-- Cleanse Spirit	
+		AddSpell(8004)		-- Healing Surge
 		AddSpell(331)		-- Healing Wave
-		AddSpell(1064)		-- Chain Heal
+		AddSpell(77472)     -- Greater Healing Wave		
+		AddSpell(1064)		-- Chain Heal		
+		AddSpell(61295)		-- Riptide		
 		AddSpell(974)		-- Earth Shield
-		AddSpell(526)		-- Cure Toxins
-		AddSpell(51886)		-- Cleanse Spirit
-		AddSpell(61295)		-- Riptide
-		
-		
-		-- Shaman Cure Toxins
-		Cures[SpellName(526)] = { CanCurePoison = true, CanCureDisease = true }
 			
 		-- Shaman Cleanse Spirit
-		Cures[SpellName(51886)] = { CanCurePoison = true, CanCureDisease = true, CanCureCurse = true } 
-		
+		Cures[SpellName(51886)] = { 
+			CanCureCurse = true,
+			CanCureMagicFunc = function() 
+				-- Shaman Improved Cleanse Spirit talent
+				return select(5, GetTalentInfo(3,12)) > 0
+			end
+		} 
 	end
 
 	if (class == "PALADIN") then
@@ -105,19 +104,26 @@ function Healium_InitSpells(class, race)
 		AddSpell(635) 		-- Holy Light
 		AddSpell(20473) 	-- Holy Shock
 		AddSpell(633) 		-- Lay on Hands
-		AddSpell(1152) 		-- Purify
 		AddSpell(4987) 		-- Cleanse
 		AddSpell(1022)		-- Hand of Protection
 		AddSpell(1038)		-- Hand of Salvation
 		AddSpell(1044)		-- Hand of Freedom
 		AddSpell(53563)		-- Beacon of Light
 		AddSpell(53601)		-- Sacred Shield
+		AddSpell(85673)		-- Word of Glory
+		AddSpell(82326)     -- Divine Light
+		AddSpell(85222)		-- Light of Dawn
+		AddSpell(82327)		-- Holy Radiance
 		
-		-- Paladin Purify 
-		Cures[SpellName(1152)] = {	CanCurePoison = true, CanCureDisease = true }
-			
 		-- Paladin Cleanse
-		Cures[SpellName(4987)] = {	CanCurePoison = true, CanCureDisease = true, CanCureMagic = true }
+		Cures[SpellName(4987)] = {	
+			CanCurePoison = true, 
+			CanCureDisease = true,
+			CanCureMagicFunc = function() 
+				-- Paladin Sacred Cleansing Talent
+				return select(5, GetTalentInfo(1,14)) > 0
+			end
+		}
 		
 	end
 
@@ -136,6 +142,18 @@ function Healium_InitSpells(class, race)
 	CuresCount = Count(Cures)
 end
 
+local function GetCanCureMagic(cure)
+	local flag = nil
+	
+	if cure.CanCureMagic then 
+		flag = true
+	elseif cure.CanCureMagicFunc ~= nil then 	
+		flag = cure.CanCureMagicFunc()
+	end
+	
+	return flag
+end
+
 function Healium_UpdateCures()
 	local Profile = Healium_GetProfile()
 	
@@ -150,7 +168,7 @@ function Healium_UpdateCures()
 			local spell = Profile.SpellNames[i]
 			local cure = Cures[spell]
 			if cure ~= nill then
-				if cure.CanCureMagic then CanCureMagic = true end
+				if GetCanCureMagic(cure) then CanCureMagic = true end
 				if cure.CanCureDisease then CanCureDisease = true end
 				if cure.CanCurePoison then CanCurePoison = true end
 				if cure.CanCureCurse then CanCureCurse = true end
@@ -190,7 +208,7 @@ function Healium_ShowDebuffButtons(Profile, frame, debuffTypes)
 				elseif debuffTypes["Disease"] and cure.CanCureDisease then
 					flag = true
 					debuffColor = DebuffTypeColor["Disease"]
-				elseif debuffTypes["Magic"] and cure.CanCureMagic then
+				elseif debuffTypes["Magic"] and GetCanCureMagic(cure) then
 					flag = true
 					debuffColor = DebuffTypeColor["Magic"]
 				elseif debuffTypes["Poison"] and cure.CanCurePoison then
