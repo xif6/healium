@@ -6,7 +6,7 @@
 -- To get the wow interface number use /run print((select(4, GetBuildInfo())))
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 2.10.0|r"
+local AddonVersion = "|cFFFFFF00 2.10.4|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 

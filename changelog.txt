@@ -1,3 +1,15 @@
+2.10.4 LK CLASSIC
+* Updated ToC to 30401
+
+2.10.3 RETAIL
+* Added Intercession to Paladin default list of spells
+
+2.10.2 CLASSIC
+* Added config option to Show or Hide the Healium Minimap button
+
+2.10.1 RETAIL
+* Added config option to Show or Hide the Healium Minimap button
+
 2.10.0 LK CLASSIC
 * Added config option to Show or Hide the Healium Minimap button
 * The button configuration and button count settings are now saved seperately for each talent specialization.
