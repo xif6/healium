@@ -304,7 +304,7 @@
 			<OnLoad>HealiumUnitFrames_Button_OnLoad(self)</OnLoad>
 			<OnShow>HealiumUnitFrames_Button_OnShow(self)</OnShow>
 			<OnHide>HealiumUnitFrames_Button_OnHide(self)</OnHide>
-			<OnUpdate>HealiumUnitFrames_Button_OnUpdate(self)</OnUpdate>			
+			<OnAttributeChanged>HealiumUnitFrames_Button_OnAttributeChanged(self, name, value)</OnAttributeChanged>
 			<OnMouseDown>HealiumUnitFrames_Button_OnMouseDown(self, button)</OnMouseDown>
 			<OnMouseUp>HealiumUnitFrames_Button_OnMouseUp(self, button)</OnMouseUp>
 		</Scripts>

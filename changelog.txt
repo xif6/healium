@@ -1,3 +1,6 @@
+1.1.5
+* Fix for showing the wrong name sometimes for some party / raid members after 4.0.3 patch.  
+
 1.1.4
 * Additional fix for names appearing as "Unknown" in random dungeon type groups, due to new unit frame bugs introduced by Blizzard in wow 4.0.3.
 

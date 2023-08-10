@@ -426,73 +426,13 @@ function HealiumUnitFames_CheckPowerType(UnitName, NamePlate)
 	return true
 end
 
--- HACK WARNING See comment in HealiumUnitFrames_Button_OnShow
-function HealiumUnitFrames_Button_OnUpdate(self)
-	if self.DoUpdate == nil then return end
 
-	self.DoUpdate = nil
-	table.insert(Healium_ShownFrames, self)
-
-	local unit = SecureButton_GetUnit(self)
-
-	if unit then
-		self.TargetUnit = unit
-
-		for i=1, Healium_MaxButtons, 1 do
-			local button = self.buttons[i]
-			if not button then break end
-
-			-- update cooldowns
-			local id = Healium_ButtonIDs[i]
-
-			if id then
-				local start, duration, enable = GetSpellCooldown(Healium_ButtonIDs[i], BOOKTYPE_SPELL)
-				CooldownFrame_SetTimer(button.cooldown, start, duration, enable)
-			end
-		end
-
-
-		local name = UnitName(unit)
-
-		if name then
-			self.name:SetText(strupper(name))
-		else
-			self.name:SetText("")
-		end
-
-		if not Healium_Units[unit] then
-			Healium_Units[unit] = { }
-		end
-
-		table.insert(Healium_Units[unit], self)
-
-		for i =1, MaxBuffs, 1 do
-			self.buffs[i].unit = unit
-		end
-
-		HealiumUnitFames_CheckPowerType(unit, self)
-
-		Healium_UpdateUnitHealth(unit, self)
-		Healium_UpdateUnitMana(unit, self)
-		Healium_UpdateUnitBuffs(unit, self)
-	else
-		Healium_Warn("No unit for button!")
-	end
-end
 
 function HealiumUnitFrames_Button_OnShow(self)
-	self.DoUpdate = 1
---[[
-    HACK HACK BLIZZARD MADE ME WRITE THIS HACK HACK
-	This function used to contain the current contents of HealiumUnitFrames_Button_OnUpdate.
-	After 4.0.3 update, unit IDs were no longer set prior to OnShow being called.  This resulted in SecureButton_GetUnit() always returning nil.
-	As a test I made an OnUpdate function to test for this and do the work that OnShow used to do, and noticed the unit IDs would return properly then.
-	I suspect at some point blizzard will realize their bug and fix it back, and after that is done I can remove the OnUpdate handler and restore this OnShow function.
---]]
+	table.insert(Healium_ShownFrames, self)
 end
 
 function HealiumUnitFrames_Button_OnHide(self)
-
 	Healium_ShownFrames[self] = nil
 
 	local parent = self:GetParent():GetParent()
@@ -500,19 +440,67 @@ function HealiumUnitFrames_Button_OnHide(self)
 		parent:StopMovingOrSizing()
 		parent.childismoving = nil
 	end
-	local unit = self.TargetUnit
-	if unit then
-		if Healium_Units[unit] then
-			for i,v in ipairs(Healium_Units[unit]) do
-				if v == self then
-					table.remove(Healium_Units[unit], i)
-					break
+
+end
+
+function HealiumUnitFrames_Button_OnAttributeChanged(self, name, value)
+	if name == "unit" or name == "unitsuffix" then
+		local newUnit = SecureButton_GetUnit(self)
+		local oldUnit = self.TargetUnit
+
+--		if newUnit == oldUnit then
+--			return
+--		end
+
+		if newUnit then
+			for i=1, Healium_MaxButtons, 1 do
+				local button = self.buttons[i]
+				if not button then break end
+
+				-- update cooldowns
+				local id = Healium_ButtonIDs[i]
+
+				if id then
+					local start, duration, enable = GetSpellCooldown(Healium_ButtonIDs[i], BOOKTYPE_SPELL)
+					CooldownFrame_SetTimer(button.cooldown, start, duration, enable)
+				end
+			end
+
+			--if self:IsVisible() then
+				local playerName= UnitName(newUnit)
+				self.name:SetText(strupper(playerName))
+			--end
+
+			if not Healium_Units[newUnit] then
+				Healium_Units[newUnit] = { }
+			end
+
+			table.insert(Healium_Units[newUnit], self)
+
+			for i =1, MaxBuffs, 1 do
+				self.buffs[i].newUnit = newUnit
+			end
+
+			HealiumUnitFames_CheckPowerType(newUnit, self)
+
+			Healium_UpdateUnitHealth(newUnit, self)
+			Healium_UpdateUnitMana(newUnit, self)
+			Healium_UpdateUnitBuffs(newUnit, self)
+		end
+
+		if oldUnit then
+			if Healium_Units[oldUnit] then
+				for i,v in ipairs(Healium_Units[oldUnit]) do
+					if v == self then
+						table.remove(Healium_Units[oldUnit], i)
+						break
+					end
 				end
 			end
 		end
-		self.TargetUnit = nil
-	end
 
+		self.TargetUnit = newUnit
+	end
 end
 
 function HealiumUnitFrames_Button_OnMouseDown(self, button)
