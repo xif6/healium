@@ -5,7 +5,7 @@
 -- Color control characters |CAARRGGBB  then |r resets to normal, where AA == Alpha, RR = Red, GG = Green, BB = blue
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 1.1.3|r"
+local AddonVersion = "|cFFFFFF00 1.1.4|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 
@@ -146,6 +146,7 @@ function Healium_OnLoad(self)
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 --	self:RegisterEvent("PLAYER_ALIVE")	
 	self:RegisterEvent("RAID_TARGET_UPDATE")
+	self:RegisterEvent("UNIT_NAME_UPDATE")
 end
 
 function Healium_UpdatePercentageVisibility()
@@ -852,6 +853,17 @@ function Healium_OnEvent(self, event, ...)
 		end	
 		
 		return		
+	end
+	
+	if event == "UNIT_NAME_UPDATE" then
+		if Healium_Units[arg1] then
+			local name = strupper(UnitName(arg1))
+			for _,v  in pairs(Healium_Units[arg1]) do
+					v.name:SetText(name)			
+			end
+		end
+		return
+
 	end
 end
 

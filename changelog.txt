@@ -1,5 +1,8 @@
+1.1.4
+* Additional fix for names appearing as "Unknown" in random dungeon type groups, due to new unit frame bugs introduced by Blizzard in wow 4.0.3.
+
 1.1.3
-* Fixed names appearing as "Unknown Enity".  This started happening after 4.0.3 update and an apparantly new bug by Blizzard where unitIDs for Secure Unit Header child frames no longer have a unitid set before calling OnShow handler.
+* Fixed names appearing as "Unknown Entity".  This started happening after 4.0.3 update and an apparantly new bug by Blizzard where unitIDs for Secure Unit Header child frames no longer have a unitid set before calling OnShow handler.
 
 1.1.2
 * Fixed issues caused when Enable Clique Support is on.  This caused heal buttons to not appear, among other things.
