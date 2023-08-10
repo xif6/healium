@@ -1,46 +1,3 @@
-2.0.6
-* Added "Holy Word: Serenity" to Priest's default spell list.  Note- to configure this, you will either need to either select it in a Healium config panel drop-down or use the "Configure Button" menu. Drag and dropping it doesn't seem to work due to the spell's dynamic nature.
-* Added checkbox option "Show names in UPPERCASE".  Previously this was hard-coded on without any option.
-* Added "/hlm toggle" slash handler.  This toggles visibility of Healium frames.  This is the same as Shift + Left clicking on the Healium minimap icon.
-* The toggle frames feature now reports whether the frames are currently shown or hidden after performing its operation.
-
-2.0.5
-* Updated ToC version number
-
-2.0.4
-* Updated ToC version number
-
-2.0.3
-* Fixed new bug in 2.0.0: When using the Healium config panel to overwrite a macro or item, it would still consider the spell in that slot to be a macro or item
-
-2.0.2 
-* Fixed new bug in 2.0.0: Toggle frames caused a LUA error.
-* Cooldowns for macros
-
-2.0.1
-* Fixed new bug in 2.0.0: Spells did not range check unless you re-assigned them.
-
-2.0.0
-* Support wow version 4.1
-* Added support for Macros and Items.  You must use Drag and Drop to configure them both, as neither macros nor items appear in the Healium menus.  
-   Macros must use [@mouseover] modifier to work correctly with Healium, otherwise they will use the default macro target logic (usually cast on you or your current target)
-   Here is an example macro for instant Druid's Healing Touch that works with Healium:
-   
-	#showtooltip
-	/cast Nature's Swiftness
-	/cast [@mouseover] Healing Touch
-   
-   Note that if you omit the [@mouseover] it will cast on your current target or yourself, instead of using the target assigned to the Healium button.
-
-* Removed ability to auto-import Button Assignments and Button Count settings from ancient versions of Healium (prior to .9.3.0)
-* Added /hlm show target and /hlm show focus slash commands
-   
-
-1.4.0 
-* Added Healium Target and Focus unit frames
-* Added option to show raid icons (raid icon support already existed but there was no option to turn it off)
-* Fixed bug with raid icons being incorrect sometimes when the party/raid makeup changes
-
 1.3.0
 * Added show Incoming Heals option
 * Toggle Frames will turn on Party and Pets frames if all frames are off and no frames were previously toggled off.  i.e. When it would otherwise do nothing at all.
@@ -48,8 +5,8 @@
 1.2.0 
 * Removed all logic that causes buttons to grey out.
 * Removed all frame strata settings.  This caused some parts of the Healium UI to sometimes incorrectly appear in front of or behind other UI elements.
-* Power Word: Shield now bases its cooldown on the unit's Weakened Soul debuff.  -- Should make many priests happy!
-* Swift Mend now bases its greyed state on the unit's Rejuvination and Regrowth buffs.  -- Should make many druids happy!
+* Power Word: Shield now bases its cooldown on the target unit's Weakened Soul debuff.  -- Should make many priests happy!
+* Swift Mend now bases its greyed state on the target unit's Rejuvination and Regrowth buffs.  -- Should make many druids happy!
 * Added Show Threat option
 * Added Show Roles option
 * Added Unleash Elements for Shamen
