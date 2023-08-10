@@ -5,7 +5,7 @@
 -- Color control characters |CAARRGGBB  then |r resets to normal, where AA == Alpha, RR = Red, GG = Green, BB = blue
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 2.0.2|r"
+local AddonVersion = "|cFFFFFF00 2.0.3|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 
@@ -132,6 +132,27 @@ end
 
 function Healium_GetProfile()
 	return Healium.Profiles[GetActiveTalentGroup()] -- this has been debugged and works fine
+end
+
+function Healium_SetProfileSpell(profile, index, spellName, spellID, spellIcon)
+	profile.SpellNames[index] = spellName
+	profile.SpellIcons[index] = spellIcon
+	profile.SpellTypes[index] = Healium_Type_Spell
+	profile.IDs[index] = spellID
+end
+
+function Healium_SetProfileItem(profile, index, itemName, itemID, itemIcon)
+	profile.SpellNames[index] = itemName
+	profile.SpellIcons[index] = itemIcon
+	profile.SpellTypes[index] = Healium_Type_Item
+	profile.IDs[index] = itemID
+end
+
+function Healium_SetProfileMacro(profile, index, macroName, macroID, macroIcon)
+	profile.SpellNames[index] = macroName
+	profile.SpellIcons[index] = macroIcon
+	profile.SpellTypes[index] = Healium_Type_Macro
+	profile.IDs[index] = macroID
 end
 
 function Healium_OnLoad(self)

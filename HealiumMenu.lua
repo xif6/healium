@@ -50,12 +50,7 @@ local function SetCurrentSpell(info, btnIndex, spellIndex)
 	end
 	
 	local Profile = Healium_GetProfile()
-	
-	Profile.SpellNames[btnIndex] = Healium_Spell.Name[spellIndex]
-	Profile.SpellIcons[btnIndex] = Healium_Spell.Icon[spellIndex]
-	Profile.SpellTypes[btnIndex] = Healium_Type_Spell
-	Profile.IDs[btnIndex] = Healium_Spell.ID[spellIndex]
-	
+	Healium_SetProfileSpell(Profile, btnIndex, Healium_Spell.Name[spellIndex], Healium_Spell.ID[spellIndex], Healium_Spell.Icon[spellIndex])
 	Healium_Update_ConfigPanel()
 	
 	Healium_UpdateButtonIcons()

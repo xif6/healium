@@ -132,10 +132,7 @@ local function Drag(self)
 		end
 
 		local name, rank, icon = GetSpellInfo(spellName)
-		Profile.SpellNames[self.index] = name
-		Profile.SpellIcons[self.index] = icon
-		Profile.SpellTypes[self.index] = Healium_Type_Spell
-		Profile.IDs[self.index] = info1
+		Healium_SetProfileSpell(Profile, self.index, name, info1, icon)
 		FinishDrag(self, old)
 		return
 	end
@@ -144,10 +141,7 @@ local function Drag(self)
 	if infoType == "macro" then
 		-- info1 holds macro index
 		local name, icon, body, isLocal = GetMacroInfo(info1);
-		Profile.SpellNames[self.index] = name
-		Profile.SpellIcons[self.index] = icon
-		Profile.SpellTypes[self.index] = Healium_Type_Macro
-		Profile.IDs[self.index] = info1
+		Healium_SetProfileMacro(Profile, self.index, name, info1, icon)		
 		FinishDrag(self, old)
 		return
 	end
@@ -157,10 +151,7 @@ local function Drag(self)
 		-- info1 = itemId: Number - The itemId. 
 		-- info2 = itemLink : String (ItemLink) - The item's link. 
 		local name, sLink, iRarity, iLevel, iMinLevel, sType, sSubType, iStackCount, iEquipLoc, icon, iSellPrice =  GetItemInfo(info1);
-		Profile.SpellNames[self.index] = name
-		Profile.SpellIcons[self.index] = icon
-		Profile.SpellTypes[self.index] = Healium_Type_Item
-		Profile.IDs[self.index] = info1
+		Healium_SetProfileItem(Profile, self.index, name, info1, icon)				
 		FinishDrag(self, old)
 		return
 	end
