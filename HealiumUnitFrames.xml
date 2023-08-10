@@ -61,7 +61,7 @@
 				<OnEnter>HealiumUnitFrames_OnEnter(self)</OnEnter>
 				<OnLeave>HealiumUnitFrames_OnLeave(self)</OnLeave>
 				<OnMouseDown>HealiumUnitFrames_OnMouseDown(self:GetParent(), button)</OnMouseDown>
-				<OnMouseUp>HealiumUnitFrames_OnMouseUp(self:GetParent(), button)</OnMouseUp>				
+				<OnMouseUp>HealiumUnitFrames_OnMouseUp(self:GetParent(), button)</OnMouseUp>		
 			</Scripts>
 			</Frame>
 		</Frames>
@@ -304,6 +304,7 @@
 			<OnLoad>HealiumUnitFrames_Button_OnLoad(self)</OnLoad>
 			<OnShow>HealiumUnitFrames_Button_OnShow(self)</OnShow>
 			<OnHide>HealiumUnitFrames_Button_OnHide(self)</OnHide>
+			<OnUpdate>HealiumUnitFrames_Button_OnUpdate(self)</OnUpdate>			
 			<OnMouseDown>HealiumUnitFrames_Button_OnMouseDown(self, button)</OnMouseDown>
 			<OnMouseUp>HealiumUnitFrames_Button_OnMouseUp(self, button)</OnMouseUp>
 		</Scripts>

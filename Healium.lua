@@ -5,7 +5,7 @@
 -- Color control characters |CAARRGGBB  then |r resets to normal, where AA == Alpha, RR = Red, GG = Green, BB = blue
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 1.1.2|r"
+local AddonVersion = "|cFFFFFF00 1.1.3|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 
@@ -84,6 +84,8 @@ Healium_ShownFrames = { } -- table of all shown "unit" frames.
 Healium_ButtonIDs = { } -- table of IDs that correspond to the selected spells, not persisted 
 Healium_FixNameplates = { } -- nameplates that need various updates when out of combat
 
+Healium_HackOnShow = { }
+Healium_DoHackOnShow = nil
 
 --[[
 Healium_DefaultButtons = { 

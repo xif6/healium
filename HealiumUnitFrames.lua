@@ -426,10 +426,14 @@ function HealiumUnitFames_CheckPowerType(UnitName, NamePlate)
 	return true
 end
 
-function HealiumUnitFrames_Button_OnShow(self)
+-- HACK WARNING See comment in HealiumUnitFrames_Button_OnShow
+function HealiumUnitFrames_Button_OnUpdate(self)
+	if self.DoUpdate == nil then return end
+
+	self.DoUpdate = nil
 	table.insert(Healium_ShownFrames, self)
 
-	local unit = self:GetAttribute("unit")
+	local unit = SecureButton_GetUnit(self)
 
 	if unit then
 		self.TargetUnit = unit
@@ -471,7 +475,20 @@ function HealiumUnitFrames_Button_OnShow(self)
 		Healium_UpdateUnitHealth(unit, self)
 		Healium_UpdateUnitMana(unit, self)
 		Healium_UpdateUnitBuffs(unit, self)
+	else
+		Healium_Warn("No unit for button!")
 	end
+end
+
+function HealiumUnitFrames_Button_OnShow(self)
+	self.DoUpdate = 1
+--[[
+    HACK HACK BLIZZARD MADE ME WRITE THIS HACK HACK
+	This function used to contain the current contents of HealiumUnitFrames_Button_OnUpdate.
+	After 4.0.3 update, unit IDs were no longer set prior to OnShow being called.  This resulted in SecureButton_GetUnit() always returning nil.
+	As a test I made an OnUpdate function to test for this and do the work that OnShow used to do, and noticed the unit IDs would return properly then.
+	I suspect at some point blizzard will realize their bug and fix it back, and after that is done I can remove the OnUpdate handler and restore this OnShow function.
+--]]
 end
 
 function HealiumUnitFrames_Button_OnHide(self)
