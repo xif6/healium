@@ -34,12 +34,16 @@
 					</Layer>			
 				</Layers>
 				<Frames>
-					<Button parentKey="CloseButton" inherits="UIPanelCloseButton"> -->
+					<Button parentKey="CloseButton" inherits="UIPanelCloseButton">
 						<Anchors>
-							<Anchor point="TOPRIGHT">
+							<Anchor point="RIGHT">
+								<Offset>
+									<AbsDimension x="-4"/>
+								</Offset>							
 							</Anchor>
 						</Anchors>
 						<Scripts>
+							<OnLoad>self:SetFrameLevel(self:GetParent():GetFrameLevel() + 1)</OnLoad>
 							<OnEnter>HealiumUnitFrames_OnEnter(self:GetParent())</OnEnter>
 							<OnLeave>HealiumUnitFrames_OnLeave(self:GetParent())</OnLeave>							
 							<OnClick>HideParentPanel(self:GetParent())</OnClick>
@@ -106,6 +110,7 @@
 							edgeSize = 28,
 							insets = {left = 0, right = 0, top = 0, bottom = 0},
 						})				
+						
 					</OnLoad>
 				</Scripts>
 			</Frame>	
@@ -139,17 +144,6 @@
 -->			
 	<Button name="HealiumUnitFrames_ButtonTemplate" virtual="true" movable="true" enableMouse="true" inherits="SecureActionButtonTemplate">
 		<Size x="120" y="28"/>
-		<Backdrop edgeFile="Interface/Tooltips/UI-Tooltip-Border" tile="true">
-			<EdgeSize>
-				<AbsValue val="10"/> 
-			</EdgeSize>
-			<TileSize>
-				<AbsValue val="16"/> 
-			</TileSize>
-			<BackgroundInsets>
-				<AbsInset left="4" right="4" top="4" bottom="4"/> 
-			</BackgroundInsets>
-		</Backdrop>		
 		<Attributes>
 			<Attribute name="type1" value="target" />
 		</Attributes>
@@ -161,7 +155,11 @@
 							<AbsDimension x="-2" y="0"/>
 						</Offset>
 					</Anchor>
-				</Anchors>				
+				</Anchors>
+				<Scripts>
+					<OnEnter>GameTooltip:Hide();</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>	
 			</Frame>
 			<Frame name="$parent_Buff2" inherits="TargetBuffFrameTemplate">
 				<Anchors>
@@ -170,7 +168,11 @@
 							<AbsDimension x="-2" y="0"/>
 						</Offset>
 					</Anchor>
-				</Anchors>				
+				</Anchors>	
+				<Scripts>
+					<OnEnter>GameTooltip:Hide();</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>	
 			</Frame>			
 			<Frame name="$parent_Buff3" inherits="TargetBuffFrameTemplate">
 				<Anchors>
@@ -180,6 +182,10 @@
 						</Offset>
 					</Anchor>
 				</Anchors>				
+				<Scripts>
+					<OnEnter>GameTooltip:Hide();</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>	
 			</Frame>						
 			<Frame name="$parent_Buff4" inherits="TargetBuffFrameTemplate">
 				<Anchors>
@@ -189,6 +195,10 @@
 						</Offset>
 					</Anchor>
 				</Anchors>				
+				<Scripts>
+					<OnEnter>GameTooltip:Hide();</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>	
 			</Frame>						
 			<Frame name="$parent_Buff5" inherits="TargetBuffFrameTemplate">
 				<Anchors>
@@ -198,6 +208,10 @@
 						</Offset>
 					</Anchor>
 				</Anchors>				
+				<Scripts>
+					<OnEnter>GameTooltip:Hide();</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>	
 			</Frame>				
 			<Frame name="$parent_Buff6" inherits="TargetBuffFrameTemplate">
 				<Anchors>
@@ -206,7 +220,11 @@
 							<AbsDimension x="-2" y="0"/>
 						</Offset>
 					</Anchor>
-				</Anchors>				
+				</Anchors>	
+				<Scripts>
+					<OnEnter>GameTooltip:Hide();</OnEnter>
+					<OnLeave>GameTooltip:Hide();</OnLeave>
+				</Scripts>	
 			</Frame>				
 			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="100">
 				<Size x="111" y="23"/>
@@ -290,7 +308,7 @@
 			<StatusBar parentKey="ManaBar" minValue="0" maxValue="100" defaultValue="100">
 				<Size x="5" y="24"/>
 				<Layers>
-					<Layer level="BACKGROUND" setAllPoints="true">
+					<Layer level="BACKGROUND">
 						<Texture>
 							<Color r="1.0" g="0.0" b="0.0"/>					
 						</Texture>

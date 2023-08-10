@@ -2,7 +2,11 @@ function Healium_HealButton_OnLoad(frame)
 	frame.TimeSinceLastUpdate = 0
 	frame:RegisterEvent("SPELL_UPDATE_USABLE")
 	frame:RegisterForDrag("LeftButton")
-	frame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	if Healium_IsRetail then	
+		frame:RegisterForClicks("AnyUp", "AnyDown")							
+	else
+		frame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	end
 end
 
 function Healium_HealButton_OnUpdate(frame, elapsed)

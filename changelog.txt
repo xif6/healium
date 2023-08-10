@@ -1,3 +1,30 @@
+2.9.6 LK Classic
+* Shaman Cleans Spirit talent should notify about cures now
+* Added support and checkbox options for heal prediction, threat, and role icons
+
+2.9.5 Classic
+* Added support and checkbox options for heal prediction, and threat
+
+2.9.4 RETAIL
+* Priest Purify will no longer notify about being able to cure a disease unless the player has the "Improved Purify" talent
+
+2.9.3 RETAIL
+* Configured default spells for the new evoker class
+
+2.9.2 RETAIL
+* Updated ToC version to 100002
+
+2.9.1 RETAIL
+* Fix close button appearing on top of other UI
+* Moved the class icon on the config panel to the left to make room for longer class names
+* Fix clicking on healthbar not targeting units
+
+2.9.0 RETAIL
+* Initial update for Dragonflight pre-patch.
+
+2.8.23 CLASSIC
+* Updated ToC version to 11403
+
 2.8.22 LK CLASSIC
 * First release for LK Classic
 

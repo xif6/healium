@@ -414,7 +414,7 @@ function HealiumUnitFrames_ShowHideFrame(frame, show)
 		return
 	end
 
-	if (Healium_IsRetail) and (frame == FocusFrame) then
+	if (not Healium_IsClassic) and (frame == FocusFrame) then
 		Healium_DebugPrint("ShowHide Focus Frame")
 		Healium.ShowFocusFrame = show
 		Healium_ShowFocusCheck:SetChecked(Healium.ShowFocusFrame)
@@ -442,7 +442,7 @@ end
 
 function HealiumUnitFrames_Button_OnLoad(frame)
 	frame.buttons = { }
-	frame:RegisterForClicks("AnyUp")
+	frame:RegisterForClicks("AnyUp", "AnyDown")
 
 	table.insert(Healium_Frames, frame)
 
@@ -635,7 +635,7 @@ function Healium_ToggleAllFrames()
 	if TanksFrame:IsShown() then hide = true end
 	if TargetFrame:IsShown() then hide = true end
 
-	if Healium_IsRetail then
+	if not Healium_IsClassic then
 		if FocusFrame:IsShown() then hide = true end
 	end
 
@@ -656,7 +656,7 @@ function Healium_ToggleAllFrames()
 		TanksFrameWasShown = TanksFrame:IsShown()
 		TargetFrameWasShown = TargetFrame:IsShown()
 
-		if Healium_IsRetail then
+		if not Healium_IsClassic then
 			FocusFrameWasShown = FocusFrame:IsShown()
 		end
 
@@ -669,7 +669,7 @@ function Healium_ToggleAllFrames()
 		TanksFrame:Hide()
 		TargetFrame:Hide()
 
-		if Healium_IsRetail then
+		if not Healium_IsClasic then
 			FocusFrame:Hide()
 		end
 
@@ -693,7 +693,7 @@ function Healium_ToggleAllFrames()
 	if TanksFrameWasShown then TanksFrame:Show() end
 	if TargetFrameWasShown then TargetFrame:Show() end
 
-	if Healium_IsRetail then
+	if not Healium_IsClassic then
 		if FocusFrameWasShown then FocusFrame:Show() end
 	end
 
@@ -802,7 +802,7 @@ function Healium_ShowHideTargetFrame(show)
 end
 
 function Healium_ShowHideFocusFrame(show)
-	if not Healium_IsRetail then return end
+	if Healium_IsClassic then return end
 	if InCombatLockdown() then return end
 	if (show ~= nil) then Healium.ShowFocusFrame = show end
 
@@ -867,7 +867,7 @@ function Healium_CreateUnitFrames()
 	TanksFrame = CreateTanksUnitFrame("HealiumTanksFrame", "Tanks")
 	TargetFrame = CreateTargetUnitFrame("HealiumTargetFrame", "Target")
 
-	if Healium_IsRetail then
+	if not Healium_IsClassic then
 		FocusFrame = CreateFocusUnitFrame("HealiumFocusFrame", "Focus")
 	end
 
@@ -891,7 +891,7 @@ function Healium_SetScale()
 	TanksFrame:SetScale(Scale)
 	TargetFrame:SetScale(Scale)
 
-	if Healium_IsRetail then
+	if not Healium_IsClassic then
 		FocusFrame:SetScale(Scale)
 	end
 
@@ -1089,6 +1089,6 @@ function Healium_UpdateTargetFrame()
 end
 
 function Healium_UpdateFocusFrame()
-	if not Healium_IsRetail then return end
+	if Healium_IsClassic then return end
 	HealiumUnitFrames_Button_OnAttributeChanged(FocusFrame.hdr, "unit")
 end

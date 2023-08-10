@@ -169,7 +169,7 @@ function Healium_InitSpells(class, race)
 			CureName = SpellName(527)
 			if CureName then 
 				Cures[CureName] = { 
-					CanCureDisease = true,
+					CanCureDisease = IsPlayerSpell(390632), -- Purify can only cure disease if the player has the "improved purify" talent
 					CanCureMagic = true 
 				}
 			end					
@@ -188,6 +188,17 @@ function Healium_InitSpells(class, race)
 		
 		if not Healium_IsRetail then 
 			-- classic
+			
+			-- Shaman Cleanse Spirit, in WOTLK but not classic. Retail only cures curses.
+			-- https://www.wowhead.com/wotlk/spell=51886/cleanse-spirit
+			CureName = SpellName(51886)
+			if CureName then 
+				Cures[CureName] = { 
+					CanCurePoison = true,
+					CanCureDisease = true,					
+					CanCureCurse = true,					
+				}
+			end			
 
 			-- Shaman Cure Poision, classic only
 			CureName = SpellName(526)
@@ -317,6 +328,31 @@ function Healium_InitSpells(class, race)
 			end
 		end
 	end
+	
+	if (class == "EVOKER") then
+		if Healium_IsRetail then 
+			-- Retail
+			AddSpell(364343) -- Echo
+			AddSpell(360995) -- Verdant Embrace
+			AddSpell(355913) -- Emerald Blossom
+			AddSpell(361469) -- Living Flame
+			AddSpell(355936) -- Dream Breath
+			AddSpell(360823) -- Naturalize
+			AddSpell(361227) -- Return 
+			
+		-- Naturalize
+			CureName = SpellName(360823)
+			if CureName then 
+				Cures[CureName] = {	
+					CanCureMagic = true, 
+					CanCurePoison = true, 					
+				}
+			end
+		end
+	end	
+	
+	
+	
 	
 	if Healium_IsRetail then 	
 		if (class == "MONK") then

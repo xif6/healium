@@ -6,7 +6,7 @@
 -- To get the wow interface number use /run print((select(4, GetBuildInfo())))
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 2.8.22|r"
+local AddonVersion = "|cFFFFFF00 2.9.6|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 
@@ -94,8 +94,8 @@ TODO refactor Healium.Profiles to instead contain a single table named Spells wh
 ]]
 
 -- Global Constants
---Healium_IsClassic = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC
---Healium_IsClassicBC = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC
+Healium_IsClassic = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC
+Healium_IsClassicLK = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_WRATH_CLASSIC
 Healium_IsRetail = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE
 Healium_MaxButtons = 15		-- Max Possible buttons 
 Healium_AddonName = "Healium"
@@ -333,7 +333,7 @@ function Healium_UpdateUnitHealth(unitName, NamePlate)
 	
 	-- incoming heals
 	
-	if (Healium_IsRetail) and Healium.ShowIncomingHeals then
+	if Healium.ShowIncomingHeals then
 		local IncomingHealth = UnitGetIncomingHeals(unitName)
 
 		if IncomingHealth then
@@ -415,7 +415,6 @@ end
 
 
 function Healium_UpdateUnitThreat(unitName, NamePlate)
-	if not Healium_IsRetail then return end
 	if not NamePlate then return end
 	if not UnitExists(unitName) then return end
 	
@@ -427,7 +426,14 @@ function Healium_UpdateUnitThreat(unitName, NamePlate)
 	local status = UnitThreatSituation(unitName)
 
 	if status and status > 1 then 
-		local r, g, b = GetThreatStatusColor(status)
+		local r, g, b
+		if Healium_IsClassic then
+			r = 255
+			g = 0
+			b = 0
+		else
+			r, g, b = GetThreatStatusColor(status) -- GetThreatStatusColor not on classic. Is on LK classic.		
+		end
 		NamePlate.AggroBar:SetBackdropBorderColor(r,g,b,1)
 		NamePlate.AggroBar:SetAlpha(1)
 	else
@@ -436,7 +442,6 @@ function Healium_UpdateUnitThreat(unitName, NamePlate)
 end
 
 function Healium_UpdateShowThreat()
-	if not Healium_IsRetail then return end
 	if Healium.ShowThreat then
 		HealiumFrame:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE")
 	else
@@ -456,10 +461,7 @@ end
 
 
 function Healium_UpdateUnitRole(unitName, NamePlate)
-	if not Healium_IsRetail then 
-		Healium.ShowRole = nil -- roles not supported on classic. This logic will cause below logic to hide the role icon.
-	end 
-
+	if Healium_IsClassic then return end
 	if not NamePlate then return end
 	if not UnitExists(unitName) then return end
 	
@@ -487,6 +489,7 @@ function Healium_UpdateUnitRole(unitName, NamePlate)
 end
 
 local function Healium_UpdateRoles()
+	if Healium_IsClassic then return end
 	for _, k in ipairs(Healium_Frames) do
 		if (k.TargetUnit) then
 			Healium_UpdateUnitRole(k.TargetUnit, k)
@@ -495,6 +498,7 @@ local function Healium_UpdateRoles()
 end
 
 function Healium_UpdateShowRole()
+	if Healium_IsClassic then return end
 	if Healium.ShowRole then
 		HealiumFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
 	else
@@ -505,14 +509,6 @@ function Healium_UpdateShowRole()
 end
 
 function Healium_UpdateShowIncomingHeals()
-	if not Healium_IsRetail then 
-		-- no support for heal prediction on classic.  just hide the frames	
-		for _, k in ipairs(Healium_Frames) do
-				k.PredictBar:Hide()
-		end	
-		return 
-	end
-		
 	if Healium.ShowIncomingHeals then
 		HealiumFrame:RegisterEvent("UNIT_HEAL_PREDICTION")
 	else
@@ -555,7 +551,7 @@ function Healium_UpdateShowTargetFrame()
 end
 
 function Healium_UpdateShowFocusFrame()
-	if not Healium_IsRetail then return end
+	if Healium_IsClassic then return end -- focus not on classic
 	if Healium.ShowFocusFrame then 
 		Healium_DebugPrint("registering PLAYER_FOCUS_CHANGED")
 		HealiumFrame:RegisterEvent("PLAYER_FOCUS_CHANGED")
@@ -998,26 +994,24 @@ local function InitVariables()
 		Healium.ShowMana = true
 	end
 	
-	if not Healium_IsRetail then
-		Healium.ShowThreat = false
-		Healium.ShowRole = false		
-		Healium.ShowIncomingHeals = false
+	if Healium.ShowThreat == nil then
+		Healium.ShowThreat = true
+	end
+	
+	if Healium.ShowIncomingHeals == nil then
+		Healium.ShowIncomingHeals = true
+	end
+	
+	if Healium_IsClassic then
 		Healium.ShowFocusFrame = false
+		Healium.ShowRole = false
 	else
-		if Healium.ShowThreat == nil then
-			Healium.ShowThreat = true
+		if Healium.ShowFocusFrame == nil then
+			Healium.ShowFocusFrame = false
 		end
 		
 		if Healium.ShowRole == nil then
 			Healium.ShowRole = true
-		end
-		
-		if Healium.ShowIncomingHeals == nil then
-			Healium.ShowIncomingHeals = true
-		end
-		
-		if Healium.ShowFocusFrame == nil then
-			Healium.ShowFocusFrame = false
 		end
 	end	
 	
@@ -1259,8 +1253,9 @@ function Healium_OnEvent(frame, event, ...)
 
 	if ((event == "SPELLS_CHANGED") and (not frame.Respecing)) then
 		Healium_DebugPrint("SPELLS_CHANGED")
-		-- Populate the Healium_Spell Table with ID and Icon data.
+		Healium_InitSpells(HealiumClass, HealiumRace) -- I have observed swapping around talents not sending PLAYER_TALENT_UPDATE, but instead sending SPELLS_CHANGED, so we need to call this here to handle the case the talent effects cures	
 		Healium_UpdateSpells()
+		Healium_UpdateButtons()
 	end
 	
 	if ((event == "PLAYER_ENTERING_WORLD") and (not frame.Respecing)) then
