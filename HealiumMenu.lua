@@ -10,6 +10,14 @@ local function ShowPetsFrame()
 	Healium_ShowHidePetsFrame(true)
 end
 
+local function ShowDamagersFrame()
+	Healium_ShowHideDamagersFrame(true)
+end
+
+local function ShowHealersFrame()
+	Healium_ShowHideHealersFrame(true)
+end
+
 local function ShowTanksFrame()
 	Healium_ShowHideTanksFrame(true)
 end
@@ -45,11 +53,13 @@ local function SetCurrentSpell(info, btnIndex, spellIndex)
 	
 	Profile.SpellNames[btnIndex] = Healium_Spell.Name[spellIndex]
 	Profile.SpellIcons[btnIndex] = Healium_Spell.Icon[spellIndex]
+	Profile.SpellTypes[btnIndex] = Healium_Type_Spell
+	Profile.IDs[btnIndex] = Healium_Spell.ID[spellIndex]
 	
-	UIDropDownMenu_SetText(HealiumDropDown[btnIndex], Profile.SpellNames[btnIndex])	
+	Healium_Update_ConfigPanel()
 	
 	Healium_UpdateButtonIcons()
-	Healium_UpdateButtonSpells()
+	Healium_UpdateButtonAttributes()
 end
 
 local function HealiumMenu_InitializeDropDown(self,level)
@@ -129,6 +139,19 @@ local function HealiumMenu_InitializeDropDown(self,level)
 					notCheckable = 1,					
 					func = ShowFriendsFrame,
 				},
+-- TODO DAMAGERS/HEALERS frame	
+--[[
+				{	-- Damagers Frame
+					text = "Show Damagers",
+					notCheckable = 1,					
+					func = ShowDamagersFrame,
+				},
+				{	-- Healers Frame
+					text = "Show Healers",
+					notCheckable = 1,					
+					func = ShowHealersFrame,
+				},
+--]]				
 				{	-- Tanks Frame
 					text = "Show Tanks",
 					notCheckable = 1,					

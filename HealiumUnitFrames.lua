@@ -3,6 +3,8 @@
 local PartyFrame = nil
 local PetsFrame = nil
 local MeFrame = nil
+local DamagersFrame = nil
+local HealersFrame = nil
 local TanksFrame = nil
 local FriendsFrame = nil
 local GroupFrames = { }
@@ -12,6 +14,8 @@ local FocusFrame = nil
 local PartyFrameWasShown = nil
 local PetsFrameWasShown = nil
 local MeFrameWasShown = nil
+local DamagersFrameWasShown = nil
+local HealersFrameWasShown = nil
 local TanksFrameWasShown = nil
 local FriendsFrameWasShown = nil
 local GroupFramesWasShown = { }
@@ -66,48 +70,6 @@ function Healium_PlayDebuffSound()
 	PlaySoundFile(DebuffSoundPath)
 end
 
---[[
-local function initialConfigFunction(frame)
-	-- The only thing you are especially allowed to do in the initialConfigFunction() is to change attributes.
-	-- CreateFrame(), :Show(), :Hide() etc will taint in combat still
-
-	Healium_DebugPrint("Inital Config")
-	frame.buttons = { }
-	frame:RegisterForClicks("AnyUp")
-
-	table.insert(Healium_Frames, frame)
-
-	if Healium.EnableClique then
-		ClickCastFrames[frame] = true
-	end
-
-	-- configure buff frames
-	frame.buffs = { }
-
-	local framename = frame:GetName()
-	for i=1, MaxBuffs, 1 do
-		local buffFrame = _G[framename.."_Buff"..i]
-		local name = buffFrame:GetName()
-		buffFrame.icon = _G[name.."Icon"]
-		buffFrame.cooldown = _G[name.."Cooldown"]
-		buffFrame.count = _G[name.."Count"]
-		buffFrame.border = _G[name.."Border"]
-		buffFrame.id = i
-		frame.buffs[i] = buffFrame
-	end
-
-	if InCombatLockdown() then
-		frame.fixCreateButtons = true
-		table.insert(Healium_FixNameplates, frame)
-		Healium_DebugPrint("Unit Frame created during combat. Its buttons will not be available until combat ends.")
-	else
-		if (not Healium.ShowPercentage) then frame.HPText:Hide() end
-		Healium_CreateButtonsForNameplate(frame)
-	end
-end
---]]
-
-
 local function CreateButton(ButtonName,ParentFrame,xoffset)
 	local button = CreateFrame("Button", ButtonName, ParentFrame, "HealiumHealButtonTemplate")
 	button:SetPoint("LEFT", ParentFrame, "RIGHT", xoffset, 0)
@@ -128,8 +90,7 @@ function Healium_CreateButtonsForNameplate(frame)
 		frame.buttons[i] = button
 
 		-- set spell attribute for button
-		local spell = Profile.SpellNames[i]
-		Healium_UpdateButtonSpell(button, spell, Healium_ButtonIDs[i], false)
+		Healium_SetButtonAttributes(button)
 
 		-- set icon for button
 		local texture = Profile.SpellIcons[i]
@@ -217,9 +178,30 @@ local function CreateGroupHeader(FrameName, ParentFrame, Group)
 	return h
 end
 
+local function CreateDamagersHeader(FrameName, ParentFrame)
+	local h = CreateHeader("SecureGroupHeaderTemplate", FrameName, ParentFrame)
+-- TODO DAMAGERS/HEALERS frame.  DAMAGER does not seem to work
+	h:SetAttribute("groupFilter", "DAMAGER")
+	h:SetAttribute("showParty", "true")
+	h:SetAttribute("showRaid", "true")
+	h:Show()
+	return h
+end
+
+local function CreateHealersHeader(FrameName, ParentFrame)
+	local h = CreateHeader("SecureGroupHeaderTemplate", FrameName, ParentFrame)
+-- TODO DAMAGERS/HEALERS frame.  HEALER does not seem to work
+	h:SetAttribute("groupFilter", "HEALER")
+	h:SetAttribute("showParty", "true")
+	h:SetAttribute("showRaid", "true")
+	h:Show()
+	return h
+end
+
 local function CreateTanksHeader(FrameName, ParentFrame)
 	local h = CreateHeader("SecureGroupHeaderTemplate", FrameName, ParentFrame)
-	h:SetAttribute("groupFilter", "MAINTANK")
+	h:SetAttribute("groupFilter", "MAINTANK,TANK")
+	h:SetAttribute("showParty", "true")
 	h:SetAttribute("showRaid", "true")
 	h:Show()
 	return h
@@ -264,6 +246,18 @@ end
 local function CreateGroupUnitFrame(FrameName, Caption, Group)
 	local uf = CreateUnitFrame(FrameName, Caption)
 	local h = CreateGroupHeader(FrameName .. "_Header", uf, Group)
+	return uf
+end
+
+local function CreateDamagersUnitFrame(FrameName, Caption)
+	local uf = CreateUnitFrame(FrameName, Caption)
+	local h = CreateDamagersHeader(FrameName .. "_Header", uf)
+	return uf
+end
+
+local function CreateHealersUnitFrame(FrameName, Caption)
+	local uf = CreateUnitFrame(FrameName, Caption)
+	local h = CreateHealersHeader(FrameName .. "_Header", uf)
 	return uf
 end
 
@@ -373,6 +367,20 @@ function HealiumUnitFrames_ShowHideFrame(self, show)
 	if self == FriendsFrame then
 		Healium.ShowFriendsFrame = show
 		Healium_ShowFriendsCheck:SetChecked(Healium.ShowFriendsFrame)
+		return
+	end
+
+	if self == DamagersFrame then
+		Healium.ShowDamagersFrame = show
+-- TODO DAMAGERS/HEALERS frame
+--		Healium_ShowDamagersCheck:SetChecked(Healium.ShowDamagersFrame)
+		return
+	end
+
+	if self == HealersFrame then
+		Healium.ShowHealersFrame = show
+-- TODO DAMAGERS/HEALERS frame
+--		Healium_ShowHealersCheck:SetChecked(Healium.ShowHealersFrame)
 		return
 	end
 
@@ -511,12 +519,7 @@ function HealiumUnitFrames_Button_OnAttributeChanged(self, name, value)
 				if not button then break end
 
 				-- update cooldowns
-				local id = Healium_ButtonIDs[i]
-
-				if id then
-					local start, duration, enable = GetSpellCooldown(Healium_ButtonIDs[i], BOOKTYPE_SPELL)
-					CooldownFrame_SetTimer(button.cooldown, start, duration, enable)
-				end
+				Healium_UpdateButtonCooldown(button)
 			end
 
 			--if self:IsVisible() then
@@ -613,6 +616,8 @@ function Healium_ToggleAllFrames()
 	if PetsFrame:IsShown() then hide = true end
 	if MeFrame:IsShown() then hide = true end
 	if FriendsFrame:IsShown() then hide = true end
+	if DamagerFrame:IsShown() then hide = true end
+	if HealerFrame:IsShown() then hide = true end
 	if TanksFrame:IsShown() then hide = true end
 	if TargetFrame:IsShown() then hide = true end
 	if FocusFrame:IsShown() then hide = true end
@@ -629,6 +634,8 @@ function Healium_ToggleAllFrames()
 		PetsFrameWasShown = PetsFrame:IsShown()
 		MeFrameWasShown = MeFrame:IsShown()
 		FriendsFrameWasShown = FriendsFrame:IsShown()
+		DamagersFrameWasShown = DamagersFrame:IsShown()
+		HealersFrameWasShown = HealersFrame:IsShown()
 		TanksFrameWasShown = TanksFrame:IsShown()
 		TargetFrameWasShown = TargetFrame:IsShown()
 		FocusFrameWasShown = FocusFrame:IsShown()
@@ -637,6 +644,8 @@ function Healium_ToggleAllFrames()
 		PetsFrame:Hide()
 		MeFrame:Hide()
 		FriendsFrame:Hide()
+		DamagersFrame:Hide()
+		HealersFrame:Hide()
 		TanksFrame:Hide()
 		TargetFrame:Hide()
 		FocusFrame:Hide()
@@ -655,6 +664,8 @@ function Healium_ToggleAllFrames()
 	if PetsFrameWasShown then PetsFrame:Show() end
 	if MeFrameWasShown then MeFrame:Show() end
 	if FriendsFrameWasShown then FriendsFrame:Show() end
+	if DamagersFrameWasShown then DamagersFrame:Show() end
+	if HealersFrameWasShown then HealersFrame:Show() end
 	if TanksFrameWasShown then TanksFrame:Show() end
 	if TargetFrameWasShown then TargetFrame:Show() end
 	if FocusFrameWasShown then FocusFrame:Show() end
@@ -715,6 +726,28 @@ function Healium_ShowHideFriendsFrame(show)
 	end
 end
 
+function Healium_ShowHideDamagersFrame(show)
+	if InCombatLockdown() then return end
+	if (show ~= nil) then Healium.ShowDamagersFrame = show end
+
+	if Healium.ShowDamagersFrame then
+		DamagersFrame:Show()
+	else
+		DamagersFrame:Hide()
+	end
+end
+
+function Healium_ShowHideHealersFrame(show)
+	if InCombatLockdown() then return end
+	if (show ~= nil) then Healium.ShowHealersFrame = show end
+
+	if Healium.ShowHealersFrame then
+		HealersFrame:Show()
+	else
+		HealersFrame:Hide()
+	end
+end
+
 function Healium_ShowHideTanksFrame(show)
 	if InCombatLockdown() then return end
 	if (show ~= nil) then Healium.ShowTanksFrame = show end
@@ -765,7 +798,7 @@ end
 
 function Healium_HideAllRaidFrames()
 	if InCombatLockdown() then return end
-	TanksFrame:Hide()
+--	TanksFrame:Hide()
 	for i,j in ipairs(GroupFrames) do
 		j:Hide()
 	end
@@ -816,6 +849,16 @@ function Healium_CreateUnitFrames()
 		FriendsFrame:Show()
 	end
 
+	DamagersFrame = CreateDamagersUnitFrame("HealiumDanagersFrame", "Damagers")
+	if Healium.ShowDamagersFrame then
+		DamagersFrame:Show()
+	end
+
+	HealersFrame = CreateHealersUnitFrame("HealiumHealersFrame", "Healers")
+	if Healium.ShowHealersFrame then
+		HealersFrame:Show()
+	end
+
 	TanksFrame = CreateTanksUnitFrame("HealiumTanksFrame", "Tanks")
 	if Healium.ShowTanksFrame then
 		TanksFrame:Show()
@@ -846,6 +889,8 @@ function Healium_SetScale()
 	PetsFrame:SetScale(Scale)
 	MeFrame:SetScale(Scale)
 	FriendsFrame:SetScale(Scale)
+	DamagersFrame:SetScale(Scale)
+	HealersFrame:SetScale(Scale)
 	TanksFrame:SetScale(Scale)
 	TargetFrame:SetScale(Scale)
 	FocusFrame:SetScale(Scale)

@@ -61,9 +61,6 @@ local function doDump(args)
 	end	
 	DevTools_Dump("Healium = ")
 	DevTools_Dump(Healium)
-	DevTools_Dump("")
-	DevTools_Dump("Healium_ButtonIDs = ")
-	DevTools_Dump(Healium_ButtonIDs)
 end
 
 -- handles /hlm config
@@ -86,8 +83,11 @@ local showHandlers = {
 	pets = function() Healium_ShowHidePetsFrame(true) end,
 	me = function() Healium_ShowHideMeFrame(true) end,
 	friends = function() Healium_ShowHideFriendsFrame(true) end,
+	damagers = function() Healium_ShowHideDamagersFrame(true) end,
+	healers = function() Healium_ShowHideHealersFrame(true) end,	
 	tanks = function() Healium_ShowHideTanksFrame(true) end,
-
+	target = function() Healium_ShowHideTargetFrame(true) end,
+	focus = function() Healium_ShowHideFocusFrame(true) end,
 }
 
 setmetatable(showHandlers, mt)
@@ -101,6 +101,23 @@ local function doShow(args)
 	
 	return showHandlers[args]()
 end
+
+--[[ *************************************************************************************
+									TEST
+************************************************************************************* --]]
+local function doTest(args)
+	local _, unit, name, subgroup, className, role, server
+	if args == "roles" then
+		Healium_Print("test - roles")
+		for i=1, 40, 1 do
+			name, _, subgroup, _, _, className, _, _, _, role = GetRaidRosterInfo(i)
+			if role then
+				Healium_Print(name .. " - " .. role)
+			end
+		end
+	end
+end
+
 
 --[[ *************************************************************************************
 									FRIENDS
@@ -226,6 +243,7 @@ local handlers = {
 	friend = doFriends,
 	friends = doFriends,
 	debug = doDebug,	
+	test = doTest,
 }
 
 setmetatable(handlers, mt)
@@ -236,3 +254,4 @@ function Healium_SlashCmdHandler(cmd)
 	local args = cmd:match("[^ ]+ (.+)")	
 	return handlers[switch](args)
 end
+
