@@ -478,7 +478,7 @@ function HealiumUnitFrames_Button_OnAttributeChanged(self, name, value)
 			table.insert(Healium_Units[newUnit], self)
 
 			for i =1, MaxBuffs, 1 do
-				self.buffs[i].newUnit = newUnit
+				self.buffs[i].unit = newUnit
 			end
 
 			HealiumUnitFames_CheckPowerType(newUnit, self)
