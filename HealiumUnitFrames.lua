@@ -477,26 +477,6 @@ function HealiumUnitFrames_Button_OnLoad(frame)
 	frame:RegisterForDrag("RightButton")
 end
 
-function HealiumUnitFames_CheckPowerType(UnitName, NamePlate)
-	local _, powerType = UnitPowerType(UnitName)
-	if  (Healium.ShowMana == false) or (UnitExists(UnitName) == nil) or (powerType ~= "MANA") then
---	if  UnitManaMax(UnitName) == nil then
-		NamePlate.ManaBar:SetStatusBarColor( .5, .5, .5 )
-		NamePlate.ManaBar:SetMinMaxValues(0,1)
-		NamePlate.ManaBar:SetValue(1)
-		NamePlate.showMana = nil
-		return nil
-	else
-		local powerColor = PowerBarColor[powerType];
-		NamePlate.ManaBar:SetStatusBarColor( powerColor.r, powerColor.g, powerColor.b )
-		NamePlate.showMana = true
-	end
-
-	return true
-end
-
-
-
 function HealiumUnitFrames_Button_OnShow(frame)
 	table.insert(Healium_ShownFrames, frame)
 end
@@ -548,8 +528,7 @@ function HealiumUnitFrames_Button_OnAttributeChanged(frame, name, value)
 				frame.buffs[i].unit = newUnit
 			end
 
-			HealiumUnitFames_CheckPowerType(newUnit, frame)
-
+			Healium_UpdateManaBarVisibility(frame) -- This is important to do here.
 			Healium_UpdateUnitName(newUnit, frame)
 			Healium_UpdateUnitHealth(newUnit, frame)
 			Healium_UpdateUnitMana(newUnit, frame)
@@ -916,14 +895,37 @@ function Healium_MakeRankedSpellName(spellName, spellSubtext)
 	return rankedSpellName
 end
 
+local function FindAuraInstanceID(auras, spellId)
+	for i,j in pairs(auras) do
+		if (spellId == j.spellId) and (j.sourceUnit == "player")  then
+			return j.auraInstanceID
+		end
+	end
+
+	return nil
+end
+
 function Healium_UpdateUnitBuffs(unit, frame)
 
 	local buffIndex = 1
 	local Profile = Healium_GetProfile()
 
+	local Auras = {}
+
+	if Healium_IsRetail then
+		local function HandleAura(aura)
+			Auras[aura.auraInstanceID] = aura
+		end
+
+		local batchCount = nil
+		local usePackedAura = true
+		AuraUtil.ForEachAura(unit, "HELPFUL", batchCount, HandleAura, usePackedAura)
+	end
+
+
 	if Healium.ShowBuffs then
 		for i=1, 100, 1 do
-			local name, icon, count, debuffType, duration, expirationTime, source, isStealable = UnitBuff(unit, i)
+			local name, icon, count, debuffType, duration, expirationTime, source, isStealable, shouldConsolidate, spellId = UnitBuff(unit, i)
 			if name then
 				if (source == "player") then
 
@@ -940,6 +942,18 @@ function Healium_UpdateUnitBuffs(unit, frame)
 						local buffFrame = frame.buffs[buffIndex]
 
 						buffFrame:SetID(i)
+
+						if Healium_IsRetail then
+							local auraInstanceID = FindAuraInstanceID(Auras, spellId)
+							--print("auraInstanceID = ", auraInstanceID)
+							if auraInstanceID then
+								buffFrame.auraInstanceID = auraInstanceID
+							else
+								buffFrame.auraInstanceID = 0
+							end
+						end
+
+
 						buffFrame.icon:SetTexture(icon)
 
 						if count > 1 then

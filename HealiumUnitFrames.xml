@@ -156,10 +156,6 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
-				<Scripts>
-					<OnEnter>GameTooltip:Hide();</OnEnter>
-					<OnLeave>GameTooltip:Hide();</OnLeave>
-				</Scripts>	
 			</Frame>
 			<Frame name="$parent_Buff2" inherits="TargetBuffFrameTemplate">
 				<Anchors>
@@ -169,10 +165,6 @@
 						</Offset>
 					</Anchor>
 				</Anchors>	
-				<Scripts>
-					<OnEnter>GameTooltip:Hide();</OnEnter>
-					<OnLeave>GameTooltip:Hide();</OnLeave>
-				</Scripts>	
 			</Frame>			
 			<Frame name="$parent_Buff3" inherits="TargetBuffFrameTemplate">
 				<Anchors>
@@ -182,10 +174,6 @@
 						</Offset>
 					</Anchor>
 				</Anchors>				
-				<Scripts>
-					<OnEnter>GameTooltip:Hide();</OnEnter>
-					<OnLeave>GameTooltip:Hide();</OnLeave>
-				</Scripts>	
 			</Frame>						
 			<Frame name="$parent_Buff4" inherits="TargetBuffFrameTemplate">
 				<Anchors>
@@ -195,10 +183,6 @@
 						</Offset>
 					</Anchor>
 				</Anchors>				
-				<Scripts>
-					<OnEnter>GameTooltip:Hide();</OnEnter>
-					<OnLeave>GameTooltip:Hide();</OnLeave>
-				</Scripts>	
 			</Frame>						
 			<Frame name="$parent_Buff5" inherits="TargetBuffFrameTemplate">
 				<Anchors>
@@ -208,10 +192,6 @@
 						</Offset>
 					</Anchor>
 				</Anchors>				
-				<Scripts>
-					<OnEnter>GameTooltip:Hide();</OnEnter>
-					<OnLeave>GameTooltip:Hide();</OnLeave>
-				</Scripts>	
 			</Frame>				
 			<Frame name="$parent_Buff6" inherits="TargetBuffFrameTemplate">
 				<Anchors>
@@ -221,10 +201,6 @@
 						</Offset>
 					</Anchor>
 				</Anchors>	
-				<Scripts>
-					<OnEnter>GameTooltip:Hide();</OnEnter>
-					<OnLeave>GameTooltip:Hide();</OnLeave>
-				</Scripts>	
 			</Frame>				
 			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="100">
 				<Size x="111" y="23"/>

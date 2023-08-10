@@ -6,7 +6,7 @@
 -- To get the wow interface number use /run print((select(4, GetBuildInfo())))
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 2.9.6|r"
+local AddonVersion = "|cFFFFFF00 2.10.0|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 
@@ -73,6 +73,7 @@ Healium = {
   ShowIncomingHeals = true,						-- Whether or not to show incoming heals
   ShowRaidIcons = true,							-- Whether or not to show raid icons
   UppercaseNames = true,						-- Whether or not to show names in UPPERCASE
+  ShowMinimapButton = true						-- Whether or not to show the minimap button
 }
 
 -- HealiumGlobal is the variable that holds all Healium settings that are not character specific
@@ -131,6 +132,12 @@ function Healium_Print(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(Healium_AddonColor .. Healium_AddonName .. "|r " .. tostring(msg))		
 end
 
+function Healium_TableLength(T)
+  local count = 0
+  for _ in pairs(T) do count = count + 1 end
+  return count
+end
+
 function Healium_DebugPrint(...)
 	if (Healium_Debug) then
 		local result = "Debug: "
@@ -150,7 +157,9 @@ end
 function Healium_GetProfile()
 	local currentSpec
 
-	if Healium_IsRetail then 
+	if Healium_IsClassicLK then 
+		currentSpec = GetActiveTalentGroup(false, false)
+	elseif Healium_IsRetail then 
 		currentSpec = GetSpecialization()
 	end
 	
@@ -348,20 +357,53 @@ function Healium_UpdateUnitHealth(unitName, NamePlate)
 end
 
 function Healium_UpdateUnitMana(unitName, NamePlate)
+	if not Healium.ShowMana then return end
 	if not NamePlate then return end
 	if not UnitExists(unitName) then return end
 	
-	if NamePlate.showMana == nil then return end
-	
-	local Mana = UnitPower(unitName, SPELL_POWER_MANA)
-	local MaxMana = UnitPowerMax(unitName, SPELL_POWER_MANA)
+	local Mana = UnitPower(unitName, Enum.PowerType.Mana)
+	local MaxMana = UnitPowerMax(unitName, Enum.PowerType.Mana)
 
+	Healium_DebugPrint("Mana: ", Mana, " MaxMana: ", MaxMana)
+	
 	if UnitIsDeadOrGhost(unitName) then
 		Mana = 0
 	end
+	
+	local grayBar 
+	
+	if unitName == "player" then 
+		grayBar = MaxMana == 0
+		-- Can't use MaxMana to properly tell if a unit can have mana. 
+		-- It will work fine if you're the player, but it will not work correctly for others when their primary power is not mana. For others it will always report their current Mana as 0, when their primary power is not mana.
+		-- This check here prevents stuff like showing gray bar for yourself if you are elemental shaman
+	else
+		local _, powerType = UnitPowerType(unitName)
+		if powerType ~= "MANA" then 
+			grayBar = true
+		end
+	end
 
-	NamePlate.ManaBar:SetMinMaxValues(0,MaxMana)
-	NamePlate.ManaBar:SetValue(Mana)
+	if grayBar then
+		-- unit can't have mana so set to gray mana bar
+		if (NamePlate.showingMana) then
+			Healium_DebugPrint("Graying out manabar for " , unitName)
+			NamePlate.ManaBar:SetStatusBarColor( .5, .5, .5 )
+			NamePlate.ManaBar:SetMinMaxValues(0,1)
+			NamePlate.ManaBar:SetValue(1)
+			NamePlate.showingMana = nil
+		end
+	else
+		if not NamePlate.showingMana then
+			Healium_DebugPrint("Configuring manabar for " , unitName)
+			local powerColor = PowerBarColor["MANA"];
+			NamePlate.ManaBar:SetStatusBarColor( powerColor.r, powerColor.g, powerColor.b )
+			NamePlate.showingMana = true				
+		end
+		NamePlate.ManaBar:SetMinMaxValues(0,MaxMana)
+		NamePlate.ManaBar:SetValue(Mana)
+		Healium_DebugPrint("Set ManaBar to: ", Mana, " MaxMana: ", MaxMana)		
+	end
 end
 
 function Healium_UpdateShowMana()
@@ -375,7 +417,6 @@ function Healium_UpdateShowMana()
 
 	for _, k in ipairs(Healium_Frames) do
 		if (k.TargetUnit) then
-			HealiumUnitFames_CheckPowerType(k.TargetUnit, k)
 			Healium_UpdateUnitMana(k.TargetUnit, k)
 		end
 		
@@ -538,6 +579,14 @@ function Healium_UpdateShowRaidIcons()
 	end
 	
 	Healium_UpdateRaidIcons()
+end
+
+function Healium_UpdateShowMinimapButton()
+	if Healium.ShowMinimapButton then
+		Healium_MMButton:Show()
+	else
+		Healium_MMButton:Hide()
+	end
 end
 
 function Healium_UpdateShowTargetFrame()
@@ -1107,6 +1156,10 @@ local function InitVariables()
 		Healium.UppercaseNames = true
 	end	
 	
+	if Healium.ShowMinimapButton == nil then 
+		Healium.ShowMinimapButton = true
+	end	
+	
 	if HealiumGlobal.Friends == nil then
 		HealiumGlobal.Friends = { }
 	end
@@ -1170,6 +1223,15 @@ function Healium_OnEvent(frame, event, ...)
 		return
 	end
 
+	if event == "UNIT_DISPLAYPOWER" then
+		if Healium_Units[arg1] then
+			for i,v  in pairs(Healium_Units[arg1]) do
+				Healium_UpdateUnitMana(arg1, v)
+			end
+		end
+		return
+	end
+	
     if event == "UNIT_POWER_UPDATE" then
 		if (arg2 == "MANA") and Healium_Units[arg1] then
 			for _,v  in pairs(Healium_Units[arg1]) do
@@ -1249,7 +1311,6 @@ function Healium_OnEvent(frame, event, ...)
 		Healium_Update_ConfigPanel()
 		return
 	end
-	
 
 	if ((event == "SPELLS_CHANGED") and (not frame.Respecing)) then
 		Healium_DebugPrint("SPELLS_CHANGED")
@@ -1263,16 +1324,6 @@ function Healium_OnEvent(frame, event, ...)
 		Healium_DebugPrint("PLAYER_ENTERING_WORLD")
 		-- Populate the Healium_Spell Table with ID and Icon data.
 		Healium_UpdateSpells()
-	end
-	
-	if event == "UNIT_DISPLAYPOWER" then
-		if Healium_Units[arg1] then
-			for i,v  in pairs(Healium_Units[arg1]) do
-				HealiumUnitFames_CheckPowerType(arg1, v)
-			end
-		end
-
-		return
 	end
 	
 	if (event == "RAID_TARGET_UPDATE") and Healium.ShowRaidIcons then
@@ -1316,6 +1367,7 @@ function Healium_OnEvent(frame, event, ...)
 		Healium_InitSpells(HealiumClass, HealiumRace) 		
 		Healium_InitDebuffSound()		
 		Healium_CreateMiniMapButton()
+		Healium_UpdateShowMinimapButton()
 		Healium_CreateConfigPanel(HealiumClass, AddonVersion)
 		Healium_InitSlashCommands()
 		Healium_InitMenu()		

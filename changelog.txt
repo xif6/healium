@@ -1,6 +1,24 @@
+2.10.0 LK CLASSIC
+* Added config option to Show or Hide the Healium Minimap button
+* The button configuration and button count settings are now saved seperately for each talent specialization.
+
+2.9.9 RETAIL
+* Evoker: Added these spells to the default list of spells: Expunge, Cauterizing Flame, Spiritbloom, Reversion, Time Dilation, Rescue
+* Evoker: Configured Expunge and Cauterizing Flame for cures
+
+2.9.8 RETAIL
+* Re-enabled buff tooltips
+* Now show gray mana bar for other party menbers (other than yourself) when they have a primary power type that's not mana, since it always reports 0 mana for them.
+
+2.9.7 RETAIL
+* Added these spells to priest default spell list: Pain Suppression, Rapture
+* Fix showing the mana bar regardless of the Show Mana setting
+* Fix showing gray mana bar when characters have multiple power types 
+
 2.9.6 LK Classic
 * Shaman Cleans Spirit talent should notify about cures now
 * Added support and checkbox options for heal prediction, threat, and role icons
+* Added support for focus frame
 
 2.9.5 Classic
 * Added support and checkbox options for heal prediction, and threat

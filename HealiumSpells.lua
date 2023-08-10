@@ -163,7 +163,8 @@ function Healium_InitSpells(class, race)
 			AddSpell(121135)	-- Cascade (not sure if correct Cascade)
 			AddSpell(2006)		-- Resurrection (rez)
 			AddSpell(194509)    -- Power Word: Radiance
-			
+			AddSpell(33206)     -- Pain Suppression
+            AddSpell(47536)     -- Rapture			
 	
 			-- Priest Purify, retail version
 			CureName = SpellName(527)
@@ -339,8 +340,14 @@ function Healium_InitSpells(class, race)
 			AddSpell(355936) -- Dream Breath
 			AddSpell(360823) -- Naturalize
 			AddSpell(361227) -- Return 
+			AddSpell(365585) -- Expunge
+			AddSpell(374251) -- Cauterizing Flame
+			AddSpell(367226) -- Spiritbloom
+			AddSpell(367364) -- Reversion
+			AddSpell(357170) -- Time Dilation
+			AddSpell(370665) -- Rescue
 			
-		-- Naturalize
+			-- Naturalize
 			CureName = SpellName(360823)
 			if CureName then 
 				Cures[CureName] = {	
@@ -348,6 +355,24 @@ function Healium_InitSpells(class, race)
 					CanCurePoison = true, 					
 				}
 			end
+			
+			-- Expunge
+			CureName = SpellName(365585)
+			if CureName then 
+				Cures[CureName] = {	
+					CanCurePoison = true, 					
+				}
+			end
+
+			-- Cauterizing Flame			
+			CureName = SpellName(374251)
+			if CureName then 
+				Cures[CureName] = {	
+					CanCurePoison = true, 
+					CanCureDisease = true,
+					CanCureCurse = true, 					
+				}
+			end			
 		end
 	end	
 	

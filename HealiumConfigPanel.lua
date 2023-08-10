@@ -190,6 +190,11 @@ local function UppercaseNamesCheck_OnClick(frame)
 	Healium_UpdateUnitNames()
 end
 
+local function ShowMinimapButtonCheck_OnClick(frame)
+	Healium.ShowMinimapButton = frame:GetChecked() or false
+	Healium_UpdateShowMinimapButton()
+end
+
 local function UpdateEnableDebuffsControls(frame)
 	local color 
 	if frame:GetChecked() then
@@ -426,13 +431,19 @@ function Healium_CreateConfigPanel(Class, Version)
 	-- Uppercase names check button
 	local UppercaseNamesCheck = CreateCheck("$parentShowUppercaseNamesCheckButton",scrollchild,ShowRaidIconsCheck, "Shows names in UPPERCASE text.", "UPPERCASE names")
 	UppercaseNamesCheck:SetScript("OnClick", UppercaseNamesCheck_OnClick)
+
+	-- Show minimap button check
+	local ShowMinimapButtonCheck = CreateCheck("$parentShowMinimapButtonCheckButton",scrollchild,UppercaseNamesCheck, "Shows the Minimap button", "Show Minimap button")
+	ShowMinimapButtonCheck:SetScript("OnClick", ShowMinimapButtonCheck_OnClick)
+	
+	
 	local ClassicConfigButtonsText
 	
 	if Healium_IsRetail then		
 		-- Dropdown menus
 		local ButtonConfigTitleText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalLarge")
 		ButtonConfigTitleText:SetJustifyH("LEFT")
-		ButtonConfigTitleText:SetPoint("TOPLEFT", UppercaseNamesCheck, "BOTTOMLEFT", 0, -20)
+		ButtonConfigTitleText:SetPoint("TOPLEFT", ShowMinimapButtonCheck, "BOTTOMLEFT", 0, -20)
 		ButtonConfigTitleText:SetText("Button Configuration")	
 		
 		local ButtonConfigTitleSubText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalSmall")
@@ -453,7 +464,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	else
 		ClassicConfigButtonsText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalSmall")
 		ClassicConfigButtonsText:SetJustifyH("LEFT")
-		ClassicConfigButtonsText:SetPoint("TOPLEFT", UppercaseNamesCheck, "BOTTOMLEFT", 0, -30)
+		ClassicConfigButtonsText:SetPoint("TOPLEFT", ShowMinimapButtonCheck, "BOTTOMLEFT", 0, -30)
 		ClassicConfigButtonsText:SetText("In Classic, to configure buttons, drag and drop directly from the spellbook onto buttons.")
 		ClassicConfigButtonsText:SetTextColor(1,1,1,1) 	
 	end
@@ -885,6 +896,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	
 	ShowRaidIconsCheck:SetChecked(Healium.ShowRaidIcons)
 	UppercaseNamesCheck:SetChecked(Healium.UppercaseNames)
+	ShowMinimapButtonCheck:SetChecked(Healium.ShowMinimapButton)
 	EnableDebuffAudioCheck:SetChecked(Healium.EnableDebufAudio)
 	EnableDebuffHealthbarHighlightingCheck:SetChecked(Healium.EnableDebufHealthbarHighlighting)
 	EnableDebuffButtonHighlightingCheck:SetChecked(Healium.EnableDebufButtonHighlighting)
