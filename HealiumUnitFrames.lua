@@ -6,6 +6,8 @@ local MeFrame = nil
 local TanksFrame = nil
 local FriendsFrame = nil
 local GroupFrames = { }
+local TargetFrame = nil
+local FocusFrame = nil
 
 local PartyFrameWasShown = nil
 local PetsFrameWasShown = nil
@@ -13,6 +15,8 @@ local MeFrameWasShown = nil
 local TanksFrameWasShown = nil
 local FriendsFrameWasShown = nil
 local GroupFramesWasShown = { }
+local TargetFrameWasShown = nil
+local FocusFrameWasShown = nil
 
 local MaxBuffs = 6
 local xSpacing = 2
@@ -247,6 +251,17 @@ local function CreateFriendsHeader(FrameName, ParentFrame)
 	return h
 end
 
+local function CreateCustomHeader(FrameName, ParentFrame, Unit)
+	local h = CreateFrame("Button", FrameName, ParentFrame, "HealiumUnitFrames_ButtonTemplate")
+	h.isCustom = true
+	ParentFrame.hdr = h
+	h:SetAttribute("unit", Unit)
+	h:SetPoint("TOPLEFT", ParentFrame, "BOTTOMLEFT")
+	RegisterUnitWatch(h)
+	h:Show()
+	return h
+end
+
 local function CreateGroupUnitFrame(FrameName, Caption, Group)
 	local uf = CreateUnitFrame(FrameName, Caption)
 	local h = CreateGroupHeader(FrameName .. "_Header", uf, Group)
@@ -280,6 +295,18 @@ end
 local function CreatePartyUnitFrame(FrameName, Caption)
 	local uf = CreateUnitFrame(FrameName, Caption)
 	local h = CreatePartyHeader(FrameName .. "_Header", uf)
+	return uf
+end
+
+local function CreateTargetUnitFrame(FrameName, Caption)
+	local uf = CreateUnitFrame(FrameName, Caption)
+	local h = CreateCustomHeader(FrameName .. "_Header", uf, "target")
+	return uf
+end
+
+local function CreateFocusUnitFrame(FrameName, Caption)
+	local uf = CreateUnitFrame(FrameName, Caption)
+	local h = CreateCustomHeader(FrameName .. "_Header", uf, "focus")
 	return uf
 end
 
@@ -356,6 +383,25 @@ function HealiumUnitFrames_ShowHideFrame(self, show)
 		return
 	end
 
+	if self == TargetFrame then
+		Healium_DebugPrint("ShowHide Target Frame")
+		Healium.ShowTargetFrame = show
+		Healium_ShowTargetCheck:SetChecked(Healium.ShowTargetFrame)
+		Healium_UpdateShowTargetFrame()
+		Healium_UpdateTargetFrame()
+		return
+	end
+
+	if self == FocusFrame then
+		Healium_DebugPrint("ShowHide Focus Frame")
+		Healium.ShowFocusFrame = show
+		Healium_ShowFocusCheck:SetChecked(Healium.ShowFocusFrame)
+		Healium_UpdateShowFocusFrame()
+		Healium_UpdateFocusFrame()
+		return
+	end
+
+
 	for i,j in ipairs(GroupFrames) do
 		if self == j then
 			Healium.ShowGroupFrames[i] = show
@@ -421,7 +467,12 @@ end
 function HealiumUnitFrames_Button_OnHide(self)
 	Healium_ShownFrames[self] = nil
 
-	local parent = self:GetParent():GetParent()
+	local parent = self:GetParent()
+
+	if not self.isCustom then
+		parent = parent:GetParent()
+	end
+
 	if parent.childismoving then
 		parent:StopMovingOrSizing()
 		parent.childismoving = nil
@@ -433,6 +484,8 @@ function HealiumUnitFrames_Button_OnAttributeChanged(self, name, value)
 	if name == "unit" or name == "unitsuffix" then
 		local newUnit = SecureButton_GetUnit(self)
 		local oldUnit = self.TargetUnit
+
+		Healium_DebugPrint(newUnit)
 
 --		if newUnit == oldUnit then
 --			return
@@ -454,7 +507,10 @@ function HealiumUnitFrames_Button_OnAttributeChanged(self, name, value)
 
 			--if self:IsVisible() then
 				local playerName= UnitName(newUnit)
-				self.name:SetText(strupper(playerName))
+				if playerName ~= nil then
+					playerName = strupper(playerName)
+				end
+				self.name:SetText(playerName)
 			--end
 
 			if not Healium_Units[newUnit] then
@@ -475,6 +531,7 @@ function HealiumUnitFrames_Button_OnAttributeChanged(self, name, value)
 			Healium_UpdateUnitThreat(newUnit, self)
 			Healium_UpdateUnitRole(newUnit, self)
 			Healium_UpdateSpecialBuffs(newUnit)
+			Healium_UpdateRaidTargetIcon(self)
 		end
 
 		if oldUnit then
@@ -494,7 +551,12 @@ end
 
 function HealiumUnitFrames_Button_OnMouseDown(self, button)
 	if button == "RightButton" and not Healium.LockFrames then
-		local parent = self:GetParent():GetParent()
+		local parent = self:GetParent()
+
+		if not self.isCustom then
+			parent = parent:GetParent()
+		end
+
 		parent.childismoving = true
 		parent:StartMoving()
 	end
@@ -502,7 +564,12 @@ end
 
 function HealiumUnitFrames_Button_OnMouseUp(self, button)
 	if button == "RightButton" then
-		local parent = self:GetParent():GetParent()
+		local parent = self:GetParent()
+
+		if not self.isCustom then
+			parent = parent:GetParent()
+		end
+
 		parent:StopMovingOrSizing()
 		parent.childismoving = nil
 	end
@@ -533,6 +600,8 @@ function Healium_ToggleAllFrames()
 	if MeFrame:IsShown() then hide = true end
 	if FriendsFrame:IsShown() then hide = true end
 	if TanksFrame:IsShown() then hide = true end
+	if TargetFrame:IsShown() then hide = true end
+	if FocusFrame:IsShown() then hide = true end
 
 	for i,j in ipairs(GroupFrames) do
 		if j:IsShown() then
@@ -547,12 +616,16 @@ function Healium_ToggleAllFrames()
 		MeFrameWasShown = MeFrame:IsShown()
 		FriendsFrameWasShown = FriendsFrame:IsShown()
 		TanksFrameWasShown = TanksFrame:IsShown()
+		TargetFrameWasShown = TargetFrame:IsShown()
+		FocusFrameWasShown = FocusFrame:IsShown()
 
 		PartyFrame:Hide()
 		PetsFrame:Hide()
 		MeFrame:Hide()
 		FriendsFrame:Hide()
 		TanksFrame:Hide()
+		TargetFrame:Hide()
+		FocusFrame:Hide()
 
 		for i,j in ipairs(GroupFrames) do
 			GroupFramesWasShown[i] = j:IsShown()
@@ -564,25 +637,13 @@ function Healium_ToggleAllFrames()
 
 	-- after this point, we know we are showing frames
 
-	if PartyFrameWasShown then
-		PartyFrame:Show()
-	end
-
-	if PetsFrameWasShown then
-		PetsFrame:Show()
-	end
-
-	if MeFrameWasShown then
-		MeFrame:Show()
-	end
-
-	if FriendsFrameWasShown then
-		FriendsFrame:Show()
-	end
-
-	if TanksFrameWasShown then
-		TanksFrame:Show()
-	end
+	if PartyFrameWasShown then PartyFrame:Show() end
+	if PetsFrameWasShown then PetsFrame:Show() end
+	if MeFrameWasShown then MeFrame:Show() end
+	if FriendsFrameWasShown then FriendsFrame:Show() end
+	if TanksFrameWasShown then TanksFrame:Show() end
+	if TargetFrameWasShown then TargetFrame:Show() end
+	if FocusFrameWasShown then FocusFrame:Show() end
 
 	for i,j in ipairs(GroupFramesWasShown) do
 		if j then
@@ -597,6 +658,7 @@ function Healium_ToggleAllFrames()
 end
 
 function Healium_ShowHidePartyFrame(show)
+	if InCombatLockdown() then return end
 	if (show ~= nil) then Healium.ShowPartyFrame = show end
 
 	if Healium.ShowPartyFrame then
@@ -607,6 +669,7 @@ function Healium_ShowHidePartyFrame(show)
 end
 
 function Healium_ShowHidePetsFrame(show)
+	if InCombatLockdown() then return end
 	if (show ~= nil) then Healium.ShowPetsFrame = show end
 
 	if Healium.ShowPetsFrame then
@@ -617,6 +680,7 @@ function Healium_ShowHidePetsFrame(show)
 end
 
 function Healium_ShowHideMeFrame(show)
+	if InCombatLockdown() then return end
 	if (show ~= nil) then Healium.ShowMeFrame = show end
 
 	if Healium.ShowMeFrame then
@@ -627,6 +691,7 @@ function Healium_ShowHideMeFrame(show)
 end
 
 function Healium_ShowHideFriendsFrame(show)
+	if InCombatLockdown() then return end
 	if (show ~= nil) then Healium.ShowFriendsFrame = show end
 
 	if Healium.ShowFriendsFrame then
@@ -636,8 +701,8 @@ function Healium_ShowHideFriendsFrame(show)
 	end
 end
 
-
 function Healium_ShowHideTanksFrame(show)
+	if InCombatLockdown() then return end
 	if (show ~= nil) then Healium.ShowTanksFrame = show end
 
 	if Healium.ShowTanksFrame then
@@ -647,7 +712,34 @@ function Healium_ShowHideTanksFrame(show)
 	end
 end
 
+function Healium_ShowHideTargetFrame(show)
+	if InCombatLockdown() then return end
+	if (show ~= nil) then Healium.ShowTargetFrame = show end
+
+	if Healium.ShowTargetFrame then
+		TargetFrame:Show()
+	else
+		TargetFrame:Hide()
+	end
+
+	Healium_UpdateShowTargetFrame()
+end
+
+function Healium_ShowHideFocusFrame(show)
+	if InCombatLockdown() then return end
+	if (show ~= nil) then Healium.ShowFocusFrame = show end
+
+	if Healium.ShowFocusFrame then
+		FocusFrame:Show()
+	else
+		FocusFrame:Hide()
+	end
+
+	Healium_UpdateShowFocusFrame()
+end
+
 function Healium_ShowHideGroupFrame(group, show)
+	if InCombatLockdown() then return end
 	if (show ~= nil) then Healium.ShowGroupFrames[group] = show end
 
 	if Healium.ShowGroupFrames[group] then
@@ -658,6 +750,7 @@ function Healium_ShowHideGroupFrame(group, show)
 end
 
 function Healium_HideAllRaidFrames()
+	if InCombatLockdown() then return end
 	TanksFrame:Hide()
 	for i,j in ipairs(GroupFrames) do
 		j:Hide()
@@ -668,17 +761,20 @@ function Healium_ShowAllRaidFramesWithMembers()
 end
 
 function Healium_Show10ManRaidFrames()
+	if InCombatLockdown() then return end
 	GroupFrames[1]:Show()
 	GroupFrames[2]:Show()
 end
 
 function Healium_Show25ManRaidFrames()
+	if InCombatLockdown() then return end
 	for i=1, 5, 1 do
 		GroupFrames[i]:Show()
 	end
 end
 
 function Healium_Show40ManRaidFrames()
+	if InCombatLockdown() then return end
 	for i=1, 8, 1 do
 		GroupFrames[i]:Show()
 	end
@@ -711,6 +807,16 @@ function Healium_CreateUnitFrames()
 		TanksFrame:Show()
 	end
 
+	TargetFrame = CreateTargetUnitFrame("HealiumTargetFrame", "Target")
+	if Healium.ShowTargetFrame then
+		TargetFrame:Show()
+	end
+
+	FocusFrame = CreateFocusUnitFrame("HealiumFocusFrame", "Focus")
+	if Healium.ShowFocusFrame then
+		FocusFrame:Show()
+	end
+
 	for i=1, 8, 1 do
 		GroupFrames[i] = CreateGroupUnitFrame("HealiumGroup" .. i .. "Frame", "Group " .. i, tostring(i))
 		GroupFramesWasShown[i]  = false
@@ -727,6 +833,8 @@ function Healium_SetScale()
 	MeFrame:SetScale(Scale)
 	FriendsFrame:SetScale(Scale)
 	TanksFrame:SetScale(Scale)
+	TargetFrame:SetScale(Scale)
+	FocusFrame:SetScale(Scale)
 
 	for i,j in ipairs(GroupFrames) do
 		j:SetScale(Scale)
@@ -910,4 +1018,12 @@ function Healium_UpdateFriends()
 	Healium_DebugPrint("namesListFriends: " ..names)
 	FriendsFrame.hdr:SetAttribute("nameList", names)
 --	Healium_DebugPrint("Friends header is shown: " .. FriendsFrame.hdr:IsShown())
+end
+
+function Healium_UpdateTargetFrame()
+	HealiumUnitFrames_Button_OnAttributeChanged(TargetFrame.hdr, "unit")
+end
+
+function Healium_UpdateFocusFrame()
+	HealiumUnitFrames_Button_OnAttributeChanged(FocusFrame.hdr, "unit")
 end
