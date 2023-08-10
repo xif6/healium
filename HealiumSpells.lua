@@ -39,7 +39,7 @@ function Healium_InitSpells(class, race)
 		AddSpell(5185)		-- Healing Touch
 		AddSpell(18562)		-- Swiftmend
 		AddSpell(50464)		-- Nourish
-		AddSpell(53248)		-- Wild Growth
+		AddSpell(48438)		-- Wild Growth
 		AddSpell(29166)		-- Innervate
 		AddSpell(20484)		-- Rebirth
 		AddSpell(2782)		-- Remove Corruption
@@ -88,6 +88,7 @@ function Healium_InitSpells(class, race)
 		AddSpell(1064)		-- Chain Heal		
 		AddSpell(61295)		-- Riptide		
 		AddSpell(974)		-- Earth Shield
+		AddSpell(16188)		-- Nature's Swiftness
 			
 		-- Shaman Cleanse Spirit
 		Cures[SpellName(51886)] = { 
