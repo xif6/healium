@@ -285,6 +285,7 @@ function Healium_UpdateUnitHealth(UnitName, NamePlate)
 	else
 		UpdateHealthBar(HPPercent, NamePlate)
 	end
+	Healium_UpdateIncomingHealth(UnitGUID(UnitName))
 
 end
 
