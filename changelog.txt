@@ -1,3 +1,18 @@
+2.0.0
+* Support wow version 4.1
+* Added support for Macros and Items.  You must use Drag and Drop to configure them both, as neither macros nor items appear in the Healium menus.
+   Macros must use [@mouseover] modifier to work correctly with Healium, otherwise they will use the default macro target logic (usually cast on you or your current target)
+   Here is an example macro for instant Druid's Healing Touch that works with Healium:
+
+	#showtooltip
+	/cast Nature's Swiftness
+	/cast [@mouseover] Healing Touch
+
+   Note that if you omit the [@mousover] it will cast on your current target or yourself, instead of using the target assigned to the Healium button.
+
+* Removed ability to auto-import Button Assignments and Button Count settings from ancient versions of Healium (prior to .9.3.0)
+* Added /hlm show target and /hlm show focus slash commands
+
 1.4.2
 * Fix bug predict health
 

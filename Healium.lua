@@ -5,7 +5,7 @@
 -- Color control characters |CAARRGGBB  then |r resets to normal, where AA == Alpha, RR = Red, GG = Green, BB = blue
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 1.4.0|r"
+local AddonVersion = "|cFFFFFF00 2.0.0|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 
@@ -45,7 +45,9 @@ Healium = {
   ShowMeFrame = false,  						-- Whether or not to show the me frame
   ShowFriendsFrame = false,						-- Whether or not to show the friends frame
   ShowGroupFrames = { },  						-- Whether or not to show individual group frame
-  ShowTanks = false,							-- Whether or not to show the tanks frame
+  ShowDamagersFrame = false,			     	-- Whether or not to show the Damagers frame
+  ShowHealersFrame = false,						-- Whether or not to show the Heals frame
+  ShowTanksFrame = false,						-- Whether or not to show the Tanks frame
   ShowTargetFrame = false,						-- Whether or not to show the target frame
   ShowFocusFrame = false,						-- Whether or not to show the focus frame
   ShowBuffs = true,								-- Whether or not to show your own buffs, that are configured in Healium to the left of the healthbar
@@ -76,7 +78,9 @@ Healium.Profiles is a table of tables with this signature
 {
 	ButtonCount -- Current button count (as set by slider)
 	SpellNames -- Table of current spell names
-	SpellIcons -- Table of current spell IDs
+	SpellIcons -- Table of current spell icons
+	SpellTypes -- One of the Healium_Type_ (new in Healium 2.0)
+	IDs -- item ID when SpelType is Healium_Type_Item
 }
 ]]
 
@@ -87,25 +91,15 @@ Healium_AddonColor = "|cFF55AAFF"
 Healium_AddonColoredName = Healium_AddonColor .. Healium_AddonName .. "|r"
 Healium_MaxClassSpells = 20 -- For now this is manually set to the max number of class specific spells in Healium_Spell.Name which currently is priest
 
+Healium_Type_Spell = 0
+Healium_Type_Macro = 1
+Healium_Type_Item = 2
 
 -- NEW FRAMES VARIABLES
 Healium_Units = { { } } -- table of tables that maps unit names to their frame, used for efficient handling of UNIT_HEALTH so each button doesn't get a UNIT_HEALTH event for every unit.
 Healium_Frames = { } -- table of all created "unit" frames.  Can access buttons from each of these.
 Healium_ShownFrames = { } -- table of all shown "unit" frames.
-Healium_ButtonIDs = { } -- table of IDs that correspond to the selected spells, not persisted
 Healium_FixNameplates = { } -- nameplates that need various updates when out of combat
-
-Healium_HackOnShow = { }
-Healium_DoHackOnShow = nil
-
---[[
-Healium_DefaultButtons = {
-	1 = {}
-	2 = {}
-	3 = {}
-	4 = {}
-}
---]]
 
 --[[
 List of spells, icons for the spells, and IDs.
@@ -542,7 +536,7 @@ local function Healium_UpdateSpells()
 		end
 	end
 
-	Healium_UpdateButtonSpells()
+	Healium_UpdateButtonAttributes()
 end
 
 -- does special checks for specific buffs/debuffs
@@ -586,7 +580,6 @@ function Healium_UpdateSpecialBuffs(unit)
 				local units = Healium_Units[unit]
 
 				if units then
---					local start, duration, enable = GetSpellCooldown(Healium_ButtonIDs[i], SpellBookFrame.bookType)
 					local rejuvName, _, _, _, _, rejuvDuration, rejuvExpirationTime = UnitBuff(unit, RejuvinationName)
 					local regrowthName, _, _, _, _, regrowthDuration, regrowthExpirationTime = UnitBuff(unit, RegrowthName)
 
@@ -615,22 +608,59 @@ function Healium_UpdateSpecialBuffs(unit)
 end
 
 -- Efficient cooldowns
-function Healium_UpdateButtonCooldownsByColumn(column)
+local function GetCooldown(Profile, column)
+	local start, duration, enable
 
-	if Healium_ButtonIDs[column] then
-		local start, duration, enable = GetSpellCooldown(Healium_ButtonIDs[column], SpellBookFrame.bookType)
+	if Profile.IDs[column] ~= nill then
+
+		if Profile.SpellTypes[column] == Healium_Type_Macro then
+			-- no cooldowns for macros, currently
+			enable = false
+		elseif Profile.SpellTypes[column] == Healium_Type_Item then
+			-- Handle "item" cooldowns
+			GetItemInfo(Profile.SpellNames[column])
+			start, duration, enable = GetItemCooldown(Profile.IDs[column])
+		else
+			-- Handle "spell" cooldowns
+			local name = Profile.SpellNames[column]
+			if name then
+				start, duration, enable = GetSpellCooldown(Profile.IDs[column], SpellBookFrame.bookType)
+			else
+				enable = false
+			end
+		end
+
+	end
+
+	return start, duration, enable
+end
+
+function Healium_UpdateButtonCooldown(self, start, duration, enable)
+	local Profile = Healium_GetProfile()
+	local column = self.index
+
+	start, duration, enable = GetCooldown(Profile, column)
+
+	if self then
+		if self:IsShown() then
+			CooldownFrame_SetTimer(self.cooldown, start, duration, enable)
+		end
+	end
+end
+
+function Healium_UpdateButtonCooldownsByColumn(column)
+	local Profile = Healium_GetProfile()
+
+	local start, duration, enable = GetCooldown(Profile, column)
 
 		for unit, j in pairs(Healium_Units) do
 			for x,y in pairs(j) do
 				local button = y.buttons[column]
 				if button then
-					if button:IsShown() then
-						CooldownFrame_SetTimer(button.cooldown, start, duration, enable)
-					end
-				end
+				Healium_UpdateButtonCooldown(button, start, duration, enable)
 			end
-			Healium_UpdateSpecialBuffs(unit)
 		end
+		Healium_UpdateSpecialBuffs(unit)
 	end
 end
 
@@ -674,67 +704,56 @@ function Healium_UpdateButtonIcons()
    end
 end
 
-function Healium_UpdateButtonSpell(button, spell, id, checkforCombat)
-
-	local oldspell = button:GetAttribute("spell")
-	local oldid = button.id
-
-	if (oldspell == spell) and (oldid == id) then
+function Healium_SetButtonAttributes(button)
+	if InCombatLockdown() then
 		return
 	end
 
-	if checkforCombat then
-		if InCombatLockdown() then
-			return
-		end
+	local index = button.index
+	local Profile = Healium_GetProfile()
+	local stype, spell, macro, item
+
+	if Profile.SpellTypes[index] == Healium_Type_Macro then
+		stype = "macro"
+		macro = Profile.SpellNames[index]
+	elseif Profile.SpellTypes[index] == Healium_Type_Item then
+		stype = "item"
+		item = Profile.SpellNames[index]
+	else
+		stype = "spell"
+		spell = Profile.SpellNames[index]
 	end
 
-	button.id = id
+	button.id = Profile.IDs[index]
+
+	button:SetAttribute("type", stype)
 	button:SetAttribute("spell", spell)
+	button:SetAttribute("macro", macro)
+	button:SetAttribute("item", item)
 end
 
-function Healium_UpdateButtonSpells()
+function Healium_UpdateButtonAttributes()
 	local Profile = Healium_GetProfile()
 
 	for i=1, Healium_MaxButtons, 1 do
-		local spell = Profile.SpellNames[i]
-		local id
 
-		-- try existing ID first as an optimization
-		-- This code section caused an issue when a user trained a new spell with the same name, it would prevent it from showing the tooltip of the newer version.
---		if Healium_ButtonIDs[i] then
---			local spellName = GetSpellName(Healium_ButtonIDs[i], BOOKTYPE_SPELL )
---			if spellName == spell then
---				id = Healium_ButtonIDs[i]
---			end
---		end
-
-		-- look up in healing spells list
-		if not id then
-			for k=1, Healium_MaxClassSpells, 1 do
-				if (spell == Healium_Spell.Name[k]) then
-					id = Healium_Spell.ID[k]
-					break
-				end
+		-- update spell IDs
+		if (Profile.SpellTypes[i]) == nil or (Profile.SpellTypes[i] == Healium_Type_Spell) then
+			local name = Profile.SpellNames[i]
+			if name then
+				Profile.IDs[i] = GetSpellID(name)
 			end
 		end
-
-		if not id then
-			id = GetSpellID(spell) -- slow method
-		end
-
-		Healium_ButtonIDs[i] = id
 
 		for _,k in ipairs(Healium_Frames) do
 			local button = k.buttons[i]
 			if button then
-				Healium_UpdateButtonSpell(button, spell, id, true)
+				Healium_SetButtonAttributes(button)
 			end
 		end
 	end
 
 	Healium_UpdateCures()
-
 end
 
 local function UpdateButtonVisibility(frame)
@@ -773,13 +792,16 @@ end
 
 function Healium_UpdateButtons()
 	Healium_UpdateButtonVisibility()
-	Healium_UpdateButtonSpells()
+	Healium_UpdateButtonAttributes()
 	Healium_UpdateButtonIcons()
 end
 
 function Healium_RangeCheckButton(button)
-    if (button.id) then
-        local isUsable, noMana = IsUsableSpell(button.id, BOOKTYPE_SPELL)
+	local Profile = Healium_GetProfile()
+
+	if Profile.SpellTypes[button.index] == Healium_Type_Spell then
+		if (button.id) then
+			local isUsable, noMana = IsUsableSpell(button.id, BOOKTYPE_SPELL)
 
 		if noMana then
 			button.icon:SetVertexColor(0.5, 0.5, 1.0)
@@ -807,6 +829,9 @@ function Healium_RangeCheckButton(button)
 			end
 		end
 	end
+end
+
+	-- todo range check macros, and items
 end
 
 function Healium_DeepCopy(object)
@@ -915,6 +940,14 @@ local function InitVariables()
 		Healium.ShowTanksFrame = false
 	end
 
+	if Healium.ShowDamagersFrame == nil then
+		Healium.ShowDamagersFrame = false
+	end
+
+	if Healium.ShowHealersFrame == nil then
+		Healium.ShowHealersFrame = false
+	end
+
 	if Healium.ShowTargetFrame == nil then
 		Healium.ShowTargetFrame = false
 	end
@@ -968,31 +1001,16 @@ local function InitVariables()
 	end
 
 	if Healium.Profiles == nil then
-		if (HealiumDropDownButton ~= nil) and (HealiumDropDownButtonIcon ~= nil) and (Healium.ButtonCount ~= nil) then
-		-- Import profiles from the old HealiumDropDownButton HealiumDropDownButtonIcon saved variables
-			Healium_Print("Importing button profiles.")
-			Healium_Print(Healium_AddonColor .. Healium_AddonName .. "|r now has seperate button configurations for each talent specialization.")
-			Healium_Print("Both " .. Healium_AddonColor .. Healium_AddonName .. "|r button configurations will be set to your current button configuration.")
-			Healium_Print("Any button changes you make will now only be applied to the configuration specific to the talent specialization you are in at the time of the change.")
-			local config = {
-				ButtonCount = Healium.ButtonCount,
-				SpellNames = Healium_DeepCopy(HealiumDropDownButton),
-				SpellIcons = Healium_DeepCopy(HealiumDropDownButtonIcon),
-			}
-			Healium.Profiles = {
-				[1] = Healium_DeepCopy(config),
-				[2] = Healium_DeepCopy(config)
-			}
-		else
-			Healium.Profiles = { }
-		end
+		Healium.Profiles = { }
 	end
 
 	-- Healium.Profiles may exist at this point, but may not be fully inited
 	local DefaultProfile = {
 		ButtonCount = DefaultButtonCount,
 		SpellNames = { },
-		SpellIcons = { }
+		SpellIcons = { },
+		SpellTypes = { },
+		IDs = { },
 	}
 
 	if Healium.Profiles[1] == nil then
@@ -1002,6 +1020,25 @@ local function InitVariables()
 	if Healium.Profiles[2] == nil then
 		Healium.Profiles[2] = Healium_DeepCopy(DefaultProfile)
 	end
+
+	-- SpellTypes was added in 2.0
+	if Healium.Profiles[1].SpellTypes == nil then
+		Healium.Profiles[1].SpellTypes = {}
+	end
+
+	if Healium.Profiles[2].SpellTypes == nil then
+		Healium.Profiles[2].SpellTypes = {}
+	end
+
+	-- IDs was added in 2.0
+	if Healium.Profiles[1].IDs == nil then
+		Healium.Profiles[1].IDs = {}
+	end
+
+	if Healium.Profiles[2].IDs == nil then
+		Healium.Profiles[2].IDs = {}
+	end
+
 
 	-- remove old saved variables
 	HealiumDropDownButton = nil
@@ -1078,49 +1115,6 @@ function Healium_OnEvent(self, event, ...)
 		end
 
 		Healium_FixNameplates = {}
-		return
-	end
-
-	-- Use this ADDON_LOADED event instead of VARIABLES_LOADED.
-	-- ADDON_LOADED will not be called until the variables are loaded.
-	-- VARIABLES_LOADED's order can no longer be relied upon. (it kind of seems random to me)
-	if ((event == "ADDON_LOADED") and (string.lower(arg1) == string.lower(Healium_AddonName))) then
-		Healium_DebugPrint("ADDON_LOADED")
-
-		InitVariables()
-		Healium_InitSpells(HealiumClass, HealiumRace)
-		Healium_InitDebuffSound()
-		Healium_CreateMiniMapButton()
-		Healium_CreateConfigPanel(HealiumClass, AddonVersion)
-		Healium_InitSlashCommands()
-		Healium_InitMenu()
-		Healium_CreateUnitFrames()
-		Healium_SetScale()
-		Healium_UpdatePercentageVisibility()
-		Healium_UpdateClassColors()
-		Healium_ShowHidePartyFrame()
-		Healium_ShowHidePetsFrame()
-		Healium_ShowHideMeFrame()
-		Healium_ShowHideTanksFrame()
-		Healium_ShowHideFriendsFrame()
-		Healium_ShowHideTargetFrame()
-		Healium_ShowHideFocusFrame()
-		Healium_UpdateShowMana()
-		Healium_UpdateShowBuffs()
-		Healium_UpdateFriends()
-		Healium_UpdateShowThreat()
-		Healium_UpdateShowRole()
-		Healium_UpdateShowIncomingHeals()
-		Healium_UpdateShowRaidIcons()
---		Healium_UpdateShowTargetFrame()
---		Healium_UpdateShowFocusFrame()
-
-		for i=1, 8, 1 do
-			Healium_ShowHideGroupFrame(i)
-		end
-
-		Healium_UpdateButtons()
-
 		return
 	end
 
@@ -1211,6 +1205,49 @@ function Healium_OnEvent(self, event, ...)
 	if (event == "PLAYER_FOCUS_CHANGED") and Healium.ShowFocusFrame then
 		Healium_DebugPrint("PLAYER_FOCUS_CHANGED")
 		Healium_UpdateFocusFrame()
+		return
+	end
+
+	-- Use this ADDON_LOADED event instead of VARIABLES_LOADED.
+	-- ADDON_LOADED will not be called until the variables are loaded.
+	-- VARIABLES_LOADED's order can no longer be relied upon. (it kind of seems random to me)
+	if ((event == "ADDON_LOADED") and (string.lower(arg1) == string.lower(Healium_AddonName))) then
+		Healium_DebugPrint("ADDON_LOADED")
+
+		InitVariables()
+		Healium_InitSpells(HealiumClass, HealiumRace)
+		Healium_InitDebuffSound()
+		Healium_CreateMiniMapButton()
+		Healium_CreateConfigPanel(HealiumClass, AddonVersion)
+		Healium_InitSlashCommands()
+		Healium_InitMenu()
+		Healium_CreateUnitFrames()
+		Healium_SetScale()
+		Healium_UpdatePercentageVisibility()
+		Healium_UpdateClassColors()
+		Healium_ShowHidePartyFrame()
+		Healium_ShowHidePetsFrame()
+		Healium_ShowHideMeFrame()
+		Healium_ShowHideDamagersFrame()
+		Healium_ShowHideHealersFrame()
+		Healium_ShowHideTanksFrame()
+		Healium_ShowHideFriendsFrame()
+		Healium_ShowHideTargetFrame()
+		Healium_ShowHideFocusFrame()
+		Healium_UpdateShowMana()
+		Healium_UpdateShowBuffs()
+		Healium_UpdateFriends()
+		Healium_UpdateShowThreat()
+		Healium_UpdateShowRole()
+		Healium_UpdateShowIncomingHeals()
+		Healium_UpdateShowRaidIcons()
+
+		for i=1, 8, 1 do
+			Healium_ShowHideGroupFrame(i)
+		end
+
+		Healium_UpdateButtons()
+
 		return
 	end
 end
