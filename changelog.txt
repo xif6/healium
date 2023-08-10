@@ -1,3 +1,272 @@
+2.8.22 LK CLASSIC
+* First release for LK Classic
+
+2.8.21 RETAIL
+* Updated ToC version to 90207
+
+2.8.20 RETAIL
+* Updated ToC version to 90200
+
+2.8.19 BC CLASSIC
+* Fix health not updating
+
+2.8.18 CLASSIC
+* Fix health not updating
+
+2.8.17 RETAIL 
+* Updated ToC version to 90105
+
+2.8.16 RETAIL 
+* Updated ToC version to 90100
+
+2.8.15 BC CLASSIC
+* Updated ToC version to 20501
+* Fixed misc LUA errors due to IsClassic variable not being correct for BC classic.
+
+2.8.14 CLASSIC
+* Updated ToC version to 11307
+
+2.8.13 RETAIL
+* Updated ToC version to 90005
+
+2.8.12 RETAIL
+* Fixed Druid SwinfMend not correctly showing as castable or not
+
+2.8.11 RETAIL
+* updated ToC version to 90002
+
+2.8.10 RETAIL
+* Added these default spells for Druid: Nourish, Overgrowth, Innervate	
+
+2.8.9 CLASSIC
+* Nicer drop down menu borders
+
+2.8.8 CLASSIC
+* Updated ToC version to 11305
+* Changes necessary to keep retail and classic single source
+
+2.8.7 RETAIL
+* Mage: Added Remove Curse default spell and configured it for curing
+
+2.8.6 RETAIL
+* Priest: Added Power Word: Radiance to the default spell list
+
+2.8.5 RETAIL
+* Fix LUA erors for new characters
+* Priest: Removed Dispel Magic from the default spell list
+* Priest: Added Purify Disease to the default spell list and configured it as a cure
+
+2.8.4 RETAIL
+* Druid: Show Tranquility buff
+
+2.8.3 RETAIL
+* Paladin: Show buff Glimmer of Light
+* Spells that are not able to cast will appear as dimmed. This fixes Druid Swift Mend showing as castable when it was not. This requires the Range Check option to be on, currently. It's possible this fixes similar issues with other spells with dynamic enable/disable conditions.
+
+2.8.2 RETAIL
+* Fix LUA errors when in combat
+
+2.8.1 RETAIL
+* Fix typo that resulted in LUA errors
+
+2.8.0 RETAIL
+* Shadowlands compatability patch
+
+2.7.2 CLASSIC
+* Updated ToC version number to 11303
+
+2.7.1 RETAIL
+* This release is the first public release that also includes source changes from the classic version. Going forward there will be a single source for both classic and retail mod versions. The sole exception being the TOC file will differ between the two, as this is unavoidable as best as I can tell.
+* Updated ToC version number to 80205
+* Fix "No Spell" menu always being checked. This issue was never released since it was an issue with in the classic source.
+
+2.7.0 CLASSIC
+* Due to the structural changes in this update you should re-add any spells that you want to use to Healium by drag and dropping from the spellbook (see below) and also reselect your debuff sound.
+* Removed button configuration from the Healium Configuration Panel and from the Configure Buttons menu. Use Drag and drop from the spellbook onto buttons to configure Healium spells, in Classic from now on.
+* Buttons will remember and use the specific rank of the spell when drag and dropped from the spellbook
+* Fixed always showing tooltips of the lowest rank of spell
+* Spell ranks are shown near the bottom of button tooltips, if tooltips are enabled
+* Fix debuff sounds not playing
+* Removed debuff sounds that don't exist in classic
+
+2.6.4 CLASSIC
+* Added Shaman Healing Wave (classic version) to the default list of spells
+* Fixed incoming heal bar being visible on some frames
+
+2.6.3 CLASSIC 
+* Fix LUA errors caused by cures that don't exist in classic
+* Added Paladin Holy Light (classic version) to the default list of spells
+* Removed options to show roles, incoming heals, and threat since classic doesn't support these at all
+
+2.6.2 CLASSIC
+* First release supporting WoW Classic
+
+2.6.1
+* Fix not displaying unit frames after first logging in.
+* Fix LUA errors for priests when Power World: Shield was used on a button
+
+2.6.0
+* Updated for Battle for Azeroth 
+
+2.5.9
+* Fix bugs with PlaySound caused by Blizzard api changes in this patch
+
+2.5.8
+* Updated ToC version number to 70300 for wow 7.3 patch
+
+2.5.7
+* Updated ToC version number to 70200 for wow 7.2 patch
+
+2.5.6
+* Updated ToC version number to 70100 for wow 7.1 patch
+
+2.5.5
+* Paladin: Added Light of the Martyr to default spell list
+* Monk:
+ * Added Zen Pulse to the default spell list
+ * Added Vivify to the default spell list
+ * Added MistWalk to the default spell list
+ * Fixed not updating cure states when switching specs.  A result of not doing this was that Monk Detox could improperly show up as curable or not after switching specs
+
+2.5.4
+* Druid: Swiftmend is no longer darkened based on if Rejuvination or Regrowth is on the target
+
+2.5.3
+* Fix LUA errors when on a Paladin, with Cleanse assigned to a button, and party member gets a magic debuf
+
+2.5.2
+* Mage: Removed "Remove Curse" from default spell list, which fixed some LUA errors when playing as a mage
+* Paladin: Workaround for "Beacon of Virtue" not allowing drag and drop onto a Healium button
+* Added these spells to the default list of spells:
+ * Paladin: Cleanse Toxins
+ * Paladin: Beacon of Virtue
+ 
+2.5.1
+* Priest: Now show Atonement buff 
+* Priest: Removed Holy Word: Chastise from the default list of spells
+* Added these spells to the default list of spells:
+ * Priest: Plea
+ * Priest: Shadow Mend.
+ * Priest: Holy Word: Serenity	
+ 
+2.5.0
+* Updated ToC version number to 70000 for Legion pre-patch release
+* Fix issues with spec swapping in Legion pre-patch
+
+2.4.1
+* Added "Clarity of Will" spell to default list of priest spells
+
+2.4.0
+* Added Healers and Damagers Frames.  These frames shows the players in the raid or party matching the Healers or Damagers roles
+* Tanks frame now uses Tank role.
+
+2.3.2
+* Updated ToC version number to 60200 for wow 6.2 patch
+
+2.3.1
+* Druid "Rejuvenation (Germination)" will show up as a buff on a player now
+* Paladin "Eternal Flame" will show up as a buff on a player now
+
+2.3.0
+* Replaced all use of Blizzard's drop down menu system with the NoTaint UIDropDownMenu library to remove taint
+
+2.2.2
+* Fixed debuff warning sounds not being played after wow 6.1 patch
+
+2.2.1
+* Updated ToC version number to 60100 for wow 6.1 patch
+
+2.2.0
+* Added these features which makes it easier to manage your button configuration:
+ * Added Rotate Buttons Left to Healium Menu->Configure Buttons - Shift all buttons to the left one position and replaces the button furthest to the right with the first button
+ * Added Rotate Buttons Right to Healium Menu->Configure Buttons - Shift all buttons to the right one position and replaces the first button with the button that was furthest to the right
+ * Added Insert Button to the bottom of Healium Menu->Configure Buttons->Configure Button x.  This will increase your button count by 1 (up to the max), shift that button and all buttons after it to the right one position, and sets that button to an empty spell, effectively inserting an empty spell at that button index.
+ * Added Delete Button to the bottom of Healium Menu->Configure Buttons->Configure Button x.  This will shift all buttons after that button to the left one position, and decrease your button count by one, effectively deleting that button.
+ * Added "No Spell" to the bottom of Healium Menu->Configure Buttons->Configure Button x.  This sets the button to the default empty spell state.
+ * Added "No Spell" to the bottom of each Button Configuration dropdown on the Healium Config Panel.  This sets the button to the default empty spell state.
+* Changed "Close" on the Healium Menu to "Close Menu" to remove ambiguity
+* Removed the default spells that were removed in the Warloads of Draenor pre-patch release.  This won't have a noticeable impact, but saves a bit of memory and improves the code quality.
+* Added these spells to the default list of spells
+ * Druid: Cenarion Ward 
+ * Shaman: Unleash Life
+* Fixed activating debuff warnings for magic based debuffs for Paladins and Monks due to Warloads of Draenor changes
+* Fixed activating the debuff warning sound when the debuff was on yourself
+
+ 
+2.1.15
+* Updated ToC version number to 60000 for Warloads of Draenor pre-patch release
+
+2.1.14
+* Workaround for Blizzard slider bug from 5.4.0 that caused the button count slider to show fractional numbers
+* Added these spells to the default list of spells
+ * Druid: Revive
+ * Priest: Resurrection
+ * Shaman: Ancestral Spirit
+ * Paladin: Redemption
+ * Death Knight: Raise Ally
+ 
+2.1.13
+* Temporary workaround for Blizzard 5.4.1 taint bug.
+
+2.1.12
+* Updated ToC version number
+
+2.1.11
+* Fix missing name text and other draw-order related issues by reworking some frame parenting and changing framelevel from a static number set in xml to a calculated number in script
+* Showing config panel (via /hlm config or Healium menu) now always opens directly to Healium config panel (work around new bliz bug)
+* Removed names from most frames to avoid potential name collision issues with other addons
+
+2.1.10
+* Updated ToC version number
+
+2.1.9
+* Fixed in-addon version number (was left as 2.1.7 in 2.1.8)
+
+2.1.8
+* Updated ToC version number
+
+2.1.7
+* Update for wow 5.1 patch
+* Monk - "Detox" now triggers cure magic logic only if it can actually cure magic 
+* Fix lua errors relating to cooldowns after 5.1 patch
+
+2.1.6 
+* Priest - Added "Dispel Magic" as a default spell, and configured it for curing
+* Fix LUA errors regarding invalid health values
+* Fixed some issues caused by dynamic spells during combat.  E.g. Balance Druid changing "Hurricane" into "Astral Storm" during "Lunar Eclipse", 
+  resulting in tooltips for some spells showing as different spells, and getting other invalid states 
+
+2.1.5
+* Shaman - Removed cure magic attribute from "Cleanse Spirit"
+* Shaman - Added "Purify Spirit" as a default spell, and configured it for curing
+
+2.1.4
+* Druid - Added "Remove Corruption" as a default spell, and configured it for curing
+* Paladin - Added "Sacred Shield" as a default spell
+* Paladin - Added "Eternal Flame" as a default spell
+* Paladin - Added "Hand of Purity" as a default spell
+* Paladin - Added "Holy Prism" as a default spell
+* Paladin - Added "Execution Sentence" as a default spell
+* Paladin - Fixed "Cleanse" magic cure logic, only shows magic debuffs if you can actually cure magic
+* Paladin - Fixed perma buffs not showing as buffs.  This wasn't necessarliy a bug before, but "Beacon of Light" was changed to perma, so it quit showing as a buff.
+
+2.1.3
+* Fixed LUA error caused by latest patch: GetSpellBookItemName(): Invalid spell slot
+
+2.1.2
+(Replaced latest Healium release for Cataclysm version with Healium for MoP beta since Blizzard released patch 5.0.4 ahead of actual MoP release)
+* Fixed LUA error caused in last beta patch
+
+2.1.1 Beta
+* Unusable spells (based on current spec) no longer appear in the Healium menus/config panel
+* Monks now have spells that appear in the Healium menus/config panel
+* Class icon on config panel updated to use same icons from character creation window for all classes
+* Removed default spells from some clases if they were removed or repurposed
+* Updated cure effects for all classes
+
+2.1.0 Beta
+* Initial support for MoP beta.  
+
 2.0.6
 * Added "Holy Word: Serenity" to Priest's default spell list.  Note- to configure this, you will either need to either select it in a Healium config panel drop-down or use the "Configure Button" menu. Drag and dropping it doesn't seem to work due to the spell's dynamic nature.
 * Added checkbox option "Show names in UPPERCASE".  Previously this was hard-coded on without any option.

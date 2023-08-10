@@ -3,7 +3,7 @@
  xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
  
 <!-- The main frame template -->	
-	<Frame name="HealiumUnitFrameTemplate" virtual="true" movable="true" parent="UIParent" hidden="false" enableMouse="true">
+	<Frame name="HealiumUnitFrameTemplate" virtual="true" movable="true" parent="UIParent" hidden="true" enableMouse="true">
         <Size>
             <AbsDimension x="120" y="30"/>
         </Size>
@@ -20,17 +20,6 @@
 					<Anchor point="CENTER">			
 					</Anchor>
 				</Anchors>			
-				<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground"  edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true"> 
-					<EdgeSize>
-						<AbsValue val="16"/> 
-					</EdgeSize>
-				   <TileSize>
-					  <AbsValue val="32"/> 
-				   </TileSize>
-				   <BackgroundInsets>
-					  <AbsInset left="5" right="5" top="5" bottom="5"/> 
-				   </BackgroundInsets>
-				</Backdrop>
 				<Layers>
 					<Layer level="OVERLAY">
 						<FontString parentKey="Caption" inherits="GameFontNormal">
@@ -58,6 +47,20 @@
 					</Button>
 				</Frames>
 			<Scripts>
+				<OnLoad>
+					if BackdropTemplateMixin then
+						Mixin(self, BackdropTemplateMixin)
+					end
+
+					self:SetBackdrop({
+						bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground", 
+						edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+						tile = true,
+						tileSize = 32,
+						edgeSize = 16,
+						insets = {left = 5, right = 5, top = 5, bottom = 5},
+					})
+				</OnLoad>
 				<OnEnter>HealiumUnitFrames_OnEnter(self)</OnEnter>
 				<OnLeave>HealiumUnitFrames_OnLeave(self)</OnLeave>
 				<OnMouseDown>HealiumUnitFrames_OnMouseDown(self:GetParent(), button)</OnMouseDown>
@@ -71,13 +74,6 @@
 		</Scripts>		
 	</Frame>
 	
-<!-- A template for the buff frames, currently doesn't do jack -->	
-	<Frame name="HealiumBuffTemplate" inherits="TargetBuffFrameTemplate" virtual="true" hidden="false">
-		<Scripts>
-			<OnLoad>
-			</OnLoad>
-		</Scripts>
-	</Frame>
 
 	<!-- A template for the healing buttons -->	
 	<!-- This can't have hidden="true" or it will fail to create unit frames during combat. -->
@@ -85,28 +81,33 @@
 		<Size x="28" y ="28"/>
 		<Layers>
 			<Layer level="BACKGROUND">
-				<Texture name="$parent_Icon" parentKey="icon" setAllPoints="true" />
+				<Texture parentKey="icon" setAllPoints="true" />
 			</Layer>
 			<Layer level="HIGHLIGHT">
-				<Texture name="$parent_Highlight" file="Interface/Buttons/ButtonHilight-Square" setAllPoints="true" alphaMode="ADD" />
+				<Texture file="Interface/Buttons/ButtonHilight-Square" setAllPoints="true" alphaMode="ADD" />
 			</Layer>
 		</Layers>
 		<PushedTexture file="Interface/Buttons/UI-Quickslot-Depress" />
 		<Frames>
-			<Cooldown name="$parent_Cooldown" parentKey="cooldown" inherits="CooldownFrameTemplate" hidden="true" setAllPoints="true"/>
+			<Cooldown parentKey="cooldown" inherits="CooldownFrameTemplate" hidden="true" setAllPoints="true"/>
 			<Frame parentKey="CurseBar" alpha="0">
 				<Size x="36" y="36"/>
 				<Anchors>
 					<Anchor point="CENTER"></Anchor>
 				</Anchors>			
-					<Backdrop edgeFile="Interface/Tooltips/UI-Tooltip-Border" tile="true"> 
-					<EdgeSize>
-						<AbsValue val="28"/> 
-					</EdgeSize>
-				   <BackgroundInsets>
-					  <AbsInset left="0" right="0" top="0" bottom="0"/> 
-				   </BackgroundInsets>
-				</Backdrop>
+				<Scripts>
+					<OnLoad>
+						if BackdropTemplateMixin then
+							Mixin(self, BackdropTemplateMixin)
+						end
+
+						self:SetBackdrop({
+							edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+							edgeSize = 28,
+							insets = {left = 0, right = 0, top = 0, bottom = 0},
+						})				
+					</OnLoad>
+				</Scripts>
 			</Frame>	
 		</Frames>
 		<Attributes>
@@ -122,8 +123,6 @@
 			<OnUpdate function="Healium_HealButton_OnUpdate" />
 			<OnReceiveDrag function="Healium_HealButton_OnReceiveDrag" />
 			<OnDragStart function ="Healium_HealButton_OnDragStart" />
-			<PreClick function = "Healium_HealButton_PreClick" />
-			<PostClick function = "Healium_HealButton_PostClick" />
 		</Scripts>
 	</Button>
 
@@ -151,76 +150,11 @@
 				<AbsInset left="4" right="4" top="4" bottom="4"/> 
 			</BackgroundInsets>
 		</Backdrop>		
-		<Layers>
-			<Layer level="OVERLAY">
-				<FontString name="$parent_Name" parentKey="name" text="Unknown Entitiy" inherits="GameFontNormalSmall" maxLines="2" nonspacewrap="true" justifyH="LEFT">
-					<Color r="1.0" g="1.0" b="1.0"/>				
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset x="10" y="0"/>
-						</Anchor>
-						<Anchor point="BOTTOMRIGHT"/>
-					</Anchors>
-				</FontString>
-				<FontString name="$parent_HPText" parentKey="HPText" text="100%" inherits="NumberFontNormalYellow"> <!-- inherits="NumberFontNormalYellow">  -->
-					<Color r="1.0" g="1.0" b="1.0"/>
-					<Anchors> 
-						<Anchor point="RIGHT"> 
-							<Offset x="-5" y="0" /> 
-						</Anchor> 
-					</Anchors> 
-				</FontString>
-			</Layer>
-	
-			<Layer level="ARTWORK">
-				<Texture name="$parent_RaidTargetIcon" parentKey="raidTargetIcon" file="Interface\TargetingFrame\UI-RaidTargetingIcons" hidden="true">
-					<Size>
-						<AbsDimension x="26" y="26"/>
-					</Size>
-					<Anchors>
-						<Anchor point="CENTER">
-							<Offset>
-								<AbsDimension x="0" y="0"/>
-							</Offset>
-						</Anchor>
-					</Anchors>			
-				</Texture>			
-			</Layer>
-		</Layers>
 		<Attributes>
 			<Attribute name="type1" value="target" />
 		</Attributes>
 		<Frames>
-			<Frame parentKey="CurseBar" alpha="0">
-				<Size x="124" y="32"/>
-				<Anchors>
-					<Anchor point="CENTER"></Anchor>
-				</Anchors>			
-				<Backdrop edgeFile="Interface/Tooltips/UI-Tooltip-Border" tile="true"> 
-					<EdgeSize>
-						<AbsValue val="24"/> 
-					</EdgeSize>
-				   <BackgroundInsets>
-					  <AbsInset left="0" right="0" top="0" bottom="0"/> 
-				   </BackgroundInsets>
-				</Backdrop>
-			</Frame>
-			<Frame parentKey="AggroBar" alpha="0">
-				<Size x="110" y="20"/>
-				<Anchors>
-					<Anchor point="CENTER"></Anchor>
-				</Anchors>			
-					<Backdrop edgeFile="Interface/Tooltips/UI-Tooltip-Border" tile="true" > 
-					<EdgeSize>
-						<AbsValue val="12"/> 
-					</EdgeSize>
-				   <BackgroundInsets>
-					  <AbsInset left="0" right="0" top="0" bottom="0"/> 
-				   </BackgroundInsets>
-				</Backdrop>
-			</Frame>				
-			
-			<Frame name="$parent_Buff1" inherits="HealiumBuffTemplate">
+			<Frame name="$parent_Buff1" inherits="TargetBuffFrameTemplate">
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="LEFT">
 						<Offset>
@@ -229,7 +163,7 @@
 					</Anchor>
 				</Anchors>				
 			</Frame>
-			<Frame name="$parent_Buff2" inherits="HealiumBuffTemplate">
+			<Frame name="$parent_Buff2" inherits="TargetBuffFrameTemplate">
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT" relativeTo="$parent_Buff1">
 						<Offset>
@@ -238,7 +172,7 @@
 					</Anchor>
 				</Anchors>				
 			</Frame>			
-			<Frame name="$parent_Buff3" inherits="HealiumBuffTemplate">
+			<Frame name="$parent_Buff3" inherits="TargetBuffFrameTemplate">
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT" relativeTo="$parent_Buff2">
 						<Offset>
@@ -247,7 +181,7 @@
 					</Anchor>
 				</Anchors>				
 			</Frame>						
-			<Frame name="$parent_Buff4" inherits="HealiumBuffTemplate">
+			<Frame name="$parent_Buff4" inherits="TargetBuffFrameTemplate">
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT" relativeTo="$parent_Buff3">
 						<Offset>
@@ -256,7 +190,7 @@
 					</Anchor>
 				</Anchors>				
 			</Frame>						
-			<Frame name="$parent_Buff5" inherits="HealiumBuffTemplate">
+			<Frame name="$parent_Buff5" inherits="TargetBuffFrameTemplate">
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT" relativeTo="$parent_Buff4">
 						<Offset>
@@ -265,7 +199,7 @@
 					</Anchor>
 				</Anchors>				
 			</Frame>				
-			<Frame name="$parent_Buff6" inherits="HealiumBuffTemplate">
+			<Frame name="$parent_Buff6" inherits="TargetBuffFrameTemplate">
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT" relativeTo="$parent_Buff5">
 						<Offset>
@@ -274,7 +208,7 @@
 					</Anchor>
 				</Anchors>				
 			</Frame>				
-			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="1">
+			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="100">
 				<Size x="111" y="23"/>
 				<Anchors>
 					<Anchor point="TOPLEFT">
@@ -285,12 +219,14 @@
 				</Anchors>				
 				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
 				<BarColor r=".25" g=".60" b=".25"/>
-				<Scripts >
-					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
-				</Scripts>				
+				<Scripts>
+					<OnShow>
+						self:SetFrameLevel(self:GetParent():GetFrameLevel() + 1);
+					</OnShow>
+				</Scripts>						
 			</StatusBar>						
-			<StatusBar parentKey="HealthBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="2">
-				<Size x="111" y="23"/>
+			<StatusBar parentKey="HealthBar" minValue="0" maxValue="100" defaultValue="100">
+				<Size x="111" y="24"/>
 				<Anchors>
 					<Anchor point="TOPLEFT">
 						<Offset>
@@ -300,12 +236,26 @@
 				</Anchors>				
 				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
 				<BarColor r="1.0" g="1.0" b="1.0"/>
-				<Scripts >
-					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
-				</Scripts>
 				<Layers>
 					<Layer level="OVERLAY">
-						<Texture parentKey="RoleIcon" file="Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES" hidden="false">
+						<FontString parentKey="name" text="Unknown Entitiy" inherits="GameFontNormalSmall" maxLines="2" nonspacewrap="true" justifyH="LEFT">
+							<Color r="1.0" g="1.0" b="1.0"/>				
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset x="10" y="0"/>
+								</Anchor>
+								<Anchor point="BOTTOMRIGHT"/>
+							</Anchors>
+						</FontString>
+						<FontString parentKey="HPText" text="100%" inherits="NumberFontNormalYellow"> <!-- inherits="NumberFontNormalYellow">  -->
+							<Color r="1.0" g="1.0" b="1.0"/>
+							<Anchors> 
+								<Anchor point="RIGHT"> 
+									<Offset x="-5" y="0" /> 
+								</Anchor> 
+							</Anchors> 
+						</FontString>
+						<Texture parentKey="RoleIcon" file="Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES" hidden="false" >
 							<Size>
 								<AbsDimension x="16" y="16"/>
 							</Size>
@@ -316,12 +266,29 @@
 									</Offset>
 								</Anchor>
 							</Anchors>
-						</Texture>				
-					</Layer>
+						</Texture>							
+						<Texture parentKey="raidTargetIcon" file="Interface\TargetingFrame\UI-RaidTargetingIcons" hidden="true">
+							<Size>
+								<AbsDimension x="26" y="26"/>
+							</Size>
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>			
+						</Texture>			
+					</Layer>				
 				</Layers>
+				<Scripts>
+					<OnShow>
+						self:SetFrameLevel(self:GetParent():GetFrameLevel() + 2);
+					</OnShow>
+				</Scripts>			
 			</StatusBar>
-			<StatusBar parentKey="ManaBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="3">
-				<Size x="5" y="23"/>
+			<StatusBar parentKey="ManaBar" minValue="0" maxValue="100" defaultValue="100">
+				<Size x="5" y="24"/>
 				<Layers>
 					<Layer level="BACKGROUND" setAllPoints="true">
 						<Texture>
@@ -336,18 +303,77 @@
 						</Offset>
 					</Anchor>
 				</Anchors>				
-				
 				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
 				<BarColor r="0.0" g="0.0" b="1.0"/>
-				<Scripts >
-					<OnLoad function="Healium_ManaStatusBar_OnLoad" />
+				<Scripts>
+					<OnLoad function="Healium_ManaStatusBar_OnLoad"/>
+					<OnShow>
+						self:SetFrameLevel(self:GetParent():GetFrameLevel() + 3);
+					</OnShow>
 				</Scripts>
-			</StatusBar>			
-			
+			</StatusBar>	
+			<Frame parentKey="CurseBar" alpha="0">
+				<Size x="124" y="32"/>
+				<Anchors>
+					<Anchor point="CENTER"></Anchor>
+				</Anchors>			
+				<Scripts>
+					<OnLoad>
+						if BackdropTemplateMixin then
+							Mixin(self, BackdropTemplateMixin)
+						end
 
+						self:SetBackdrop({
+							edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+							edgeSize = 24,
+							insets = {left = 0, right = 0, top = 0, bottom = 0},
+						})	
+					</OnLoad>				
+					<OnShow>
+						self:SetFrameLevel(self:GetParent():GetFrameLevel() + 4);
+					</OnShow>
+				</Scripts>	
+			</Frame>
+			<Frame parentKey="AggroBar" alpha="0">
+				<Size x="110" y="20"/>
+				<Anchors>
+					<Anchor point="CENTER"></Anchor>
+				</Anchors>			
+				<Scripts>
+					<OnLoad>
+						if BackdropTemplateMixin then
+							Mixin(self, BackdropTemplateMixin)
+						end
+						
+						self:SetBackdrop({
+							tile = true,
+							edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+							edgeSize = 12,
+							insets = {left = 0, right = 0, top = 0, bottom = 0},
+						})							
+					</OnLoad>
+					<OnShow>
+						self:SetFrameLevel(self:GetParent():GetFrameLevel() + 4);
+					</OnShow>
+				</Scripts>					
+			</Frame>						
 		</Frames>
 		<Scripts>
-			<OnLoad>HealiumUnitFrames_Button_OnLoad(self)</OnLoad>
+			<OnLoad>
+				if BackdropTemplateMixin then
+					Mixin(self, BackdropTemplateMixin)
+				end
+				
+				self:SetBackdrop({
+					tile = true,
+					tileSize = 16,				
+					edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+					edgeSize = 12,
+					insets = {left = 0, right = 0, top = 0, bottom = 0},
+				})		
+				
+				HealiumUnitFrames_Button_OnLoad(self)
+			</OnLoad>
 			<OnShow>HealiumUnitFrames_Button_OnShow(self)</OnShow>
 			<OnHide>HealiumUnitFrames_Button_OnHide(self)</OnHide>
 			<OnAttributeChanged>HealiumUnitFrames_Button_OnAttributeChanged(self, name, value)</OnAttributeChanged>
@@ -355,5 +381,4 @@
 			<OnMouseUp>HealiumUnitFrames_Button_OnMouseUp(self, button)</OnMouseUp>
 		</Scripts>
 	</Button>
-
 </Ui>

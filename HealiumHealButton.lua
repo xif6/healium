@@ -1,17 +1,17 @@
-function Healium_HealButton_OnLoad(self)
-	self.TimeSinceLastUpdate = 0
-	self:RegisterEvent("SPELL_UPDATE_USABLE")
-	self:RegisterForDrag("LeftButton")
-	self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+function Healium_HealButton_OnLoad(frame)
+	frame.TimeSinceLastUpdate = 0
+	frame:RegisterEvent("SPELL_UPDATE_USABLE")
+	frame:RegisterForDrag("LeftButton")
+	frame:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 end
 
-function Healium_HealButton_OnUpdate(self, elapsed)
+function Healium_HealButton_OnUpdate(frame, elapsed)
 	if ( not Healium.DoRangeChecks ) then return 0 end 	
-	self.TimeSinceLastUpdate = self.TimeSinceLastUpdate + elapsed 	
+	frame.TimeSinceLastUpdate = frame.TimeSinceLastUpdate + elapsed 	
 
-	if (self.TimeSinceLastUpdate > Healium.RangeCheckPeriod) then
-		Healium_RangeCheckButton(self)
-		self.TimeSinceLastUpdate = 0
+	if (frame.TimeSinceLastUpdate > Healium.RangeCheckPeriod) then
+		Healium_RangeCheckButton(frame)
+		frame.TimeSinceLastUpdate = 0
 	end
 end
 
@@ -23,6 +23,11 @@ function Healium_HealButton_OnEnter(frame, motion)
     if frame.id and (stype == "spell") then 
 		GameTooltip_SetDefaultAnchor(GameTooltip, frame)	
 		GameTooltip:SetSpellBookItem(frame.id, SpellBookFrame.bookType)
+		local Profile = Healium_GetProfile()
+		local rank = Profile.SpellRanks[frame.index]
+		if rank then 
+			GameTooltip:AddLine(Healium_AddonColor .. rank .. "|r",1,1,1)
+		end
 		local unit = frame:GetParent().TargetUnit
 		if not UnitExists(unit) then return end
 		local Name = UnitName(unit)
@@ -46,7 +51,7 @@ function Healium_HealButton_OnEnter(frame, motion)
         GameTooltip:AddLine("Target: |cFF00FF00"..Name,1,1,1)			
 	else
 		-- Safely Handle Empty Buttons	
-		GameTooltip:SetText("|cFFFFFFFFNo Spell|n|cFF00FF00You may drag-and-drop a spell from your|nspellbook onto this button, or you may go|nto Interface, Addons, " ..Healium_AddonName .. " and|nselect your spells from the list.")
+		GameTooltip:SetText("|cFFFFFFFFNo Spell|n|cFF00FF00You may drag-and-drop a spell from your|nspellbook onto this button, or you may go|nto Game Menu, Interface, Addons, " ..Healium_AddonName .. " and|nselect your spells from the list.")
     end
 	
 	GameTooltip:Show()			
@@ -56,11 +61,11 @@ function Healium_HealButton_OnLeave()
 	GameTooltip:Hide()
 end
 
-function Healium_HealButton_OnEvent(self, event)
-	if (not self.id) then return 0 end   
+function Healium_HealButton_OnEvent(frame, event)
+	if (not frame.id) then return 0 end   
 	
 	if event == "SPELL_UPDATE_USABLE" then
-		Healium_RangeCheckButton(self)
+		Healium_RangeCheckButton(frame)
 	end
 end
 
@@ -85,10 +90,10 @@ local function PickupOldSpell(old)
 	end
 end
 
-local function FinishDrag(self,old)
+local function FinishDrag(frame,old)
 	Healium_UpdateButtonAttributes()
 	Healium_UpdateButtonIcons()				
-	Healium_UpdateButtonCooldownsByColumn(self.index)	
+	Healium_UpdateButtonCooldownsByColumn(frame.index)	
 	
 	ClearCursor()
 	Healium_Update_ConfigPanel()
@@ -107,33 +112,46 @@ local function GetOldSpell(Index, Profile)
 	return old
 end
 
-local function Drag(self)
+local function Drag(frame)
 	if InCombatLockdown() then
 		Healium_Warn("Can't update button while in combat")
 		return
 	end
 	
-	if (self.index < 0) or (self.index > Healium_MaxButtons) then
+	if (frame.index < 0) or (frame.index > Healium_MaxButtons) then
 		return
 	end
 
 	local Profile = Healium_GetProfile()
-	local infoType, info1, info2 = GetCursorInfo()
-	local old = GetOldSpell(self.index, Profile)
+	local infoType, info1, info2, info3 = GetCursorInfo()
+	Healium_DebugPrint("infoType:", infoType, "info1:", info1, "info2:", info2, "info3:", info3 )
+	local old = GetOldSpell(frame.index, Profile)
 	
+	local spellName
 	-- Handle spell drag
 	if infoType == "spell" then 
 		-- info1 holds spellid
-		local spellName = GetSpellBookItemName(info1, BOOKTYPE_SPELL )		
-		if IsPassiveSpell(info1, BOOKTYPE_SPELL) then
-			local link = GetSpellLink(info1, BOOKTYPE_SPELL)
-			Healium_Warn(link .. " is a passive spell and cannot be used in " .. Healium_AddonName)
-			return
+		
+		if info1 == 0 then  
+			-- workaround for beacon of virtue nonsense by blizz
+			spellName = GetSpellInfo(info3)
+		else
+			spellName = GetSpellBookItemName(info1, BOOKTYPE_SPELL )	
+			Healium_DebugPrint("spellName:", spellName)
+			if IsPassiveSpell(info1, BOOKTYPE_SPELL) then
+				local link = GetSpellLink(info1, BOOKTYPE_SPELL)
+				Healium_Warn(link .. " is a passive spell and cannot be used in " .. Healium_AddonName)
+				return
+			end
 		end
 
-		local name, rank, icon = GetSpellInfo(spellName)
-		Healium_SetProfileSpell(Profile, self.index, name, info1, icon)
-		FinishDrag(self, old)
+		-- GetSpellInfo() is returning nil for everything for Holy Word: Chastise and any of it's transformed variations
+		local icon = GetSpellTexture(spellName)
+		local subtext = GetSpellSubtext(info3)
+		local rankedSpellName = Healium_MakeRankedSpellName(spellName, subtext)
+		Healium_DebugPrint("name:", spellName, "subtext:", subtext, "rankedSpellName:", rankedSpellName, "icon:", icon)
+		Healium_SetProfileSpell(Profile, frame.index, spellName, info1, icon, subtext)
+		FinishDrag(frame, old)
 		return
 	end
 	
@@ -141,8 +159,8 @@ local function Drag(self)
 	if infoType == "macro" then
 		-- info1 holds macro index
 		local name, icon, body, isLocal = GetMacroInfo(info1);
-		Healium_SetProfileMacro(Profile, self.index, name, info1, icon)		
-		FinishDrag(self, old)
+		Healium_SetProfileMacro(Profile, frame.index, name, info1, icon)		
+		FinishDrag(frame, old)
 		return
 	end
 	
@@ -151,63 +169,28 @@ local function Drag(self)
 		-- info1 = itemId: Number - The itemId. 
 		-- info2 = itemLink : String (ItemLink) - The item's link. 
 		local name, sLink, iRarity, iLevel, iMinLevel, sType, sSubType, iStackCount, iEquipLoc, icon, iSellPrice =  GetItemInfo(info1);
-		Healium_SetProfileItem(Profile, self.index, name, info1, icon)				
-		FinishDrag(self, old)
+		Healium_SetProfileItem(Profile, frame.index, name, info1, icon)				
+		FinishDrag(frame, old)
 		return
 	end
 	
 end 
 
 -- drag stop
-function Healium_HealButton_OnReceiveDrag(self)
+function Healium_HealButton_OnReceiveDrag(frame)
 	Healium_DebugPrint("Healium_HealButton_OnReceiveDrag() called")
-	Drag(self, nil)
+	Drag(frame, nil)
 end
 
 -- drag start
-function Healium_HealButton_OnDragStart(self)
+function Healium_HealButton_OnDragStart(frame)
 	Healium_DebugPrint("Healium_HealButton_OnDragStart() called")
 	-- starting drag requires shift to be pressed
 	if IsShiftKeyDown() == nil then return end
 	
 	local Profile = Healium_GetProfile()
-	local old = GetOldSpell(self.index, Profile)
+	local old = GetOldSpell(frame.index, Profile)
 	
 	PickupOldSpell(old)
 end
 
-function Healium_HealButton_PreClick(self)
---[[
-	Healium_DebugPrint("Healium_HealButton_PreClick() called")
-
-	local typ, id = GetCursorInfo()
-
-	if (typ == "spell") or (typ == "item") or (typ == "macro") then
-		self.DragType = typ
-		self.DragID = id
-	else
-		self.DragType = nil
-		self.DragID = nil
-	end
-]]
-end
-
-function Healium_HealButton_PostClick(self)
---[[
-	Healium_DebugPrint("Healium_HealButton_PostClick() called")
-
-	if self.DragType == "spell" then
-		PickupSpellBookItem(self.DragID, BOOKTYPE_SPELL)
-		Drag(self)
-	elseif self.DragType == "macro" then
-		PickupMacro(self.DragID)
-		Drag(self)
-	elseif self.DragType == "item" then
-		PickupItem(self.DragID)
-		Drag(self)
-	end
-	
-	self.DragType = nil
-	self.DragID = nil
-]]
-end
