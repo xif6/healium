@@ -23,7 +23,7 @@ function Healium_HealButton_OnEnter(frame, motion)
 
     if frame.id and (stype == "spell") then
 		GameTooltip_SetDefaultAnchor(GameTooltip, frame)
-		GameTooltip:SetSpell (frame.id, SpellBookFrame.bookType)
+		GameTooltip:SetSpell(frame.id, SpellBookFrame.bookType)
 		local unit = frame:GetParent().TargetUnit
 		if not UnitExists(unit) then return end
 		local Name = UnitName(unit)
@@ -38,8 +38,15 @@ function Healium_HealButton_OnEnter(frame, motion)
 		if (not Name) then Name = "-" end
         GameTooltip:AddLine("Target: |cFF00FF00"..Name,1,1,1)
 	elseif (stype == "macro") then
+		local spellID
+		local index = GetMacroIndexByName(frame:GetAttribute("macro"));
+		if (index) then
+			spellname = GetMacroSpell(index);
+			spellID = GetSpellID(spellname)
+		end
 		GameTooltip_SetDefaultAnchor(GameTooltip, frame)
-		GameTooltip:AddLine("Macro: " .. frame:GetAttribute("macro"))
+		GameTooltip:SetSpell(spellID, SpellBookFrame.bookType)
+		GameTooltip:AddLine("|cFFFFFFFFMacro: |cFF00FF00" .. frame:GetAttribute("macro"))
 		local unit = frame:GetParent().TargetUnit
 		if not UnitExists(unit) then return end
 		local Name = UnitName(unit)
@@ -142,7 +149,7 @@ local function Drag(self)
 	if infoType == "macro" then
 		-- info1 holds macro index
 		local name, icon, body, isLocal = GetMacroInfo(info1);
-		Healium_SetProfileMacro(Profile, self.index, name, info1, icon)		
+		Healium_SetProfileMacro(Profile, self.index, name, info1, icon)
 		FinishDrag(self, old)
 		return
 	end
@@ -152,7 +159,7 @@ local function Drag(self)
 		-- info1 = itemId: Number - The itemId.
 		-- info2 = itemLink : String (ItemLink) - The item's link.
 		local name, sLink, iRarity, iLevel, iMinLevel, sType, sSubType, iStackCount, iEquipLoc, icon, iSellPrice =  GetItemInfo(info1);
-		Healium_SetProfileItem(Profile, self.index, name, info1, icon)				
+		Healium_SetProfileItem(Profile, self.index, name, info1, icon)
 		FinishDrag(self, old)
 		return
 	end

@@ -18,7 +18,8 @@ local function printUsage()
 	Healium_Print(Healium_AddonName .. " Commands")  
 	Healium_Print(Healium_Slash .. " - Shows " .. Healium_AddonName .. " commands.  (what you see here)")
 	Healium_Print(Healium_Slash .. " config - Shows the " .. Healium_AddonName .. " config panel")		
-	Healium_Print(Healium_Slash .. " show [party | pets | me | tanks | 1-8] - Shows the corresponding " .. Healium_AddonName .. " frame")				
+	Healium_Print(Healium_Slash .. " show [party | pets | me | tanks | 1-8] - Shows the corresponding " .. Healium_AddonName .. " frame")
+	Healium_Print(Healium_Slash .. " toggle - Shows or Hides the current " .. Healium_AddonName .. " frames.")
 	Healium_Print(Healium_Slash .. " reset frames - Resets the positions of all " .. Healium_AddonName .. " frames")	
 	Healium_Print(Healium_Slash .. " friends add [name or Target] - Adds name to the " .. Healium_AddonName .. " friends list.")	
 	Healium_Print(Healium_Slash .. " friends remove [name or Target] - Removes name from the " .. Healium_AddonName .. " friends list.")		
@@ -66,6 +67,10 @@ end
 -- handles /hlm config
 local function doConfig(args)
 	Healium_ShowConfigPanel()
+end
+
+local function doToggle(args)
+	Healium_ToggleAllFrames()
 end
 
 local mt = { __index =  function() return printUsage end }
@@ -244,6 +249,7 @@ local handlers = {
 	friends = doFriends,
 	debug = doDebug,	
 	test = doTest,
+	toggle = doToggle,
 }
 
 setmetatable(handlers, mt)

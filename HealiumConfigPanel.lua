@@ -185,6 +185,11 @@ local function ShowRaidIconsCheck_OnClick(self)
 	Healium_UpdateShowRaidIcons()
 end
 
+local function UppercaseNamesCheck_OnClick(self)
+	Healium.UppercaseNames = self:GetChecked() or false
+	Healium_UpdateUnitNames()
+end
+
 local function UpdateEnableDebuffsControls(self)
 	local color
 	if self:GetChecked() then
@@ -394,10 +399,14 @@ function Healium_CreateConfigPanel(Class, Version)
 	local ShowRaidIconsCheck = CreateCheck("$parentShowRaidIconsCheckButton",scrollchild,ShowIncomingHealsCheck, "Shows the raid icon assigned to this unit.", "Show Raid Icons")
 	ShowRaidIconsCheck:SetScript("OnClick", ShowRaidIconsCheck_OnClick)
 
+	-- Uppercase ames check button
+	local UppercaseNamesCheck = CreateCheck("$parentShowUppercaseNamesCheckButton",scrollchild,ShowRaidIconsCheck, "Shows names in UPPERCASE text.", "UPPERCASE names")
+	UppercaseNamesCheck:SetScript("OnClick", UppercaseNamesCheck_OnClick)
+
 	-- Dropdown menus
 	local ButtonConfigTitleText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalLarge")
 	ButtonConfigTitleText:SetJustifyH("LEFT")
-	ButtonConfigTitleText:SetPoint("TOPLEFT", ShowRaidIconsCheck, "BOTTOMLEFT", 0, -20)
+	ButtonConfigTitleText:SetPoint("TOPLEFT", UppercaseNamesCheck, "BOTTOMLEFT", 0, -20)
 	ButtonConfigTitleText:SetText("Button Configuration")
 
 	local ButtonConfigTitleSubText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalSmall")
@@ -406,7 +415,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	ButtonConfigTitleSubText:SetText("Click the dropdowns to configure each button.|nYou may now drag and drop directly from the spellbook|nonto buttons to configure them, including buffs!")
 	ButtonConfigTitleSubText:SetTextColor(1,1,1,1)
 
-	local y = -450
+	local y = -480
 	local y_inc = 20
 
 	for i=1, Healium_MaxButtons, 1 do
@@ -820,6 +829,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	ShowRoleCheck:SetChecked(Healium.ShowRole)
 	ShowIncomingHealsCheck:SetChecked(Healium.ShowIncomingHeals)
 	ShowRaidIconsCheck:SetChecked(Healium.ShowRaidIcons)
+	UppercaseNamesCheck:SetChecked(Healium.UppercaseNames)
 	EnableDebuffAudioCheck:SetChecked(Healium.EnableDebufAudio)
 	EnableDebuffHealthbarHighlightingCheck:SetChecked(Healium.EnableDebufHealthbarHighlighting)
 	EnableDebuffButtonHighlightingCheck:SetChecked(Healium.EnableDebufButtonHighlighting)

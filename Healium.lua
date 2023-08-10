@@ -5,7 +5,7 @@
 -- Color control characters |CAARRGGBB  then |r resets to normal, where AA == Alpha, RR = Red, GG = Green, BB = blue
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 2.0.5|r"
+local AddonVersion = "|cFFFFFF00 2.0.6|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 
@@ -66,6 +66,7 @@ Healium = {
   ShowRole = true,								-- Whether or not to show the role icon
   ShowIncomingHeals = true,						-- Whether or not to show incoming heals
   ShowRaidIcons = true,							-- Whether or not to show raid icons
+  UppercaseNames = true,						-- Whether or not to show names in UPPERCASE
 }
 
 -- HealiumGlobal is the variable that holds all Healium settings that are not character specific
@@ -256,6 +257,27 @@ function Healium_UpdateClassColors()
 				HPPercent =  Health / MaxHealth
 				UpdateHealthBar(HPPercent, k)
 			end
+		end
+	end
+end
+
+function Healium_UpdateUnitName(unitName, NamePlate)
+	if not NamePlate then return end
+	if not UnitExists(unitName) then return end
+
+	local playerName = UnitName(unitName)
+
+	if playerName ~= nil and Healium.UppercaseNames then
+		playerName = strupper(playerName)
+	end
+
+	NamePlate.name:SetText(playerName)
+end
+
+function Healium_UpdateUnitNames()
+	for _, k in ipairs(Healium_Frames) do
+		if (k.TargetUnit) then
+			Healium_UpdateUnitName(k.TargetUnit, k)
 		end
 	end
 end
@@ -525,7 +547,7 @@ function Healium_UpdateShowFocusFrame()
 	end
 end
 
-local function GetSpellID(spell)
+function GetSpellID(spell)
 	local i = 1
 	local spellID
 	local highestRank
@@ -669,6 +691,18 @@ function Healium_UpdateButtonCooldown(self, start, duration, enable)
 
 	if self then
 		if self:IsShown() then
+			-- temp fix for lua errors caused in patch 5.1.. Somehow these values are sometimes invalid for a few seconds after loading, and these explicit checks seem to fix it
+			if start == nil then
+				start = GetTime()
+			end
+
+			if duration == nil then
+				duration = 0
+			end
+
+			if enable == nil then
+				enable = 0
+			end
 			CooldownFrame_SetTimer(self.cooldown, start, duration, enable)
 		end
 	end
@@ -1020,6 +1054,10 @@ local function InitVariables()
 
 	if Healium.EnableDebufHealthbarColoring == nil then
 		Healium.EnableDebufHealthbarColoring = false
+	end
+
+	if Healium.UppercaseNames == nil then
+		Healium.UppercaseNames = true
 	end
 
 	if HealiumGlobal.Friends == nil then
