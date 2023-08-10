@@ -18,6 +18,14 @@ local function ShowFriendsFrame()
 	Healium_ShowHideFriendsFrame(true)
 end
 
+local function ShowTargetFrame()
+	Healium_ShowHideTargetFrame(true)
+end
+
+local function ShowFocusFrame()
+	Healium_ShowHideFocusFrame(true)
+end
+
 local function SetButtonCount(info, arg1)
 	if InCombatLockdown() then
 		Healium_Warn("Can't update button count while in combat!")
@@ -125,6 +133,16 @@ local function HealiumMenu_InitializeDropDown(self,level)
 					text = "Show Tanks",
 					notCheckable = 1,					
 					func = ShowTanksFrame,
+				},
+				{	-- Target Frame
+					text = "Show Target",
+					notCheckable = 1,					
+					func = ShowTargetFrame,
+				},
+				{	-- Focus Frame
+					text = "Show Focus",
+					notCheckable = 1,					
+					func = ShowFocusFrame,
 				},
 				{
 					text = "Hide All Raid Groups",

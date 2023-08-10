@@ -1,11 +1,11 @@
--- Healium - Maintained by Engy of Area 52.  Based on FB Healbox by Dourd of Argent Dawn EU
+-- Healium - Maintained by Engee of Durotan.  Based on FB Healbox by Dourd of Argent Dawn EU
 --
 -- Programming notes
 -- WARNING In LUA all logical operators consider false and nil as false and anything else as true.  This means not 0 is false!!!!!!!!
 -- Color control characters |CAARRGGBB  then |r resets to normal, where AA == Alpha, RR = Red, GG = Green, BB = blue
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 1.3.0|r"
+local AddonVersion = "|cFFFFFF00 1.4.0|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 
@@ -46,6 +46,8 @@ Healium = {
   ShowFriendsFrame = false,						-- Whether or not to show the friends frame
   ShowGroupFrames = { },  						-- Whether or not to show individual group frame
   ShowTanks = false,							-- Whether or not to show the tanks frame
+  ShowTargetFrame = false,						-- Whether or not to show the target frame
+  ShowFocusFrame = false,						-- Whether or not to show the focus frame
   ShowBuffs = true,								-- Whether or not to show your own buffs, that are configured in Healium to the left of the healthbar
   HideCloseButton = false,						-- Whether or not to hide the close (X) button, to prevent accidental closing of the Healium Frame
   HideCaptions = false,							-- Whether or not to hide the caption when the mouse leaves the caption area
@@ -61,6 +63,7 @@ Healium = {
   ShowThreat = true,							-- Whether or not to show the threat warnings
   ShowRole = true,								-- Whether or not to show the role icon
   ShowIncomingHeals = true,						-- Whether or not to show incoming heals
+  ShowRaidIcons = true,							-- Whether or not to show raid icons
 }
 
 -- HealiumGlobal is the variable that holds all Heliuam settings that are not character specific
@@ -153,7 +156,6 @@ function Healium_OnLoad(self)
 	self:RegisterEvent("SPELL_UPDATE_COOLDOWN")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED")
 --	self:RegisterEvent("PLAYER_ALIVE")	
-	self:RegisterEvent("RAID_TARGET_UPDATE")
 	self:RegisterEvent("UNIT_NAME_UPDATE")
 	self:RegisterEvent("UNIT_AURA")
 end
@@ -391,8 +393,6 @@ function Healium_UpdateUnitRole(UnitName, NamePlate)
 		icon:SetTexCoord(GetTexCoordsForRoleSmallCircle(role))
 		icon:Show()
 	else
---		icon:SetTexCoord(GetTexCoordsForRoleSmallCircle("TANK"))	
---		icon:Show()
 		NamePlate.HasRole = nil
 		icon:Hide()
 	end
@@ -401,7 +401,6 @@ function Healium_UpdateUnitRole(UnitName, NamePlate)
 end
 
 local function Healium_UpdateRoles()
-
 	for _, k in ipairs(Healium_Frames) do
 		if (k.TargetUnit) then
 			Healium_UpdateUnitRole(k.TargetUnit, k)
@@ -433,6 +432,42 @@ function Healium_UpdateShowIncomingHeals()
 			k.PredictBar:Hide()
 		end
 	end	
+end
+
+local function Healium_UpdateRaidIcons()
+	for _, k in ipairs(Healium_Frames) do
+		Healium_UpdateRaidTargetIcon(k)
+	end	
+end
+
+function Healium_UpdateShowRaidIcons()
+	if Healium.ShowRaidIcons then
+		HealiumFrame:RegisterEvent("RAID_TARGET_UPDATE")
+	else
+		HealiumFrame:UnregisterEvent("RAID_TARGET_UPDATE")
+	end
+	
+	Healium_UpdateRaidIcons()
+end
+
+function Healium_UpdateShowTargetFrame()
+	if Healium.ShowTargetFrame then 
+		Healium_DebugPrint("registering PLAYER_TARGET_CHANGED")	
+		HealiumFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
+	else
+		Healium_DebugPrint("UNregistering PLAYER_TARGET_CHANGED")		
+		HealiumFrame:UnregisterEvent("PLAYER_TARGET_CHANGED")	
+	end
+end
+
+function Healium_UpdateShowFocusFrame()
+	if Healium.ShowFocusFrame then 
+		Healium_DebugPrint("registering PLAYER_FOCUS_CHANGED")
+		HealiumFrame:RegisterEvent("PLAYER_FOCUS_CHANGED")
+	else
+		Healium_DebugPrint("UNregistering PLAYER_FOCUS_CHANGED")	
+		HealiumFrame:UnregisterEvent("PLAYER_FOCUS_CHANGED")	
+	end
 end
 
 local function GetSpellID(spell)
@@ -755,6 +790,19 @@ function Healium_DeepCopy(object)
     return _copy(object)
 end
 
+function Healium_UpdateRaidTargetIcon(self)
+	if (self.TargetUnit) then
+		if not UnitExists(self.TargetUnit) then return end
+		local index = GetRaidTargetIndex(self.TargetUnit);
+		if ( index  and Healium.ShowRaidIcons ) then
+			SetRaidTargetIconTexture(self.raidTargetIcon, index);
+			self.raidTargetIcon:Show();
+		else
+			self.raidTargetIcon:Hide();
+		end
+	end
+end
+
 
 -- Sets persisted variables to their default, if they do not exist.
 local function InitVariables()
@@ -794,6 +842,10 @@ local function InitVariables()
 		Healium.ShowIncomingHeals = true
 	end
 	
+	if Healium.ShowRaidIcons == nil then
+		Healium.ShowRaidIcons = true
+	end
+	
 	if Healium.ShowPercentage == nil then 
 		Healium.ShowPercentage = true
 	end
@@ -824,6 +876,14 @@ local function InitVariables()
 	
 	if Healium.ShowTanksFrame == nil then
 		Healium.ShowTanksFrame = false
+	end
+	
+	if Healium.ShowTargetFrame == nil then
+		Healium.ShowTargetFrame = false
+	end
+	
+	if Healium.ShowFocusFrame == nil then
+		Healium.ShowFocusFrame = false
 	end
 	
 	if Healium.ShowFriendsFrame == nil then
@@ -950,7 +1010,7 @@ function Healium_OnEvent(self, event, ...)
 		return
 	end
 	
-	if event == "UNIT_THREAT_SITUATION_UPDATE" and Healium.ShowThreat then
+	if (event == "UNIT_THREAT_SITUATION_UPDATE") and Healium.ShowThreat then
 		if Healium_Units[arg1] then
 			for _,v  in pairs(Healium_Units[arg1]) do
 				Healium_UpdateUnitThreat(arg1, v)
@@ -959,7 +1019,7 @@ function Healium_OnEvent(self, event, ...)
 		return
 	end
 
-	if event == "SPELL_UPDATE_COOLDOWN" and Healium.EnableCooldowns then
+	if (event == "SPELL_UPDATE_COOLDOWN") and Healium.EnableCooldowns then
 		Healium_UpdateButtonCooldowns()
 		return
 	end	
@@ -1006,12 +1066,17 @@ function Healium_OnEvent(self, event, ...)
 		Healium_ShowHideMeFrame()
 		Healium_ShowHideTanksFrame()
 		Healium_ShowHideFriendsFrame()
+		Healium_ShowHideTargetFrame()
+		Healium_ShowHideFocusFrame()
 		Healium_UpdateShowMana()
 		Healium_UpdateShowBuffs()
 		Healium_UpdateFriends()
 		Healium_UpdateShowThreat()
 		Healium_UpdateShowRole()
 		Healium_UpdateShowIncomingHeals()
+		Healium_UpdateShowRaidIcons()
+--		Healium_UpdateShowTargetFrame()
+--		Healium_UpdateShowFocusFrame()
 		
 		for i=1, 8, 1 do
 			Healium_ShowHideGroupFrame(i)
@@ -1080,20 +1145,8 @@ function Healium_OnEvent(self, event, ...)
 		return
 	end
 	
-	if event == "RAID_TARGET_UPDATE" then
-		for _, k in ipairs(Healium_Frames) do
-			if (k.TargetUnit) then
-				if not UnitExists(k.TargetUnit) then return end
-				local index = GetRaidTargetIndex(k.TargetUnit);
-				if ( index ) then
-					SetRaidTargetIconTexture(k.raidTargetIcon, index);
-					k.raidTargetIcon:Show();
-				else
-					k.raidTargetIcon:Hide();
-				end
-			end
-		end	
-		
+	if (event == "RAID_TARGET_UPDATE") and Healium.ShowRaidIcons then
+		Healium_UpdateRaidIcons()
 		return		
 	end
 	
@@ -1101,14 +1154,26 @@ function Healium_OnEvent(self, event, ...)
 		if Healium_Units[arg1] then
 			local name = strupper(UnitName(arg1))
 			for _,v  in pairs(Healium_Units[arg1]) do
-					v.name:SetText(name)			
+				v.name:SetText(name)			
 			end
 		end
 		return
 	end
 	
-	if event == "PARTY_MEMBERS_CHANGED" and Healium.ShowRole then
+	if (event == "PARTY_MEMBERS_CHANGED") and Healium.ShowRole then
 		Healium_UpdateRoles()
+		return
+	end
+	
+	if (event == "PLAYER_TARGET_CHANGED") and Healium.ShowTargetFrame then
+		Healium_DebugPrint("PLAYER_TARGET_CHANGED")
+		Healium_UpdateTargetFrame()
+		return
+	end
+	
+	if (event == "PLAYER_FOCUS_CHANGED") and Healium.ShowFocusFrame then
+		Healium_DebugPrint("PLAYER_FOCUS_CHANGED")
+		Healium_UpdateFocusFrame()
 		return
 	end
 end

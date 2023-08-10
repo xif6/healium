@@ -181,6 +181,11 @@ local function ShowIncomingHealsCheck_OnClick(self)
 	Healium_UpdateShowIncomingHeals()
 end
 
+local function ShowRaidIconsCheck_OnClick(self)
+	Healium.ShowRaidIcons = self:GetChecked() or false
+	Healium_UpdateShowRaidIcons()
+end
+
 local function UpdateEnableDebuffsControls(self)
 	local color 
 	if self:GetChecked() then
@@ -192,7 +197,6 @@ local function UpdateEnableDebuffsControls(self)
 	for _,j in ipairs(self.children) do
 		j:SetTextColor(color.r, color.g, color.b)
 	end
-
 end
 
 local function EnableDebuffsCheck_OnClick(self)
@@ -433,10 +437,22 @@ function Healium_CreateConfigPanel(Class, Version)
 	ShowIncomingHealsCheck:SetScript("OnClick", ShowIncomingHealsCheck_OnClick)	
 	ShowIncomingHealsCheck.tooltipText = "Shows incoming heals from all units as a dark green bar extending beyond the unit's current health."
 	
+	-- Show Raid Icons check button
+    local ShowRaidIconsCheck = CreateFrame("CheckButton","$parentShowRaidIconsCheckButton",scrollchild,"OptionsCheckButtonTemplate")
+    ShowRaidIconsCheck:SetPoint("TOPLEFT", ShowIncomingHealsCheck, "BOTTOMLEFT", 0, 0)
+    
+    ShowRaidIconsCheck.Text = ShowRaidIconsCheck:CreateFontString(nil, "BACKGROUND","GameFontNormal")
+	ShowRaidIconsCheck.Text:SetPoint("LEFT", ShowRaidIconsCheck, "RIGHT", 0)
+    ShowRaidIconsCheck.Text:SetText("Show Raid Icons")
+
+	ShowRaidIconsCheck:SetScript("OnClick", ShowRaidIconsCheck_OnClick)	
+	ShowRaidIconsCheck.tooltipText = "Shows the raid icon assigned to this unit."
+	
+	
 	-- Dropdown menus
 	local ButtonConfigTitleText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalLarge")
 	ButtonConfigTitleText:SetJustifyH("LEFT")
-	ButtonConfigTitleText:SetPoint("TOPLEFT", ShowIncomingHealsCheck, "BOTTOMLEFT", 0, -20)
+	ButtonConfigTitleText:SetPoint("TOPLEFT", ShowRaidIconsCheck, "BOTTOMLEFT", 0, -20)
 	ButtonConfigTitleText:SetText("Button Configuration")	
 	
 	local ButtonConfigTitleSubText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalSmall")
@@ -445,7 +461,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	ButtonConfigTitleSubText:SetText("Click the dropdowns to configure each button.|nYou may now drag and drop directly from the spellbook|nonto buttons to configure them, including buffs!")
 	ButtonConfigTitleSubText:SetTextColor(1,1,1,1) 	
 	
-	local y = -420
+	local y = -450
 	local y_inc = 20
 	
 	for i=1, Healium_MaxButtons, 1 do
@@ -563,9 +579,37 @@ function Healium_CreateConfigPanel(Class, Version)
 		Healium_ShowHideFriendsFrame()
     end)	
 	
+	-- Show Target Check
+    Healium_ShowTargetCheck = CreateFrame("CheckButton","$parentShowTargetCheckButton",scrollchild,"OptionsCheckButtonTemplate")
+    Healium_ShowTargetCheck:SetPoint("TOPLEFT",Healium_ShowFriendsCheck, "BOTTOMLEFT", 0, 0)
+	Healium_ShowTargetCheck.tooltipText = "Shows the Target " .. Healium_AddonColoredName .. " frame."		
+    Healium_ShowTargetCheck.Text = Healium_ShowTargetCheck:CreateFontString(nil, "BACKGROUND","GameFontNormal")
+    Healium_ShowTargetCheck.Text:SetPoint("LEFT", Healium_ShowTargetCheck, "RIGHT", 0)
+    Healium_ShowTargetCheck.Text:SetText("Target")
+    
+    Healium_ShowTargetCheck:SetScript("OnClick",function()
+        Healium.ShowTargetFrame = Healium_ShowTargetCheck:GetChecked() or false
+		Healium_ShowHideTargetFrame()
+--		Healium_UpdateShowTargetFrame()
+    end)		
+	
+	-- Show Focus Check
+    Healium_ShowFocusCheck = CreateFrame("CheckButton","$parentShowFocusCheckButton",scrollchild,"OptionsCheckButtonTemplate")
+    Healium_ShowFocusCheck:SetPoint("TOPLEFT",Healium_ShowTargetCheck, "BOTTOMLEFT", 0, 0)
+	Healium_ShowFocusCheck.tooltipText = "Shows the Focus " .. Healium_AddonColoredName .. " frame."		
+    Healium_ShowFocusCheck.Text = Healium_ShowFocusCheck:CreateFontString(nil, "BACKGROUND","GameFontNormal")
+    Healium_ShowFocusCheck.Text:SetPoint("LEFT", Healium_ShowFocusCheck, "RIGHT", 0)
+    Healium_ShowFocusCheck.Text:SetText("Focus")
+    
+    Healium_ShowFocusCheck:SetScript("OnClick",function()
+        Healium.ShowFocusFrame = Healium_ShowFocusCheck:GetChecked() or false
+		Healium_ShowHideFocusFrame()
+--		Healium_UpdateShowFocusFrame()
+    end)		
+	
 	-- Show Group 1 Check
     Healium_ShowGroup1Check = CreateFrame("CheckButton","$parentShowGroup1CheckButton",scrollchild,"OptionsCheckButtonTemplate")
-    Healium_ShowGroup1Check:SetPoint("TOPLEFT",Healium_ShowFriendsCheck, "BOTTOMLEFT", 0, 0)
+    Healium_ShowGroup1Check:SetPoint("TOPLEFT",Healium_ShowFocusCheck, "BOTTOMLEFT", 0, 0)
 	Healium_ShowGroup1Check.tooltipText = "Shows the Group 1 " .. Healium_AddonColoredName .. " frame."		
     Healium_ShowGroup1Check.Text = Healium_ShowGroup1Check:CreateFontString(nil, "BACKGROUND","GameFontNormal")
     Healium_ShowGroup1Check.Text:SetPoint("LEFT", Healium_ShowGroup1Check, "RIGHT", 0)
@@ -667,6 +711,7 @@ function Healium_CreateConfigPanel(Class, Version)
 		Healium_ShowHideGroupFrame(8)
     end)		
 	
+	-- Show Tanks Check
     Healium_ShowTanksCheck = CreateFrame("CheckButton","$parentShowTanksCheckButton",scrollchild,"OptionsCheckButtonTemplate")
     Healium_ShowTanksCheck:SetPoint("TOPLEFT",Healium_ShowGroup8Check, "BOTTOMLEFT", 0, 0)
 	Healium_ShowTanksCheck.tooltipText = "Shows the Tanks " .. Healium_AddonColoredName .. " frame."			
@@ -884,6 +929,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	ShowThreatCheck:SetChecked(Healium.ShowThreat)
 	ShowRoleCheck:SetChecked(Healium.ShowRole)
 	ShowIncomingHealsCheck:SetChecked(Healium.ShowIncomingHeals)
+	ShowRaidIconsCheck:SetChecked(Healium.ShowRaidIcons)
 	EnableDebuffAudioCheck:SetChecked(Healium.EnableDebufAudio)
 	EnableDebuffHealthbarHighlightingCheck:SetChecked(Healium.EnableDebufHealthbarHighlighting)
 	EnableDebuffButtonHighlightingCheck:SetChecked(Healium.EnableDebufButtonHighlighting)
@@ -896,6 +942,8 @@ function Healium_CreateConfigPanel(Class, Version)
 	Healium_ShowMeCheck:SetChecked(Healium.ShowMeFrame)
 	Healium_ShowFriendsCheck:SetChecked(Healium.ShowFriendsFrame)
 	Healium_ShowTanksCheck:SetChecked(Healium.ShowTanksFrame)
+	Healium_ShowTargetCheck:SetChecked(Healium.ShowTargetFrame)
+	Healium_ShowFocusCheck:SetChecked(Healium.ShowFocusFrame)
 	Healium_ShowGroup1Check:SetChecked(Healium.ShowGroupFrames[1])
 	Healium_ShowGroup2Check:SetChecked(Healium.ShowGroupFrames[2])
 	Healium_ShowGroup3Check:SetChecked(Healium.ShowGroupFrames[3])

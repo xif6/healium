@@ -27,11 +27,9 @@ local function Count(tab)
 end
 
 -- These spellIDs are from wowhead
-
 function Healium_InitSpells(class, race)
 	
 	-- Init spell list
-	-- DONE FOR CATA
 	if (class == "DRUID") then 
 		AddSpell(774)		-- Rejuvenation
 		AddSpell(8936)		-- Regrowth
@@ -55,7 +53,6 @@ function Healium_InitSpells(class, race)
 		}
 	end
 
-	-- DONE FOR CATA
 	if (class == "PRIEST") then 
 		AddSpell(139)		-- Renew
 		AddSpell(2061)		-- Flash Heal
@@ -79,7 +76,6 @@ function Healium_InitSpells(class, race)
 		Cures[SpellName(527)]  = { CanCureMagic = true }
 	end
 
-	-- DONE FOR CATA
 	if (class == "SHAMAN") then
 		AddSpell(51886)		-- Cleanse Spirit	
 		AddSpell(8004)		-- Healing Surge
