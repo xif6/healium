@@ -274,6 +274,21 @@
 					</Anchor>
 				</Anchors>				
 			</Frame>				
+			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="1">
+				<Size x="111" y="23"/>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="7" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>				
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
+				<BarColor r=".25" g=".60" b=".25"/>
+				<Scripts >
+					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
+				</Scripts>				
+			</StatusBar>						
 			<StatusBar parentKey="HealthBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="2">
 				<Size x="111" y="23"/>
 				<Anchors>

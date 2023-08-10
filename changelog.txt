@@ -1,3 +1,7 @@
+1.3.0
+* Added show Incoming Heals option
+* Toggle Frames will turn on Party and Pets frames if all frames are off and no frames were previously toggled off.  i.e. When it would otherwise do nothing at all.
+
 1.2.0 
 * Removed all logic that causes buttons to grey out.
 * Removed all frame strata settings.  This caused some parts of the Healium UI to sometimes incorrectly appear in front of or behind other UI elements.

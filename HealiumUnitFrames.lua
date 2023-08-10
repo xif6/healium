@@ -522,6 +522,18 @@ function HealiumUnitFrames_Button_OnMouseUp(self, button)
 	end
 end
 
+local function IsAnyUnitFrameVisible()
+	local visible
+
+	for _,j in pairs(UnitFrames) do
+		if j:IsShown() then
+			return true
+		end
+	end
+
+	return nil
+end
+
 function Healium_ToggleAllFrames()
 	if InCombatLockdown() then
 		Healium_Warn("Can't toggle frames while in combat.")
@@ -564,6 +576,8 @@ function Healium_ToggleAllFrames()
 		return
 	end
 
+	-- after this point, we know we are showing frames
+
 	if PartyFrameWasShown then
 		PartyFrame:Show()
 	end
@@ -588,6 +602,11 @@ function Healium_ToggleAllFrames()
 		if j then
 			GroupFrames[i]:Show()
 		end
+	end
+
+	if IsAnyUnitFrameVisible() == nil then
+		PartyFrame:Show()
+		PetsFrame:Show()
 	end
 end
 

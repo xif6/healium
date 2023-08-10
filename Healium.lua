@@ -5,7 +5,7 @@
 -- Color control characters |CAARRGGBB  then |r resets to normal, where AA == Alpha, RR = Red, GG = Green, BB = blue
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 1.2.0|r"
+local AddonVersion = "|cFFFFFF00 1.3.0|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 
@@ -60,6 +60,7 @@ Healium = {
   ShowMana = true,								-- Whether or not to show mana
   ShowThreat = true,							-- Whether or not to show the threat warnings
   ShowRole = true,								-- Whether or not to show the role icon
+  ShowIncomingHeals = true,						-- Whether or not to show incoming heals
 }
 
 -- HealiumGlobal is the variable that holds all Heliuam settings that are not character specific
@@ -243,6 +244,20 @@ function Healium_UpdateUnitHealth(UnitName, NamePlate)
 	else
 		UpdateHealthBar(HPPercent, NamePlate)
 	end
+	
+	-- incoming heals
+	if Healium.ShowIncomingHeals then
+		local IncomingHealth = UnitGetIncomingHeals(UnitName)
+
+		if IncomingHealth then
+			Health = Health + IncomingHealth
+		else
+			Health = 0
+		end
+
+		NamePlate.PredictBar:SetMinMaxValues(0,MaxHealth)
+		NamePlate.PredictBar:SetValue(Health)
+	end
 end
 
 function Healium_UpdateUnitMana(UnitName, NamePlate)
@@ -290,10 +305,15 @@ function Healium_UpdateManaBarVisibility(frame)
 		frame.ManaBar:Show()
 		frame.HealthBar:SetWidth(111)
 		frame.HealthBar:SetPoint("TOPLEFT", 7, -2)
+		frame.PredictBar:SetWidth(111)
+		frame.PredictBar:SetPoint("TOPLEFT", 7, -2)
 	else
 		frame.ManaBar:Hide()
 		frame.HealthBar:SetWidth(116)			
-		frame.HealthBar:SetPoint("TOPLEFT", 2, -2)				
+		frame.HealthBar:SetPoint("TOPLEFT", 2, -2)
+		frame.PredictBar:SetWidth(116)			
+		frame.PredictBar:SetPoint("TOPLEFT", 2, -2)						
+		
 	end		
 	
 	Healium_UpdateUnitHealth(frame.TargetUnit, frame)
@@ -397,6 +417,22 @@ function Healium_UpdateShowRole()
 	end
 	
 	Healium_UpdateRoles()
+end
+
+function Healium_UpdateShowIncomingHeals()
+	if Healium.ShowIncomingHeals then
+		HealiumFrame:RegisterEvent("UNIT_HEAL_PREDICTION")
+	else
+		HealiumFrame:UnregisterEvent("UNIT_HEAL_PREDICTION")
+	end
+	
+	for _, k in ipairs(Healium_Frames) do
+		if Healium.ShowIncomingHeals then
+			k.PredictBar:Show()
+		else
+			k.PredictBar:Hide()
+		end
+	end	
 end
 
 local function GetSpellID(spell)
@@ -754,6 +790,10 @@ local function InitVariables()
 		Healium.ShowRole = true
 	end
 	
+	if Healium.ShowIncomingHeals == nil then
+		Healium.ShowIncomingHeals = true
+	end
+	
 	if Healium.ShowPercentage == nil then 
 		Healium.ShowPercentage = true
 	end
@@ -878,7 +918,7 @@ function Healium_OnEvent(self, event, ...)
 	-------------------------------------------------------------
 	-- [[ Update Unit Health Display Whenever Their HP Changes ]]
 	-------------------------------------------------------------
-    if event == "UNIT_HEALTH" then
+    if (event == "UNIT_HEALTH") or (event == "UNIT_HEAL_PREDICTION") then
 --		if (not HealiumActive) then return 0 end
 		
 		if Healium_Units[arg1] then
@@ -971,6 +1011,7 @@ function Healium_OnEvent(self, event, ...)
 		Healium_UpdateFriends()
 		Healium_UpdateShowThreat()
 		Healium_UpdateShowRole()
+		Healium_UpdateShowIncomingHeals()
 		
 		for i=1, 8, 1 do
 			Healium_ShowHideGroupFrame(i)

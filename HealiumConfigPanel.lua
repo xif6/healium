@@ -176,6 +176,10 @@ local function ShowRoleCheck_OnClick(self)
 	Healium_UpdateShowRole()
 end
 
+local function ShowIncomingHealsCheck_OnClick(self)
+	Healium.ShowIncomingHeals = self:GetChecked() or false
+	Healium_UpdateShowIncomingHeals()
+end
 
 local function UpdateEnableDebuffsControls(self)
 	local color 
@@ -416,13 +420,23 @@ function Healium_CreateConfigPanel(Class, Version)
     ShowRoleCheck.Text:SetText("Show Role Icons")
 
 	ShowRoleCheck:SetScript("OnClick", ShowRoleCheck_OnClick)	
-	ShowRoleCheck.tooltipText = "Shows unit's role icon (healer, tank, damage) when in random dungeons.  Will override Health Percentage text when enabled and in a random dungeon."
+	ShowRoleCheck.tooltipText = "Shows unit's role icon (healer, tank, damage) when in random dungeons.  Will override Health Percentage text when unit is assigned a role."
 
+	-- Show Incoming Heals check button
+    local ShowIncomingHealsCheck = CreateFrame("CheckButton","$parentShowIncomingHealsCheckButton",scrollchild,"OptionsCheckButtonTemplate")
+    ShowIncomingHealsCheck:SetPoint("TOPLEFT", ShowRoleCheck, "BOTTOMLEFT", 0, 0)
+    
+    ShowIncomingHealsCheck.Text = ShowIncomingHealsCheck:CreateFontString(nil, "BACKGROUND","GameFontNormal")
+	ShowIncomingHealsCheck.Text:SetPoint("LEFT", ShowIncomingHealsCheck, "RIGHT", 0)
+    ShowIncomingHealsCheck.Text:SetText("Show Incoming Heals")
+
+	ShowIncomingHealsCheck:SetScript("OnClick", ShowIncomingHealsCheck_OnClick)	
+	ShowIncomingHealsCheck.tooltipText = "Shows incoming heals from all units as a dark green bar extending beyond the unit's current health."
 	
- 	-- Dropdown menus
+	-- Dropdown menus
 	local ButtonConfigTitleText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalLarge")
 	ButtonConfigTitleText:SetJustifyH("LEFT")
-	ButtonConfigTitleText:SetPoint("TOPLEFT", ShowRoleCheck, "BOTTOMLEFT", 0, -20)
+	ButtonConfigTitleText:SetPoint("TOPLEFT", ShowIncomingHealsCheck, "BOTTOMLEFT", 0, -20)
 	ButtonConfigTitleText:SetText("Button Configuration")	
 	
 	local ButtonConfigTitleSubText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalSmall")
@@ -431,7 +445,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	ButtonConfigTitleSubText:SetText("Click the dropdowns to configure each button.|nYou may now drag and drop directly from the spellbook|nonto buttons to configure them, including buffs!")
 	ButtonConfigTitleSubText:SetTextColor(1,1,1,1) 	
 	
-	local y = -400
+	local y = -420
 	local y_inc = 20
 	
 	for i=1, Healium_MaxButtons, 1 do
@@ -846,7 +860,7 @@ function Healium_CreateConfigPanel(Class, Version)
     AboutFrame.Text:SetWidth(330)
     AboutFrame.Text:SetJustifyH("LEFT")
     AboutFrame.Text:SetPoint("TOPLEFT", 7,-10)
-    AboutFrame.Text:SetText(Healium_AddonColoredName .. Version .. " |cFFFFFFFFCreated by Engy of Area 52.|n|n|cFFFFFFFFOriginally based on FB Heal Box, which was created by Dourd of Argent Dawn EU.")
+    AboutFrame.Text:SetText(Healium_AddonColoredName .. Version .. " |cFFFFFFFFCreated by Engee of Durotan.|n|n|cFFFFFFFFOriginally based on FB Heal Box, which was created by Dourd of Argent Dawn EU.")
 
 	-- Init Config Panel controls
 	for i=1, Healium_MaxButtons, 1 do
@@ -869,6 +883,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	EnableCliqueCheck:SetChecked(Healium.EnableClique)
 	ShowThreatCheck:SetChecked(Healium.ShowThreat)
 	ShowRoleCheck:SetChecked(Healium.ShowRole)
+	ShowIncomingHealsCheck:SetChecked(Healium.ShowIncomingHeals)
 	EnableDebuffAudioCheck:SetChecked(Healium.EnableDebufAudio)
 	EnableDebuffHealthbarHighlightingCheck:SetChecked(Healium.EnableDebufHealthbarHighlighting)
 	EnableDebuffButtonHighlightingCheck:SetChecked(Healium.EnableDebufButtonHighlighting)
