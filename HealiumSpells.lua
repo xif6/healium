@@ -68,6 +68,7 @@ function Healium_InitSpells(class, race)
 		AddSpell(47788)		-- Guardian Spirit
 		AddSpell(47540)		-- Penance
 		AddSpell(88625)		-- Holy Word: Chastise
+		AddSpell(88684)     -- Holy Word: Serenity		
 		
 		-- Priest Cure Disease
 		Cures[SpellName(528)] = { CanCureDisease = true }

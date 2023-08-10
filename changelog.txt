@@ -1,3 +1,9 @@
+2.0.6
+* Added "Holy Word: Serenity" to Priest's default spell list.  Note- to configure this, you will either need to either select it in a Healium config panel drop-down or use the "Configure Button" menu. Drag and dropping it doesn't seem to work due to the spell's dynamic nature.
+* Added checkbox option "Show names in UPPERCASE".  Previously this was hard-coded on without any option.
+* Added "/hlm toggle" slash handler.  This toggles visibility of Healium frames.  This is the same as Shift + Left clicking on the Healium minimap icon.
+* The toggle frames feature now reports whether the frames are currently shown or hidden after performing its operation.
+
 2.0.5
 * Updated ToC version number
 

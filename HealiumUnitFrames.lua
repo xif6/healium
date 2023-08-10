@@ -522,13 +522,6 @@ function HealiumUnitFrames_Button_OnAttributeChanged(self, name, value)
 				Healium_UpdateButtonCooldown(button)
 			end
 
-			--if self:IsVisible() then
-				local playerName= UnitName(newUnit)
-				if playerName ~= nil then
-					playerName = strupper(playerName)
-				end
-				self.name:SetText(playerName)
-			--end
 
 			if not Healium_Units[newUnit] then
 				Healium_Units[newUnit] = { }
@@ -542,6 +535,7 @@ function HealiumUnitFrames_Button_OnAttributeChanged(self, name, value)
 
 			HealiumUnitFames_CheckPowerType(newUnit, self)
 
+			Healium_UpdateUnitName(newUnit, self)
 			Healium_UpdateUnitHealth(newUnit, self)
 			Healium_UpdateUnitMana(newUnit, self)
 			Healium_UpdateUnitBuffs(newUnit, self)
@@ -655,6 +649,7 @@ function Healium_ToggleAllFrames()
 			j:Hide()
 		end
 
+		Healium_Print("Current frames are now hidden.")
 		return
 	end
 
@@ -680,6 +675,8 @@ function Healium_ToggleAllFrames()
 		PartyFrame:Show()
 		PetsFrame:Show()
 	end
+
+	Healium_Print("Current frames are now shown.")
 end
 
 function Healium_ShowHidePartyFrame(show)
