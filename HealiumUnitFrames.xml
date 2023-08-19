@@ -274,22 +274,7 @@
 					</Anchor>
 				</Anchors>
 			</Frame>
-			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="0" frameLevel="1">
-				<Size x="111" y="23"/>
-				<Anchors>
-					<Anchor point="TOPLEFT">
-						<Offset>
-							<AbsDimension x="7" y="-2"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
-				<BarColor r=".25" g=".60" b=".25"/>
-				<Scripts >
-					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
-				</Scripts>
-			</StatusBar>
-			<StatusBar parentKey="HealthBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="2">
+			<StatusBar parentKey="HealthBar" minValue="0" maxValue="100" defaultValue="100">
 				<Size x="111" y="23"/>
 				<Anchors>
 					<Anchor point="TOPLEFT">
@@ -310,9 +295,9 @@
 								<AbsDimension x="16" y="16"/>
 							</Size>
 							<Anchors>
-								<Anchor point="RIGHT">
+								<Anchor point="LEFT">
 									<Offset>
-										<AbsDimension x="-2" y="-1"/>
+										<AbsDimension x="2" y="-1"/>
 									</Offset>
 								</Anchor>
 							</Anchors>
@@ -320,7 +305,22 @@
 					</Layer>
 				</Layers>
 			</StatusBar>
-			<StatusBar parentKey="ManaBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="3">
+			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="0">
+				<Size x="111" y="23"/>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="7" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
+				<BarColor r=".25" g=".60" b=".25"/>
+				<Scripts >
+					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
+				</Scripts>
+			</StatusBar>
+			<StatusBar parentKey="ManaBar" minValue="0" maxValue="100" defaultValue="100">
 				<Size x="5" y="23"/>
 				<Layers>
 					<Layer level="BACKGROUND" setAllPoints="true">

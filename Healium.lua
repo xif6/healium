@@ -167,7 +167,7 @@ function Healium_OnLoad(self)
 end
 
 local function Healium_ShowHidePercentage(frame)
-	if Healium.ShowPercentage and (frame.HasRole == nil) then
+	if Healium.ShowPercentage then
 		frame.HPText:Show()
 	else
 		frame.HPText:Hide()
@@ -305,10 +305,10 @@ end
 
 function Healium_UpdateShowMana()
 	if Healium.ShowMana then
-		HealiumFrame:RegisterEvent("UNIT_POWER")
+		HealiumFrame:RegisterEvent("UNIT_MANA")
 		HealiumFrame:RegisterEvent("UNIT_DISPLAYPOWER")
 	else
-		HealiumFrame:UnregisterEvent("UNIT_POWER")
+		HealiumFrame:UnregisterEvent("UNIT_MANA")
 		HealiumFrame:UnregisterEvent("UNIT_DISPLAYPOWER")
 	end
 
@@ -402,6 +402,7 @@ function Healium_UpdateUnitRole(UnitName, NamePlate)
 	if not UnitExists(UnitName) then return end
 
 	local icon = NamePlate.HealthBar.RoleIcon
+	local name = NamePlate.name
 
 	if not Healium.ShowRole then
 		icon:Hide()
@@ -412,13 +413,22 @@ function Healium_UpdateUnitRole(UnitName, NamePlate)
 
 	local role = UnitGroupRolesAssigned(UnitName);
 
-	if ( role == "TANK" or role == "HEALER" or role == "DAMAGER") then
+	if (role == "TANK") then
 		NamePlate.HasRole = true
-		icon:SetTexCoord(GetTexCoordsForRoleSmallCircle(role))
+		name:SetPoint("TOPLEFT", 26, 0)
+		icon:SetTexCoord(0/64, 19/64, 22/64, 41/64)
+		icon:Show()
+	elseif (role == "HEALER") then
+		NamePlate.HasRole = true
+		name:SetPoint("TOPLEFT", 26, 0)
+		icon:SetTexCoord(20/64, 39/64, 1/64, 20/64)
+		icon:Show()
+	elseif (role == "DAMAGER") then
+		NamePlate.HasRole = true
+		name:SetPoint("TOPLEFT", 26, 0)
+		icon:SetTexCoord(20/64, 39/64, 22/64, 41/64)
 		icon:Show()
 	else
---		icon:SetTexCoord(GetTexCoordsForRoleSmallCircle("TANK"))
---		icon:Show()
 		NamePlate.HasRole = nil
 		icon:Hide()
 	end
@@ -462,26 +472,24 @@ function Healium_UpdateShowIncomingHeals()
 end
 
 local function GetSpellID(spell)
-    local i = 1
-    local spellID
-    while true do
-        local spellName = GetSpellBookItemName(i, SpellBookFrame.bookType)
-        if (not spellName) then
-            break
-        end
-        if (spellName == spell) then
-			local slotType = GetSpellBookItemInfo(i, SpellBookFrame.bookType)
-			if (slotType == "FUTURESPELL") then
-				break
-			end
-            return i
-        end
-        i = i + 1
-        if (i > 300) then
-            break
-        end
-    end
-    return nil
+	local i = 1
+	local spellID
+	local highestRank
+	while true do
+		local spellName = GetSpellName(i, SpellBookFrame.bookType)
+		if (not spellName) then
+			break
+		end
+		if (spellName == spell) then
+			spellID = i
+			highestRank = spellRank
+		end
+		i = i + 1
+		if (i > 300) then
+			break
+		end
+	end
+	return spellID, highestRank
 end
 
 -- Loops through Healium_Spell.Name[] and updates it's corresponding .ID[] and .Icon[]
@@ -955,8 +963,8 @@ function Healium_OnEvent(self, event, ...)
 		return
 	end
 
-    if event == "UNIT_POWER" then
-		if (arg2 == "MANA") and Healium_Units[arg1] then
+    if event == "UNIT_MANA" then
+		if Healium_Units[arg1] then
 			for _,v  in pairs(Healium_Units[arg1]) do
 				Healium_UpdateUnitMana(arg1, v)
 			end
