@@ -62,12 +62,11 @@ function Healium_PlayDebuffSound()
 	PlaySoundFile(DebuffSoundPath)
 end
 
---[[
+
 local function initialConfigFunction(frame)
 	-- The only thing you are especially allowed to do in the initialConfigFunction() is to change attributes.
 	-- CreateFrame(), :Show(), :Hide() etc will taint in combat still
 
-	Healium_DebugPrint("Inital Config")
 	frame.buttons = { }
 	frame:RegisterForClicks("AnyUp")
 
@@ -100,9 +99,9 @@ local function initialConfigFunction(frame)
 		if (not Healium.ShowPercentage) then frame.HPText:Hide() end
 		Healium_CreateButtonsForNameplate(frame)
 	end
-end
---]]
 
+--	Healium_DebugPrint("Inital Config")
+end
 
 local function CreateButton(ButtonName,ParentFrame,xoffset)
 	local button = CreateFrame("Button", ButtonName, ParentFrame, "HealiumHealButtonTemplate")
@@ -148,7 +147,7 @@ function Healium_CreateButtonsForNameplate(frame)
 end
 
 local function SetHeaderAttributes(frame)
---	frame.initialConfigFunction = initialConfigFunction
+	frame.initialConfigFunction = initialConfigFunction
 	frame:SetAttribute("showPlayer", "true")
 	frame:SetAttribute("maxColumns", 1)
 	frame:SetAttribute("columnAnchorPoint", "LEFT")
@@ -372,39 +371,7 @@ function HealiumUnitFrames_ShowHideFrame(self, show)
 end
 
 function HealiumUnitFrames_Button_OnLoad(self)
-	self.buttons = { }
-	self:RegisterForClicks("AnyUp")
-
-	table.insert(Healium_Frames, self)
-
-	if Healium.EnableClique then
-		ClickCastselfs[self] = true
-	end
-
-	-- configure buff selfs
-	self.buffs = { }
-
-	local selfname = self:GetName()
-	for i=1, MaxBuffs, 1 do
-		local buffself = _G[selfname.."_Buff"..i]
-		local name = buffself:GetName()
-		buffself.icon = _G[name.."Icon"]
-		buffself.cooldown = _G[name.."Cooldown"]
-		buffself.count = _G[name.."Count"]
-		buffself.border = _G[name.."Border"]
-		buffself.id = i
-		self.buffs[i] = buffself
-	end
-
-	if InCombatLockdown() then
-		self.fixCreateButtons = true
-		table.insert(Healium_FixNameplates, self)
-		Healium_DebugPrint("Unit self created during combat. Its buttons will not be available until combat ends.")
-	else
-		if (not Healium.ShowPercentage) then self.HPText:Hide() end
-		Healium_CreateButtonsForNameplate(self)
-	end
-
+	self.initialConfigFunction = HealiumUnitFrames_Header_Initial_Config
 	self:RegisterForDrag("RightButton")
 end
 
