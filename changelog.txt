@@ -1,3 +1,6 @@
+1.4.1
+* Fix bug focus and target frames
+
 1.4.0
 * Added Healium Target and Focus unit frames
 * Added option to show raid icons (raid icon support already existed but there was no option to turn it off)

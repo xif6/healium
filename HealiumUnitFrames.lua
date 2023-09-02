@@ -419,7 +419,39 @@ function HealiumUnitFrames_ShowHideFrame(self, show)
 end
 
 function HealiumUnitFrames_Button_OnLoad(self)
-	self.initialConfigFunction = HealiumUnitFrames_Header_Initial_Config
+	self.buttons = { }
+	self:RegisterForClicks("AnyUp")
+
+	table.insert(Healium_Frames, self)
+
+	if Healium.EnableClique then
+		ClickCastFrames[self] = true
+	end
+
+	-- configure buff frames
+	self.buffs = { }
+
+	local framename = self:GetName()
+	for i=1, MaxBuffs, 1 do
+		local buffframe = _G[framename.."_Buff"..i]
+		local name = buffframe:GetName()
+		buffframe.icon = _G[name.."Icon"]
+		buffframe.cooldown = _G[name.."Cooldown"]
+		buffframe.count = _G[name.."Count"]
+		buffframe.border = _G[name.."Border"]
+		buffframe.id = i
+		self.buffs[i] = buffframe
+	end
+
+	if InCombatLockdown() then
+		self.fixCreateButtons = true
+		table.insert(Healium_FixNameplates, self)
+		Healium_DebugPrint("Unit frame created during combat. Its buttons will not be available until combat ends.")
+	else
+		if (not Healium.ShowPercentage) then self.HPText:Hide() end
+		Healium_CreateButtonsForNameplate(self)
+	end
+
 	self:RegisterForDrag("RightButton")
 end
 
