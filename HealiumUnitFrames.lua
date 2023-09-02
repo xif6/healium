@@ -628,8 +628,8 @@ function Healium_ToggleAllFrames()
 	if PetsFrame:IsShown() then hide = true end
 	if MeFrame:IsShown() then hide = true end
 	if FriendsFrame:IsShown() then hide = true end
-	if DamagerFrame:IsShown() then hide = true end
-	if HealerFrame:IsShown() then hide = true end
+	if DamagersFrame:IsShown() then hide = true end
+	if HealersFrame:IsShown() then hide = true end
 	if TanksFrame:IsShown() then hide = true end
 	if TargetFrame:IsShown() then hide = true end
 	if FocusFrame:IsShown() then hide = true end
