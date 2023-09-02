@@ -66,7 +66,7 @@ function Healium_PlayDebuffSound()
 	PlaySoundFile(DebuffSoundPath)
 end
 
-
+--[[
 local function initialConfigFunction(frame)
 	-- The only thing you are especially allowed to do in the initialConfigFunction() is to change attributes.
 	-- CreateFrame(), :Show(), :Hide() etc will taint in combat still
@@ -105,7 +105,7 @@ local function initialConfigFunction(frame)
 		Healium_CreateButtonsForNameplate(frame)
 	end
 end
-
+--]]
 
 
 local function CreateButton(ButtonName,ParentFrame,xoffset)
@@ -152,7 +152,7 @@ function Healium_CreateButtonsForNameplate(frame)
 end
 
 local function SetHeaderAttributes(frame)
-	frame.initialConfigFunction = initialConfigFunction
+	--frame.initialConfigFunction = initialConfigFunction
 
 	frame:SetAttribute("showPlayer", "true")
 	frame:SetAttribute("maxColumns", 1)
