@@ -377,6 +377,23 @@ function HealiumUnitFrames_Button_OnLoad(self)
 	self:RegisterForDrag("RightButton")
 end
 
+function HealiumUnitFrames_Button_OnEnter(self)
+	local _, powerType = UnitPowerType(self.TargetUnit)
+	GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
+	GameTooltip:SetUnit(self.TargetUnit)
+	GameTooltip:AddLine("Health: |cFF00FF00"..UnitHealth(self.TargetUnit).." / "..UnitHealthMax(self.TargetUnit),1,1,1)
+	if (powerType == "MANA") then
+		GameTooltip:AddLine("Mana: |cFF0000FF"..UnitPower(self.TargetUnit).." / "..UnitPowerMax(self.TargetUnit),1,1,1)
+	elseif (powerType == "RAGE") then
+		GameTooltip:AddLine("Rage: |cFFFF0000"..UnitPower(self.TargetUnit).." / "..UnitPowerMax(self.TargetUnit),1,1,1)
+	elseif (powerType == "ENERGY") then
+		GameTooltip:AddLine("Energy: |cFFFFFF00"..UnitPower(self.TargetUnit).." / "..UnitPowerMax(self.TargetUnit),1,1,1)
+	elseif (powerType == "RUNIC_POWER") then
+		GameTooltip:AddLine("Runic power: |cFF00D1FF"..UnitPower(self.TargetUnit).." / "..UnitPowerMax(self.TargetUnit),1,1,1)
+	end
+	GameTooltip:Show()
+end
+
 function HealiumUnitFames_CheckPowerType(UnitName, NamePlate)
 	local _, powerType = UnitPowerType(UnitName)
 	if  (Healium.ShowMana == false) or (UnitExists(UnitName) == nil) or (powerType ~= "MANA") then
@@ -890,7 +907,7 @@ function Healium_UpdateFriends()
 			names = v
 		end
 	end
-	Healium_DebugPrint("namesList: " ..names)
+	Healium_DebugPrint("namesListFriends: " ..names)
 	FriendsFrame.hdr:SetAttribute("nameList", names)
 --	Healium_DebugPrint("Friends header is shown: " .. FriendsFrame.hdr:IsShown())
 end

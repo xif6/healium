@@ -5,7 +5,7 @@
 -- Color control characters |CAARRGGBB  then |r resets to normal, where AA == Alpha, RR = Red, GG = Green, BB = blue
 
 Healium_Debug = false
-local AddonVersion = "|cFFFFFF00 1.3.0|r"
+local AddonVersion = "|cFFFFFF00 1.3.1|r"
 
 HealiumDropDown = {} -- the dropdown menus on the config panel
 

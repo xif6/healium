@@ -348,6 +348,7 @@
 		</Frames>
 		<Scripts>
 			<OnLoad>HealiumUnitFrames_Button_OnLoad(self)</OnLoad>
+			<OnEnter>HealiumUnitFrames_Button_OnEnter(self)</OnEnter>
 			<OnShow>HealiumUnitFrames_Button_OnShow(self)</OnShow>
 			<OnHide>HealiumUnitFrames_Button_OnHide(self)</OnHide>
 			<OnAttributeChanged>HealiumUnitFrames_Button_OnAttributeChanged(self, name, value)</OnAttributeChanged>
