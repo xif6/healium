@@ -465,7 +465,6 @@ end
 
 function HealiumUnitFrames_Button_OnEnter(self)
 	local _, powerType = UnitPowerType(self.TargetUnit)
-	GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
 	GameTooltip:SetUnit(self.TargetUnit)
 	GameTooltip:AddLine("Health: |cFF00FF00"..UnitHealth(self.TargetUnit).." / "..UnitHealthMax(self.TargetUnit),1,1,1)
 	if (powerType == "MANA") then
@@ -601,6 +600,21 @@ function HealiumUnitFrames_Button_OnMouseUp(self, button)
 
 		parent:StopMovingOrSizing()
 		parent.childismoving = nil
+		if self.TargetUnit == "player" then
+			ToggleDropDownMenu(1, nil, PlayerFrameDropDown, "cursor");
+		elseif self.TargetUnit == "target" then
+			ToggleDropDownMenu(1, nil, TargetFrameDropDown, "cursor");
+		elseif self.TargetUnit == "focus" then
+			ToggleDropDownMenu(1, nil, FocusFrameDropDown, "cursor");
+		elseif self.TargetUnit == "party1" then
+			ToggleDropDownMenu(1, nil, PartyMemberFrame1DropDown, "cursor");
+		elseif self.TargetUnit == "party2" then
+			ToggleDropDownMenu(1, nil, PartyMemberFrame2DropDown, "cursor");
+		elseif self.TargetUnit == "party3" then
+			ToggleDropDownMenu(1, nil, PartyMemberFrame3DropDown, "cursor");
+		elseif self.TargetUnit == "party4" then
+			ToggleDropDownMenu(1, nil, PartyMemberFrame4DropDown, "cursor");
+		end
 	end
 end
 
