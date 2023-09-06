@@ -373,15 +373,15 @@ function Healium_UpdateManaBarVisibility(frame)
 	if Healium.ShowMana then
 		frame.ManaBar:Show()
 		frame.HealthBar:SetWidth(141)
-		frame.HealthBar:SetPoint("TOPLEFT", 7, -2)
+		frame.HealthBar:SetPoint("CENTER", 3, 0)
 		frame.PredictBar:SetWidth(141)
-		frame.PredictBar:SetPoint("TOPLEFT", 7, -2)
+		frame.PredictBar:SetPoint("CENTER", 3, 0)
 	else
 		frame.ManaBar:Hide()
 		frame.HealthBar:SetWidth(146)
-		frame.HealthBar:SetPoint("TOPLEFT", 2, -2)
+		frame.HealthBar:SetPoint("CENTER", 0, 0)
 		frame.PredictBar:SetWidth(146)
-		frame.PredictBar:SetPoint("TOPLEFT", 2, -2)
+		frame.PredictBar:SetPoint("CENTER", 0, 0)
 
 	end
 

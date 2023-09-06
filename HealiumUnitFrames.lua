@@ -464,18 +464,19 @@ function HealiumUnitFrames_Button_OnLoad(self)
 end
 
 function HealiumUnitFrames_Button_OnEnter(self)
-	local _, powerType = UnitPowerType(self.TargetUnit)
-	GameTooltip:SetUnit(self.TargetUnit)
-	--GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
-	GameTooltip:AddLine("Health: |cFF00FF00"..UnitHealth(self.TargetUnit).." / "..UnitHealthMax(self.TargetUnit),1,1,1)
+	local unit = self.TargetUnit
+	local _, powerType = UnitPowerType(unit)
+	GameTooltip_SetDefaultAnchor(GameTooltip, UIParent)
+	GameTooltip:SetUnit(unit)
+	GameTooltip:AddLine("Health: |cFF00FF00"..UnitHealth(unit).." / "..UnitHealthMax(unit),1,1,1)
 	if (powerType == "MANA") then
-		GameTooltip:AddLine("Mana: |cFF0000FF"..UnitPower(self.TargetUnit).." / "..UnitPowerMax(self.TargetUnit),1,1,1)
+		GameTooltip:AddLine("Mana: |cFF0000FF"..UnitPower(unit).." / "..UnitPowerMax(unit),1,1,1)
 	elseif (powerType == "RAGE") then
-		GameTooltip:AddLine("Rage: |cFFFF0000"..UnitPower(self.TargetUnit).." / "..UnitPowerMax(self.TargetUnit),1,1,1)
+		GameTooltip:AddLine("Rage: |cFFFF0000"..UnitPower(unit).." / "..UnitPowerMax(unit),1,1,1)
 	elseif (powerType == "ENERGY") then
-		GameTooltip:AddLine("Energy: |cFFFFFF00"..UnitPower(self.TargetUnit).." / "..UnitPowerMax(self.TargetUnit),1,1,1)
+		GameTooltip:AddLine("Energy: |cFFFFFF00"..UnitPower(unit).." / "..UnitPowerMax(unit),1,1,1)
 	elseif (powerType == "RUNIC_POWER") then
-		GameTooltip:AddLine("Runic power: |cFF00D1FF"..UnitPower(self.TargetUnit).." / "..UnitPowerMax(self.TargetUnit),1,1,1)
+		GameTooltip:AddLine("Runic power: |cFF00D1FF"..UnitPower(unit).." / "..UnitPowerMax(unit),1,1,1)
 	end
 	GameTooltip:Show()
 end

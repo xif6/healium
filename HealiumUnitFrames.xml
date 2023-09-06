@@ -139,18 +139,7 @@
 		    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 -->
 	<Button name="HealiumUnitFrames_ButtonTemplate" virtual="true" movable="true" enableMouse="true" inherits="SecureActionButtonTemplate">
-		<Size x="150" y="28"/>
-		<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" tile="true">
-			<EdgeSize>
-				<AbsValue val="14"/>
-			</EdgeSize>
-			<TileSize>
-				<AbsValue val="16"/>
-			</TileSize>
-			<BackgroundInsets>
-				<AbsInset left="2" right="2" top="2" bottom="2"/>
-			</BackgroundInsets>
-		</Backdrop>
+		<Size x="150" y="30"/>
 		<Layers>
 			<Layer>
 				<FontString name="$parent_Name" parentKey="name" text="Unknown Entitiy" inherits="GameFontNormalSmall" maxLines="2" nonspacewrap="true" justifyH="LEFT">
@@ -277,9 +266,9 @@
 			<StatusBar parentKey="HealthBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="4">
 				<Size x="141" y="24"/>
 				<Anchors>
-					<Anchor point="TOPLEFT">
+					<Anchor point="CENTER">
 						<Offset>
-							<AbsDimension x="7" y="-2"/>
+							<AbsDimension x="3" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -304,6 +293,7 @@
 						</Texture>
 					</Layer>
 				</Layers>
+
 			</StatusBar>
 			<StatusBar parentKey="ManaBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="11">
 				<Size x="5" y="24"/>
@@ -315,9 +305,9 @@
 					</Layer>
 				</Layers>
 				<Anchors>
-					<Anchor point="TOPLEFT">
+					<Anchor point="CENTER">
 						<Offset>
-							<AbsDimension x="2" y="-2"/>
+							<AbsDimension x="-70" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -331,20 +321,29 @@
 			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="0" frameLevel="3">
 				<Size x="141" y="24"/>
 				<Anchors>
-					<Anchor point="TOPLEFT">
+					<Anchor point="CENTER">
 						<Offset>
-							<AbsDimension x="7" y="-2"/>
+							<AbsDimension x="3" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
 				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
-				<BarColor r="1" g="1" b="1"/>
+				<BarColor r=".25" g=".60" b=".25"/>
 				<Scripts >
 					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
 				</Scripts>
 			</StatusBar>
-
-
+			<StatusBar parentKey="bgBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="1">
+				<Size x="150" y="24"/>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<BarTexture file="Interface\TutorialFrame\TutorialFrameBackground" />
+			</StatusBar>
 		</Frames>
 		<Scripts>
 			<OnLoad>HealiumUnitFrames_Button_OnLoad(self)</OnLoad>
