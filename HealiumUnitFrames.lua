@@ -466,6 +466,7 @@ end
 function HealiumUnitFrames_Button_OnEnter(self)
 	local _, powerType = UnitPowerType(self.TargetUnit)
 	GameTooltip:SetUnit(self.TargetUnit)
+	--GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
 	GameTooltip:AddLine("Health: |cFF00FF00"..UnitHealth(self.TargetUnit).." / "..UnitHealthMax(self.TargetUnit),1,1,1)
 	if (powerType == "MANA") then
 		GameTooltip:AddLine("Mana: |cFF0000FF"..UnitPower(self.TargetUnit).." / "..UnitPowerMax(self.TargetUnit),1,1,1)

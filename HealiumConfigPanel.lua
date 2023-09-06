@@ -713,7 +713,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	PlayButton:SetText("Play")
 	PlayButton:SetWidth(54)
 	PlayButton:SetHeight(22)
-	PlayButton:SetPoint("LEFT", SoundDropDown, "RIGHT", 120, 0)
+	PlayButton:SetPoint("LEFT", SoundDropDown, "RIGHT", 150, 0)
 	PlayButton:SetScript("OnClick", Healium_PlayDebuffSound)
 
 	-- CPU Intensive Settings text

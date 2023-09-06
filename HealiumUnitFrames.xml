@@ -5,7 +5,7 @@
 <!-- The main frame template -->
 	<Frame name="HealiumUnitFrameTemplate" virtual="true" movable="true" parent="UIParent" hidden="false" enableMouse="true">
         <Size>
-            <AbsDimension x="120" y="30"/>
+            <AbsDimension x="150" y="30"/>
         </Size>
         <Anchors>
             <Anchor point="CENTER">
@@ -14,13 +14,13 @@
 		<Frames>
 			<Frame parentKey="CaptionBar" enableMouse="true" hidden="false">
 				<Size>
-					<AbsDimension x="120" y="30"/>
+					<AbsDimension x="150" y="30"/>
 				</Size>
 				<Anchors>
 					<Anchor point="CENTER">
 					</Anchor>
 				</Anchors>
-				<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground"  edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+				<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
 					<EdgeSize>
 						<AbsValue val="16"/>
 					</EdgeSize>
@@ -139,20 +139,20 @@
 		    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 -->
 	<Button name="HealiumUnitFrames_ButtonTemplate" virtual="true" movable="true" enableMouse="true" inherits="SecureActionButtonTemplate">
-		<Size x="120" y="28"/>
-		<Backdrop edgeFile="Interface/Tooltips/UI-Tooltip-Border" tile="true">
+		<Size x="150" y="28"/>
+		<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" tile="true">
 			<EdgeSize>
-				<AbsValue val="10"/>
+				<AbsValue val="14"/>
 			</EdgeSize>
 			<TileSize>
 				<AbsValue val="16"/>
 			</TileSize>
 			<BackgroundInsets>
-				<AbsInset left="4" right="4" top="4" bottom="4"/>
+				<AbsInset left="2" right="2" top="2" bottom="2"/>
 			</BackgroundInsets>
 		</Backdrop>
 		<Layers>
-			<Layer level="OVERLAY">
+			<Layer>
 				<FontString name="$parent_Name" parentKey="name" text="Unknown Entitiy" inherits="GameFontNormalSmall" maxLines="2" nonspacewrap="true" justifyH="LEFT">
 					<Color r="1.0" g="1.0" b="1.0"/>
 					<Anchors>
@@ -162,7 +162,7 @@
 						<Anchor point="BOTTOMRIGHT"/>
 					</Anchors>
 				</FontString>
-				<FontString name="$parent_HPText" parentKey="HPText" text="100%" inherits="NumberFontNormalYellow"> <!-- inherits="NumberFontNormalYellow">  -->
+				<FontString name="$parent_HPText" parentKey="HPText" text="100%" inherits="GameFontNormalSmall"> <!-- inherits="NumberFontNormalYellow">  -->
 					<Color r="1.0" g="1.0" b="1.0"/>
 					<Anchors>
 						<Anchor point="RIGHT">
@@ -172,7 +172,7 @@
 				</FontString>
 			</Layer>
 
-			<Layer level="ARTWORK">
+			<Layer>
 				<Texture name="$parent_RaidTargetIcon" parentKey="raidTargetIcon" file="Interface\TargetingFrame\UI-RaidTargetingIcons" hidden="true">
 					<Size>
 						<AbsDimension x="26" y="26"/>
@@ -191,35 +191,35 @@
 			<Attribute name="type1" value="target" />
 		</Attributes>
 		<Frames>
-			<Frame parentKey="CurseBar" alpha="0">
-				<Size x="124" y="32"/>
+
+			<Frame parentKey="CurseBar" alpha="0" frameLevel="30">
+				<Size x="154" y="32"/>
 				<Anchors>
 					<Anchor point="CENTER"></Anchor>
 				</Anchors>
 				<Backdrop edgeFile="Interface/Tooltips/UI-Tooltip-Border" tile="true">
 					<EdgeSize>
-						<AbsValue val="24"/>
+						<AbsValue val="16"/>
 					</EdgeSize>
 				   <BackgroundInsets>
 					  <AbsInset left="0" right="0" top="0" bottom="0"/>
 				   </BackgroundInsets>
 				</Backdrop>
 			</Frame>
-			<Frame parentKey="AggroBar" alpha="0">
-				<Size x="110" y="20"/>
+			<Frame parentKey="AggroBar" alpha="1" frameLevel="20">
+				<Size x="154" y="32"/>
 				<Anchors>
 					<Anchor point="CENTER"></Anchor>
 				</Anchors>
-					<Backdrop edgeFile="Interface/Tooltips/UI-Tooltip-Border" tile="true" >
+				<Backdrop edgeFile="Interface/Tooltips/UI-Tooltip-Border" tile="true">
 					<EdgeSize>
-						<AbsValue val="12"/>
+						<AbsValue val="16"/>
 					</EdgeSize>
-				   <BackgroundInsets>
-					  <AbsInset left="0" right="0" top="0" bottom="0"/>
-				   </BackgroundInsets>
+					<BackgroundInsets>
+						<AbsInset left="0" right="0" top="0" bottom="0"/>
+					</BackgroundInsets>
 				</Backdrop>
 			</Frame>
-
 			<Frame name="$parent_Buff1" inherits="HealiumBuffTemplate">
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="LEFT">
@@ -274,8 +274,8 @@
 					</Anchor>
 				</Anchors>
 			</Frame>
-			<StatusBar parentKey="HealthBar" minValue="0" maxValue="100" defaultValue="100">
-				<Size x="111" y="23"/>
+			<StatusBar parentKey="HealthBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="4">
+				<Size x="141" y="24"/>
 				<Anchors>
 					<Anchor point="TOPLEFT">
 						<Offset>
@@ -305,8 +305,8 @@
 					</Layer>
 				</Layers>
 			</StatusBar>
-			<StatusBar parentKey="ManaBar" minValue="0" maxValue="100" defaultValue="100">
-				<Size x="5" y="23"/>
+			<StatusBar parentKey="ManaBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="11">
+				<Size x="5" y="24"/>
 				<Layers>
 					<Layer level="BACKGROUND" setAllPoints="true">
 						<Texture>
@@ -328,8 +328,8 @@
 					<OnLoad function="Healium_ManaStatusBar_OnLoad" />
 				</Scripts>
 			</StatusBar>
-			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="0" frameLevel="1">
-				<Size x="111" y="23"/>
+			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="0" frameLevel="3">
+				<Size x="141" y="24"/>
 				<Anchors>
 					<Anchor point="TOPLEFT">
 						<Offset>
@@ -338,7 +338,7 @@
 					</Anchor>
 				</Anchors>
 				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
-				<BarColor r=".25" g=".60" b=".25"/>
+				<BarColor r="1" g="1" b="1"/>
 				<Scripts >
 					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
 				</Scripts>

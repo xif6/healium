@@ -12,7 +12,7 @@ HealiumDropDown = {} -- the dropdown menus on the config panel
 -- Constants
 local LowHP = 0.6
 local VeryLowHP = 0.3
-local NamePlateWidth = 120
+local NamePlateWidth = 150
 local _, HealiumClass = UnitClass("player")
 local _, HealiumRace = UnitRace("player")
 local MaxParty = 5 -- Max number of people in party
@@ -307,6 +307,8 @@ function Healium_UpdateUnitHealth(UnitName, NamePlate)
 
 	if isDead then
 		NamePlate.HPText:SetText( "dead" )
+	elseif MaxHealth == 0 then
+		NamePlate.HPText:SetText( "" )
 	else
 		NamePlate.HPText:SetText( format("%.1i%%", HPPercent*100))
 	end
@@ -370,15 +372,15 @@ end
 function Healium_UpdateManaBarVisibility(frame)
 	if Healium.ShowMana then
 		frame.ManaBar:Show()
-		frame.HealthBar:SetWidth(111)
+		frame.HealthBar:SetWidth(141)
 		frame.HealthBar:SetPoint("TOPLEFT", 7, -2)
-		frame.PredictBar:SetWidth(111)
+		frame.PredictBar:SetWidth(141)
 		frame.PredictBar:SetPoint("TOPLEFT", 7, -2)
 	else
 		frame.ManaBar:Hide()
-		frame.HealthBar:SetWidth(116)
+		frame.HealthBar:SetWidth(146)
 		frame.HealthBar:SetPoint("TOPLEFT", 2, -2)
-		frame.PredictBar:SetWidth(116)
+		frame.PredictBar:SetWidth(146)
 		frame.PredictBar:SetPoint("TOPLEFT", 2, -2)
 
 	end
@@ -411,13 +413,8 @@ function Healium_UpdateUnitThreat(UnitName, NamePlate)
 
 	local status = UnitThreatSituation(UnitName)
 
-	if status and status > 1 then
-		local r, g, b = GetThreatStatusColor(status)
-		NamePlate.AggroBar:SetBackdropBorderColor(r,g,b,1)
-		NamePlate.AggroBar:SetAlpha(1)
-	else
-		NamePlate.AggroBar:SetAlpha(0)
-	end
+	local r, g, b = GetThreatStatusColor(status)
+	NamePlate.AggroBar:SetBackdropBorderColor(r,g,b,1)
 end
 
 function Healium_UpdateShowThreat()
@@ -446,30 +443,34 @@ function Healium_UpdateUnitRole(UnitName, NamePlate)
 	local name = NamePlate.name
 
 	if not Healium.ShowRole then
+		name:SetPoint("TOPLEFT", 10, 0)
 		icon:Hide()
 		NamePlate.HasRole = nil
 		Healium_ShowHidePercentage(NamePlate)
 		return
 	end
 
-	local role = UnitGroupRolesAssigned(UnitName);
+	if (IsInGroup()) then
+		local tank, heal, lead = UnitGroupRolesAssigned(UnitName);
 
-	if (role == "TANK") then
-		NamePlate.HasRole = true
-		name:SetPoint("TOPLEFT", 26, 0)
-		icon:SetTexCoord(0/64, 19/64, 22/64, 41/64)
-		icon:Show()
-	elseif (role == "HEALER") then
-		NamePlate.HasRole = true
-		name:SetPoint("TOPLEFT", 26, 0)
-		icon:SetTexCoord(20/64, 39/64, 1/64, 20/64)
-		icon:Show()
-	elseif (role == "DAMAGER") then
-		NamePlate.HasRole = true
-		name:SetPoint("TOPLEFT", 26, 0)
-		icon:SetTexCoord(20/64, 39/64, 22/64, 41/64)
-		icon:Show()
+		if (tank) then
+			NamePlate.HasRole = true
+			name:SetPoint("TOPLEFT", 26, 0)
+			icon:SetTexCoord(0/64, 19/64, 22/64, 41/64)
+			icon:Show()
+		elseif (heal) then
+			NamePlate.HasRole = true
+			name:SetPoint("TOPLEFT", 26, 0)
+			icon:SetTexCoord(20/64, 39/64, 1/64, 20/64)
+			icon:Show()
+		else
+			NamePlate.HasRole = true
+			name:SetPoint("TOPLEFT", 26, 0)
+			icon:SetTexCoord(20/64, 39/64, 22/64, 41/64)
+			icon:Show()
+		end
 	else
+		name:SetPoint("TOPLEFT", 10, 0)
 		NamePlate.HasRole = nil
 		icon:Hide()
 	end
@@ -1316,3 +1317,6 @@ function Healium_OnEvent(self, event, ...)
 	end
 end
 
+function IsInGroup()
+	return GetNumPartyMembers() > 0 or GetNumRaidMembers() > 0
+end
