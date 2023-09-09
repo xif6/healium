@@ -141,7 +141,7 @@
 	<Button name="HealiumUnitFrames_ButtonTemplate" virtual="true" movable="true" enableMouse="true" inherits="SecureActionButtonTemplate">
 		<Size x="150" y="30"/>
 		<Layers>
-			<Layer>
+			<Layer level="OVERLAY">
 				<FontString name="$parent_Name" parentKey="name" text="Unknown Entitiy" inherits="GameFontNormalSmall" maxLines="2" nonspacewrap="true" justifyH="LEFT">
 					<Color r="1.0" g="1.0" b="1.0"/>
 					<Anchors>
@@ -161,7 +161,7 @@
 				</FontString>
 			</Layer>
 
-			<Layer>
+			<Layer level="ARTWORK">
 				<Texture name="$parent_RaidTargetIcon" parentKey="raidTargetIcon" file="Interface\TargetingFrame\UI-RaidTargetingIcons" hidden="true">
 					<Size>
 						<AbsDimension x="26" y="26"/>
@@ -181,14 +181,14 @@
 		</Attributes>
 		<Frames>
 
-			<Frame parentKey="CurseBar" alpha="0" frameLevel="30">
+			<Frame parentKey="CurseBar" alpha="0">
 				<Size x="154" y="32"/>
 				<Anchors>
 					<Anchor point="CENTER"></Anchor>
 				</Anchors>
 				<Backdrop edgeFile="Interface/Tooltips/UI-Tooltip-Border" tile="true">
 					<EdgeSize>
-						<AbsValue val="16"/>
+						<AbsValue val="24"/>
 					</EdgeSize>
 				   <BackgroundInsets>
 					  <AbsInset left="0" right="0" top="0" bottom="0"/>
@@ -210,7 +210,7 @@
 					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
 				</Scripts>
 				<Layers>
-					<Layer level="OVERLAY">
+					<Layer level="BACKGROUND">
 						<Texture parentKey="RoleIcon" file="Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES" hidden="false">
 							<Size>
 								<AbsDimension x="16" y="16"/>
@@ -227,7 +227,7 @@
 				</Layers>
 
 			</StatusBar>
-			<StatusBar parentKey="ManaBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="11">
+			<StatusBar parentKey="ManaBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="3">
 				<Size x="5" y="24"/>
 				<Layers>
 					<Layer level="BACKGROUND" setAllPoints="true">
@@ -250,8 +250,9 @@
 					<OnLoad function="Healium_ManaStatusBar_OnLoad" />
 				</Scripts>
 			</StatusBar>
-			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="0" frameLevel="2">
+			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="0" frameLevel="1">
 				<Size x="141" y="24"/>
+				<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" />
 				<Anchors>
 					<Anchor point="CENTER">
 						<Offset>
@@ -264,17 +265,6 @@
 				<Scripts >
 					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
 				</Scripts>
-			</StatusBar>
-			<StatusBar parentKey="bgBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="1">
-				<Size x="150" y="24"/>
-				<Anchors>
-					<Anchor point="CENTER">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<BarTexture file="Interface\TutorialFrame\TutorialFrameBackground" />
 			</StatusBar>
 			<Frame parentKey="AggroBar" alpha="1" frameLevel="20">
 				<Size x="154" y="32"/>
