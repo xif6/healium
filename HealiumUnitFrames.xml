@@ -195,6 +195,87 @@
 				   </BackgroundInsets>
 				</Backdrop>
 			</Frame>
+			<StatusBar parentKey="HealthBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="3">
+				<Size x="141" y="24"/>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="3" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
+				<BarColor r="1.0" g="1.0" b="1.0"/>
+				<Scripts >
+					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
+				</Scripts>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture parentKey="RoleIcon" file="Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES" hidden="false">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT">
+									<Offset>
+										<AbsDimension x="2" y="-1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+
+			</StatusBar>
+			<StatusBar parentKey="ManaBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="11">
+				<Size x="5" y="24"/>
+				<Layers>
+					<Layer level="BACKGROUND" setAllPoints="true">
+						<Texture>
+							<Color r="1.0" g="0.0" b="0.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="-70" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
+				<BarColor r="0.0" g="0.0" b="1.0"/>
+				<Scripts >
+					<OnLoad function="Healium_ManaStatusBar_OnLoad" />
+				</Scripts>
+			</StatusBar>
+			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="0" frameLevel="2">
+				<Size x="141" y="24"/>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="3" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
+				<BarColor r=".25" g=".60" b=".25"/>
+				<Scripts >
+					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
+				</Scripts>
+			</StatusBar>
+			<StatusBar parentKey="bgBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="1">
+				<Size x="150" y="24"/>
+				<Anchors>
+					<Anchor point="CENTER">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<BarTexture file="Interface\TutorialFrame\TutorialFrameBackground" />
+			</StatusBar>
 			<Frame parentKey="AggroBar" alpha="1" frameLevel="20">
 				<Size x="154" y="32"/>
 				<Anchors>
@@ -263,87 +344,6 @@
 					</Anchor>
 				</Anchors>
 			</Frame>
-			<StatusBar parentKey="HealthBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="4">
-				<Size x="141" y="24"/>
-				<Anchors>
-					<Anchor point="CENTER">
-						<Offset>
-							<AbsDimension x="3" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
-				<BarColor r="1.0" g="1.0" b="1.0"/>
-				<Scripts >
-					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
-				</Scripts>
-				<Layers>
-					<Layer level="OVERLAY">
-						<Texture parentKey="RoleIcon" file="Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES" hidden="false">
-							<Size>
-								<AbsDimension x="16" y="16"/>
-							</Size>
-							<Anchors>
-								<Anchor point="LEFT">
-									<Offset>
-										<AbsDimension x="2" y="-1"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-
-			</StatusBar>
-			<StatusBar parentKey="ManaBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="11">
-				<Size x="5" y="24"/>
-				<Layers>
-					<Layer level="BACKGROUND" setAllPoints="true">
-						<Texture>
-							<Color r="1.0" g="0.0" b="0.0"/>
-						</Texture>
-					</Layer>
-				</Layers>
-				<Anchors>
-					<Anchor point="CENTER">
-						<Offset>
-							<AbsDimension x="-70" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-
-				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
-				<BarColor r="0.0" g="0.0" b="1.0"/>
-				<Scripts >
-					<OnLoad function="Healium_ManaStatusBar_OnLoad" />
-				</Scripts>
-			</StatusBar>
-			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="0" frameLevel="3">
-				<Size x="141" y="24"/>
-				<Anchors>
-					<Anchor point="CENTER">
-						<Offset>
-							<AbsDimension x="3" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
-				<BarColor r=".25" g=".60" b=".25"/>
-				<Scripts >
-					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
-				</Scripts>
-			</StatusBar>
-			<StatusBar parentKey="bgBar" minValue="0" maxValue="100" defaultValue="100" frameLevel="1">
-				<Size x="150" y="24"/>
-				<Anchors>
-					<Anchor point="CENTER">
-						<Offset>
-							<AbsDimension x="0" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<BarTexture file="Interface\TutorialFrame\TutorialFrameBackground" />
-			</StatusBar>
 		</Frames>
 		<Scripts>
 			<OnLoad>HealiumUnitFrames_Button_OnLoad(self)</OnLoad>

@@ -772,20 +772,25 @@ function Healium_SetButtonAttributes(button)
 
 	local index = button.index
 	local Profile = Healium_GetProfile()
-	local stype, spell, macro, item
+	local stype, spell, macro, item, spellID
 
 	if Profile.SpellTypes[index] == Healium_Type_Macro then
 		stype = "macro"
 		macro = Profile.SpellNames[index]
+		spellname = GetMacroSpell(macro);
+		spellID = GetSpellID(spellname)
 	elseif Profile.SpellTypes[index] == Healium_Type_Item then
 		stype = "item"
 		item = Profile.SpellNames[index]
 	else
 		stype = "spell"
 		spell = Profile.SpellNames[index]
+		spellID = Profile.IDs[index]
 	end
 
 	button.id = Profile.IDs[index]
+
+	button.spellID = spellID
 
 	button:SetAttribute("type", stype)
 	button:SetAttribute("spell", spell)
@@ -862,16 +867,15 @@ function Healium_RangeCheckButton(button)
 
 	if (Profile.SpellTypes[button.index] == nil) or (Profile.SpellTypes[button.index] == Healium_Type_Spell) then
 		if (button.id) then
-			local isUsable, noMana = IsUsableSpell(button.id, BOOKTYPE_SPELL)
+			local isUsable, noMana = IsUsableSpell(button.spellID, BOOKTYPE_SPELL)
 
-		if noMana then
-			button.icon:SetVertexColor(0.5, 0.5, 1.0)
-		else
-			if not button.icon.disabled then
-				button.icon:SetVertexColor(1.0, 1.0, 1.0)
+			if noMana then
+				button.icon:SetVertexColor(0.5, 0.5, 1.0)
+			else
+				if not button.icon.disabled then
+					button.icon:SetVertexColor(1.0, 1.0, 1.0)
+				end
 			end
-		end
-
 
 --[[
         if isUsable then
@@ -882,15 +886,15 @@ function Healium_RangeCheckButton(button)
       	  button.icon:SetVertexColor(0.3, 0.3, 0.3)
       	end
 --]]
-       	local inRange = IsSpellInRange(button.id, BOOKTYPE_SPELL, button:GetParent().TargetUnit)
+			local inRange = IsSpellInRange(button.spellID, BOOKTYPE_SPELL, button:GetParent().TargetUnit)
 
-		if SpellHasRange(button.id, BOOKTYPE_SPELL)  then
-			if (inRange == 0) or (inRange == nil) then
-				button.icon:SetVertexColor(1.0, 0.3, 0.3)
+			if SpellHasRange(button.spellID, BOOKTYPE_SPELL) then
+				if (inRange == 0) or (inRange == nil) then
+					button.icon:SetVertexColor(1.0, 0.3, 0.3)
+				end
 			end
 		end
 	end
-end
 
 	-- todo range check macros, and items
 end
