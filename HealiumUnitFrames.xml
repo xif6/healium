@@ -210,7 +210,7 @@
 					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
 				</Scripts>
 				<Layers>
-					<Layer level="BACKGROUND">
+					<Layer level="OVERLAY">
 						<Texture parentKey="RoleIcon" file="Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES" hidden="false">
 							<Size>
 								<AbsDimension x="16" y="16"/>
