@@ -250,6 +250,7 @@
 					<OnLoad function="Healium_ManaStatusBar_OnLoad" />
 				</Scripts>
 			</StatusBar>
+
 			<StatusBar parentKey="PredictBar" minValue="0" maxValue="100" defaultValue="0" frameLevel="1">
 				<Size x="141" y="24"/>
 				<Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground" />
@@ -261,7 +262,7 @@
 					</Anchor>
 				</Anchors>
 				<BarTexture file="Interface\TargetingFrame\UI-StatusBar" />
-				<BarColor r=".25" g=".60" b=".25"/>
+				<BarColor r=".6" g=".6" b=".6"/>
 				<Scripts >
 					<OnLoad function="Healium_HealthStatusBar_OnLoad" />
 				</Scripts>
