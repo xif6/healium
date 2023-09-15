@@ -623,6 +623,14 @@ function Healium_CreateConfigPanel(Class, Version)
 		Healium_ShowHideTanksFrame()
     end)
 
+	-- Show All Check
+    Healium_ShowAllCheck = CreateCheck("$parentShowAllCheckButton",scrollchild,Healium_ShowAllCheck, "Shows the All " .. Healium_AddonColoredName .. " frame.", "All")
+
+    Healium_ShowAllCheck:SetScript("OnClick",function()
+        Healium.ShowAllFrame = Healium_ShowAllCheck:GetChecked() or false
+		Healium_ShowHideAllFrame()
+    end)
+
 
 	-- Debuff Warnings
 	local DebuffWarningsTitleText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalLarge")
@@ -848,6 +856,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	Healium_ShowHealersCheck:SetChecked(Healium.ShowHealersFrame)
 --]]
 	Healium_ShowTanksCheck:SetChecked(Healium.ShowTanksFrame)
+	Healium_ShowAllCheck:SetChecked(Healium.ShowAllFrame)
 	Healium_ShowTargetCheck:SetChecked(Healium.ShowTargetFrame)
 	Healium_ShowFocusCheck:SetChecked(Healium.ShowFocusFrame)
 	Healium_ShowGroup1Check:SetChecked(Healium.ShowGroupFrames[1])

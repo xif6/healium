@@ -22,6 +22,10 @@ local function ShowTanksFrame()
 	Healium_ShowHideTanksFrame(true)
 end
 
+local function ShowAllFrame()
+	Healium_ShowHideAllFrame(true)
+end
+
 local function ShowFriendsFrame()
 	Healium_ShowHideFriendsFrame(true)
 end
@@ -39,7 +43,7 @@ local function SetButtonCount(info, arg1)
 		Healium_Warn("Can't update button count while in combat!")
 		return
 	end
-	
+
 	Healium_SetButtonCount(arg1)
 end
 
@@ -48,19 +52,19 @@ local function SetCurrentSpell(info, btnIndex, spellIndex)
 		Healium_Warn("Can't configure buttons while in combat!")
 		return
 	end
-	
+
 	local Profile = Healium_GetProfile()
 	Healium_SetProfileSpell(Profile, btnIndex, Healium_Spell.Name[spellIndex], Healium_Spell.ID[spellIndex], Healium_Spell.Icon[spellIndex])
 	Healium_Update_ConfigPanel()
-	
+
 	Healium_UpdateButtonIcons()
 	Healium_UpdateButtonAttributes()
 end
 
 local function HealiumMenu_InitializeDropDown(self,level)
 	level = level or 1
-	
-	local MenuTable = 
+
+	local MenuTable =
 	{
 		[1] = -- Define level one elements here
 		{
@@ -102,12 +106,12 @@ local function HealiumMenu_InitializeDropDown(self,level)
 				value  = nil,
 				notCheckable = 1,
 				text = CLOSE,
-				func = self.HideMenu			
+				func = self.HideMenu
 			}
 		},
 		[2] = -- Submenu items, keyed by value
 		{
-			["Frames"] = 
+			["Frames"] =
 			{
 				{
 					text = "Toggle Frames",
@@ -126,62 +130,67 @@ local function HealiumMenu_InitializeDropDown(self,level)
 				},
 				{	-- Pet Frame
 					text = "Show Pets",
-					notCheckable = 1,					
+					notCheckable = 1,
 					func = ShowPetsFrame,
 				},
 				{	-- Friends Frame
 					text = "Show Friends",
-					notCheckable = 1,					
+					notCheckable = 1,
 					func = ShowFriendsFrame,
 				},
--- TODO DAMAGERS/HEALERS frame	
+-- TODO DAMAGERS/HEALERS frame
 --[[
 				{	-- Damagers Frame
 					text = "Show Damagers",
-					notCheckable = 1,					
+					notCheckable = 1,
 					func = ShowDamagersFrame,
 				},
 				{	-- Healers Frame
 					text = "Show Healers",
-					notCheckable = 1,					
+					notCheckable = 1,
 					func = ShowHealersFrame,
 				},
---]]				
+--]]
 				{	-- Tanks Frame
 					text = "Show Tanks",
-					notCheckable = 1,					
+					notCheckable = 1,
 					func = ShowTanksFrame,
+				},
+				{	-- Tanks All
+					text = "Show All",
+					notCheckable = 1,
+					func = ShowAllFrame,
 				},
 				{	-- Target Frame
 					text = "Show Target",
-					notCheckable = 1,					
+					notCheckable = 1,
 					func = ShowTargetFrame,
 				},
 				{	-- Focus Frame
 					text = "Show Focus",
-					notCheckable = 1,					
+					notCheckable = 1,
 					func = ShowFocusFrame,
 				},
 				{
 					text = "Hide All Raid Groups",
-					notCheckable = 1,					
+					notCheckable = 1,
 					func = Healium_HideAllRaidFrames,
 				},
 				{
 					text = "Show Raid Groups 1 and 2 (10 man)",
-					notCheckable = 1,					
+					notCheckable = 1,
 					func = Healium_Show10ManRaidFrames,
 				},
 				{
 					text = "Show Raid Groups 1-5 (25 man)",
-					notCheckable = 1,					
+					notCheckable = 1,
 					func = Healium_Show25ManRaidFrames,
-				}, 
+				},
 				{
 					text = "Show Raid Groups 1-8 (40 man)",
-					notCheckable = 1,					
+					notCheckable = 1,
 					func = Healium_Show40ManRaidFrames,
-				}, 
+				},
 			},
 		},
 		[3] = {},
@@ -189,13 +198,13 @@ local function HealiumMenu_InitializeDropDown(self,level)
 
 	local sbc = { }
 	local btnConfig = {}
-	local Profile = Healium_GetProfile()	
-	
+	local Profile = Healium_GetProfile()
+
 --	if level >= 2 then
 
-		
+
 		for i=0, Healium_MaxButtons, 1 do
-		
+
 			-- configure SetButtonCount
 			local menuItem = { }
 			menuItem.text = i
@@ -205,7 +214,7 @@ local function HealiumMenu_InitializeDropDown(self,level)
 --			menuItem.disabled = nil
 			table.insert(sbc, menuItem)
 
-			-- configure Configure Buttons		
+			-- configure Configure Buttons
 			if i > 0 and i <= Profile.ButtonCount then
 				local btnMenuItem = { }
 				btnMenuItem.text = "Button " .. i
@@ -215,12 +224,12 @@ local function HealiumMenu_InitializeDropDown(self,level)
 				table.insert(btnConfig, btnMenuItem)
 			end
 		end
-	
+
 		MenuTable[2].SetButtonCount = sbc
 		MenuTable[2].ConfigureButtons = btnConfig
 --	end
 
-   
+
 --    if level >= 3 then
 		local index = UIDROPDOWNMENU_MENU_VALUE or 1
 
@@ -231,9 +240,9 @@ local function HealiumMenu_InitializeDropDown(self,level)
 				isTitle = 1,
 			}
 		}
-		
+
 		local currentSpell = Profile.SpellNames[index]
-		
+
 		for k, v in ipairs (Healium_Spell.Name) do
 			local spellmenuItem = { }
 			spellmenuItem.text = Healium_Spell.Name[k]
@@ -242,7 +251,7 @@ local function HealiumMenu_InitializeDropDown(self,level)
 			spellmenuItem.checked = currentSpell == Healium_Spell.Name[k]
 			spellmenuItem.arg1 = index
 			spellmenuItem.arg2 = k
-			
+
 			if (spellmenuItem.icon) then
 				table.insert(spells, spellmenuItem)
 			end
@@ -250,10 +259,10 @@ local function HealiumMenu_InitializeDropDown(self,level)
 
 		MenuTable[3][index] = spells
 --	end
-	
+
 	local info = MenuTable[level]
 	local menuval = UIDROPDOWNMENU_MENU_VALUE
-	
+
 	if (level > 1 and menuval) then
 		if info[menuval] then
 			info = info[menuval]
@@ -267,7 +276,7 @@ local function HealiumMenu_InitializeDropDown(self,level)
 end
 
 function Healium_InitMenu()
-	HealiumMenu = CreateFrame("Frame", "HealiumOptionsMenu", Healium_MMButton, "UIDropDownMenuTemplate") 
+	HealiumMenu = CreateFrame("Frame", "HealiumOptionsMenu", Healium_MMButton, "UIDropDownMenuTemplate")
 	HealiumMenu:SetPoint("TOP", Healium_MMButton, "BOTTOM")
 	UIDropDownMenu_Initialize(HealiumMenu, HealiumMenu_InitializeDropDown, "MENU");
 --[[

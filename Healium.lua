@@ -48,6 +48,7 @@ Healium = {
   ShowDamagersFrame = false,			     	-- Whether or not to show the Damagers frame
   ShowHealersFrame = false,						-- Whether or not to show the Heals frame
   ShowTanksFrame = false,						-- Whether or not to show the Tanks frame
+  ShowAllFrame = false,							-- Whether or not to show the friends frame
   ShowTargetFrame = false,						-- Whether or not to show the target frame
   ShowFocusFrame = false,						-- Whether or not to show the focus frame
   ShowBuffs = true,								-- Whether or not to show your own buffs, that are configured in Healium to the left of the healthbar
@@ -447,12 +448,12 @@ function Healium_UpdateUnitRole(UnitName, NamePlate)
 	if (IsInGroup()) then
 		local tank, heal, lead = UnitGroupRolesAssigned(UnitName);
 
-		if (tank) then
+		if (tank or GetPartyAssignment("MAINTANK", UnitName)) then
 			NamePlate.HasRole = true
 			name:SetPoint("TOPLEFT", 26, 0)
 			icon:SetTexCoord(0/64, 19/64, 22/64, 41/64)
 			icon:Show()
-		elseif (heal) then
+		elseif (heal or GetPartyAssignment("MAINASSIST", UnitName)) then
 			NamePlate.HasRole = true
 			name:SetPoint("TOPLEFT", 26, 0)
 			icon:SetTexCoord(20/64, 39/64, 1/64, 20/64)
@@ -862,6 +863,7 @@ function Healium_RangeCheckButton(button)
 	if (Profile.SpellTypes[button.index] == nil) or (Profile.SpellTypes[button.index] == Healium_Type_Spell) or (Profile.SpellTypes[button.index] == Healium_Type_Macro) then
 		if (button.spellID) then
 			local isUsable, noMana = IsUsableSpell(button.spellID, BOOKTYPE_SPELL)
+--[[
 
 			if noMana then
 				button.icon:SetVertexColor(0.5, 0.5, 1.0)
@@ -870,16 +872,16 @@ function Healium_RangeCheckButton(button)
 					button.icon:SetVertexColor(1.0, 1.0, 1.0)
 				end
 			end
+]]
 
---[[
-        if isUsable then
-      	 button.icon:SetVertexColor(1.0, 1.0, 1.0)
-      	elseif noMana then
-      	 button.icon:SetVertexColor(0.5, 0.5, 1.0)
-      	else
-      	  button.icon:SetVertexColor(0.3, 0.3, 0.3)
-      	end
---]]
+			if isUsable then
+				button.icon:SetVertexColor(1.0, 1.0, 1.0)
+			elseif noMana then
+				button.icon:SetVertexColor(0.5, 0.5, 1.0)
+			else
+				button.icon:SetVertexColor(0.3, 0.3, 0.3)
+			end
+
 			local inRange = IsSpellInRange(button.spellID, BOOKTYPE_SPELL, button:GetParent().TargetUnit)
 
 			if SpellHasRange(button.spellID, BOOKTYPE_SPELL) then
@@ -997,6 +999,10 @@ local function InitVariables()
 
 	if Healium.ShowTanksFrame == nil then
 		Healium.ShowTanksFrame = false
+	end
+
+	if Healium.ShowAllFrame == nil then
+		Healium.ShowAllFrame = false
 	end
 
 	if Healium.ShowDamagersFrame == nil then
@@ -1294,6 +1300,7 @@ function Healium_OnEvent(self, event, ...)
 		Healium_ShowHideDamagersFrame()
 		Healium_ShowHideHealersFrame()
 		Healium_ShowHideTanksFrame()
+		Healium_ShowHideAllFrame()
 		Healium_ShowHideFriendsFrame()
 		Healium_ShowHideTargetFrame()
 		Healium_ShowHideFocusFrame()

@@ -1,45 +1,45 @@
-Healium_Slash = "/hlm" -- the slash command 
+Healium_Slash = "/hlm" -- the slash command
 
 local function DumpVar(varName, Value)
-	if (Value == nil) then 
-		Healium_Print(varName .. " = (nil)")	
+	if (Value == nil) then
+		Healium_Print(varName .. " = (nil)")
 	else
-		Healium_Print(varName .. " = " .. tostring(Value))	
+		Healium_Print(varName .. " = " .. tostring(Value))
 	end
 end
 
 function Healium_InitSlashCommands()
 	SLASH_HEALIUM1 = Healium_Slash
 	SlashCmdList["HEALIUM"] = Healium_SlashCmdHandler
-end	
+end
 
 
 local function printUsage()
-	Healium_Print(Healium_AddonName .. " Commands")  
+	Healium_Print(Healium_AddonName .. " Commands")
 	Healium_Print(Healium_Slash .. " - Shows " .. Healium_AddonName .. " commands.  (what you see here)")
-	Healium_Print(Healium_Slash .. " config - Shows the " .. Healium_AddonName .. " config panel")		
+	Healium_Print(Healium_Slash .. " config - Shows the " .. Healium_AddonName .. " config panel")
 	Healium_Print(Healium_Slash .. " show [party | pets | me | tanks | 1-8] - Shows the corresponding " .. Healium_AddonName .. " frame")
 	Healium_Print(Healium_Slash .. " toggle - Shows or Hides the current " .. Healium_AddonName .. " frames.")
-	Healium_Print(Healium_Slash .. " reset frames - Resets the positions of all " .. Healium_AddonName .. " frames")	
-	Healium_Print(Healium_Slash .. " friends add [name or Target] - Adds name to the " .. Healium_AddonName .. " friends list.")	
-	Healium_Print(Healium_Slash .. " friends remove [name or Target] - Removes name from the " .. Healium_AddonName .. " friends list.")		
-	Healium_Print(Healium_Slash .. " friends show - Shows the current " .. Healium_AddonName .. " friends list.")			
-	Healium_Print(Healium_Slash .. " friends clear - clears the " .. Healium_AddonName .. " friends list.")				
+	Healium_Print(Healium_Slash .. " reset frames - Resets the positions of all " .. Healium_AddonName .. " frames")
+	Healium_Print(Healium_Slash .. " friends add [name or Target] - Adds name to the " .. Healium_AddonName .. " friends list.")
+	Healium_Print(Healium_Slash .. " friends remove [name or Target] - Removes name from the " .. Healium_AddonName .. " friends list.")
+	Healium_Print(Healium_Slash .. " friends show - Shows the current " .. Healium_AddonName .. " friends list.")
+	Healium_Print(Healium_Slash .. " friends clear - clears the " .. Healium_AddonName .. " friends list.")
 --		Healium_Print(Slash .. " reset - Resets the ".. Healium_AddonName .. " UI")
 --		DEFAULT_CHAT_FRAME:AddMessage(Slash .. " debug - Toggles " .. Healium_AddonName .. " debugging")
 --		DEFAULT_CHAT_FRAME:AddMessage(Slash .. " dump - Outputs " .. Healium_AddonName .. " variables for debugging purposes")
 end
 
--- handles /hlm reset 
+-- handles /hlm reset
 local function doReset(args)
-	if (args == "frames") then 
+	if (args == "frames") then
 		Healium_ResetAllFramePositions()
 	elseif (cmd == "all") then
 		Healium = nil
-		Healium_Print("Reset all complete.  Please log out now.")  
+		Healium_Print("Reset all complete.  Please log out now.")
 	elseif (cmd == "profiles") then
 		Healium.Profiles = nil
-		Healium_Print("Reset Profiles complete.  Please log out now.")  
+		Healium_Print("Reset Profiles complete.  Please log out now.")
 	else
 		printUsage()
 	end
@@ -59,7 +59,7 @@ end
 local function doDump(args)
 	if not IsAddOnLoaded("Blizzard_DebugTools") then
 		LoadAddOn("Blizzard_DebugTools")
-	end	
+	end
 	DevTools_Dump("Healium = ")
 	DevTools_Dump(Healium)
 end
@@ -89,8 +89,9 @@ local showHandlers = {
 	me = function() Healium_ShowHideMeFrame(true) end,
 	friends = function() Healium_ShowHideFriendsFrame(true) end,
 	damagers = function() Healium_ShowHideDamagersFrame(true) end,
-	healers = function() Healium_ShowHideHealersFrame(true) end,	
+	healers = function() Healium_ShowHideHealersFrame(true) end,
 	tanks = function() Healium_ShowHideTanksFrame(true) end,
+	all = function() Healium_ShowHideAllFrame(true) end,
 	target = function() Healium_ShowHideTargetFrame(true) end,
 	focus = function() Healium_ShowHideFocusFrame(true) end,
 }
@@ -103,7 +104,7 @@ local function doShow(args)
 		Healium_ShowHidePartyFrame(true)
 		return
 	end
-	
+
 	return showHandlers[args]()
 end
 
@@ -131,7 +132,7 @@ end
 
 local function GetFriendsTarget(args)
 	local friend = args
-	
+
 	if args == nil then
 		local realm
 		friend, realm  = UnitName("Target")
@@ -141,7 +142,7 @@ local function GetFriendsTarget(args)
 			end
 		end
 	end
-	
+
 	if friend == nil then
 		Healium_Warn("No unit specified")
 		return nil
@@ -153,51 +154,51 @@ end
 -- handles /hlm friends add
 local function doFriendsAdd(args)
 	local friend = GetFriendsTarget(args)
-	
-	if friend == nil then 
+
+	if friend == nil then
 		return
 	end
-	
+
 	local f = HealiumGlobal.Friends[string.lower(friend)]
 	if f then
 		Healium_Warn(friend .. " is already in the friends list.")
 		return
 	end
-	
+
 	HealiumGlobal.Friends[string.lower(friend)] = friend
 	Healium_UpdateFriends()
-	Healium_Print(friend .. " added to friends list") 
+	Healium_Print(friend .. " added to friends list")
 end
 
 -- handles  /hlm friends remove
 local function doFriendsRemove(args)
 	local friend = GetFriendsTarget(args)
-	
-	if friend == nil then 
+
+	if friend == nil then
 		return
 	end
-	
+
 	local num = tonumber(friend)
 
 	if num then
 		local index = 1
 		for k, v in pairs(HealiumGlobal.Friends) do
-			if index == num then 
+			if index == num then
 				friend = v
 			end
 			index = index + 1
 		end
 	end
-	
+
 	local f = HealiumGlobal.Friends[string.lower(friend)]
 	if f == nil then
 		Healium_Warn(friend .. " is not in the friends list.")
 		return
-	end	
-	
+	end
+
 	HealiumGlobal.Friends[string.lower(friend)] = nil
 	Healium_UpdateFriends()
-	Healium_Print(f .. " removed from friends list.") 
+	Healium_Print(f .. " removed from friends list.")
 end
 
 -- handles /hlm friends show
@@ -214,7 +215,7 @@ end
 local function doFriendsClear(args)
 	HealiumGlobal.Friends = {}
 	Healium_UpdateFriends()
-	Healium_Print("Friends cleared.")	
+	Healium_Print("Friends cleared.")
 end
 
 local friendsHandlers = {
@@ -233,9 +234,9 @@ local function doFriends(val)
 		doFriendsShow()
 		return
 	end
-	
+
 	local switch = val:match("([^ ]+)")
-	local args = val:match("[^ ]+ (.+)")	
+	local args = val:match("[^ ]+ (.+)")
 
 	return friendsHandlers[switch](args)
 end
@@ -247,7 +248,7 @@ local handlers = {
 	show = doShow,
 	friend = doFriends,
 	friends = doFriends,
-	debug = doDebug,	
+	debug = doDebug,
 	test = doTest,
 	toggle = doToggle,
 }
@@ -257,7 +258,7 @@ setmetatable(handlers, mt)
 -- handles the slash commands for this addon
 function Healium_SlashCmdHandler(cmd)
 	local switch = cmd:match("([^ ]+)")
-	local args = cmd:match("[^ ]+ (.+)")	
+	local args = cmd:match("[^ ]+ (.+)")
 	return handlers[switch](args)
 end
 

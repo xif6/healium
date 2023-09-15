@@ -6,6 +6,7 @@ local MeFrame = nil
 local DamagersFrame = nil
 local HealersFrame = nil
 local TanksFrame = nil
+local AllFrame = nil
 local FriendsFrame = nil
 local GroupFrames = { }
 local TargetFrame = nil
@@ -17,6 +18,7 @@ local MeFrameWasShown = nil
 local DamagersFrameWasShown = nil
 local HealersFrameWasShown = nil
 local TanksFrameWasShown = nil
+local AllFrameWasShown = nil
 local FriendsFrameWasShown = nil
 local GroupFramesWasShown = { }
 local TargetFrameWasShown = nil
@@ -208,6 +210,15 @@ local function CreateTanksHeader(FrameName, ParentFrame)
 	return h
 end
 
+local function CreateAllHeader(FrameName, ParentFrame)
+	local h = CreateHeader("SecureGroupHeaderTemplate", FrameName, ParentFrame)
+	h:SetAttribute("showSolo", "true")
+	h:SetAttribute("showParty", "true")
+	h:SetAttribute("showRaid", "true")
+	h:Show()
+	return h
+end
+
 local function CreatePartyHeader(FrameName, ParentFrame)
 	local h = CreateHeader("SecureGroupHeaderTemplate", FrameName, ParentFrame)
 	h:SetAttribute("showSolo", "true")
@@ -265,6 +276,12 @@ end
 local function CreateTanksUnitFrame(FrameName, Caption)
 	local uf = CreateUnitFrame(FrameName, Caption)
 	local h = CreateTanksHeader(FrameName .. "_Header", uf)
+	return uf
+end
+
+local function CreateAllUnitFrame(FrameName, Caption)
+	local uf = CreateUnitFrame(FrameName, Caption)
+	local h = CreateAllHeader(FrameName .. "_Header", uf)
 	return uf
 end
 
@@ -388,6 +405,12 @@ function HealiumUnitFrames_ShowHideFrame(self, show)
 	if self == TanksFrame then
 		Healium.ShowTanksFrame = show
 		Healium_ShowTanksCheck:SetChecked(Healium.ShowTanksFrame)
+		return
+	end
+
+	if self == AllFrame then
+		Healium.ShowAllFrame = show
+		Healium_ShowAllCheck:SetChecked(Healium.ShowAllFrame)
 		return
 	end
 
@@ -647,6 +670,7 @@ function Healium_ToggleAllFrames()
 	if DamagersFrame:IsShown() then hide = true end
 	if HealersFrame:IsShown() then hide = true end
 	if TanksFrame:IsShown() then hide = true end
+	if AllFrame:IsShown() then hide = true end
 	if TargetFrame:IsShown() then hide = true end
 	if FocusFrame:IsShown() then hide = true end
 
@@ -665,6 +689,7 @@ function Healium_ToggleAllFrames()
 		DamagersFrameWasShown = DamagersFrame:IsShown()
 		HealersFrameWasShown = HealersFrame:IsShown()
 		TanksFrameWasShown = TanksFrame:IsShown()
+		AllFrameWasShown = AllFrame:IsShown()
 		TargetFrameWasShown = TargetFrame:IsShown()
 		FocusFrameWasShown = FocusFrame:IsShown()
 
@@ -675,6 +700,7 @@ function Healium_ToggleAllFrames()
 		DamagersFrame:Hide()
 		HealersFrame:Hide()
 		TanksFrame:Hide()
+		AllFrame:Hide()
 		TargetFrame:Hide()
 		FocusFrame:Hide()
 
@@ -696,6 +722,7 @@ function Healium_ToggleAllFrames()
 	if DamagersFrameWasShown then DamagersFrame:Show() end
 	if HealersFrameWasShown then HealersFrame:Show() end
 	if TanksFrameWasShown then TanksFrame:Show() end
+	if AllFrameWasShown then AllFrame:Show() end
 	if TargetFrameWasShown then TargetFrame:Show() end
 	if FocusFrameWasShown then FocusFrame:Show() end
 
@@ -787,6 +814,17 @@ function Healium_ShowHideTanksFrame(show)
 		TanksFrame:Show()
 	else
 		TanksFrame:Hide()
+	end
+end
+
+function Healium_ShowHideAllFrame(show)
+	if InCombatLockdown() then return end
+	if (show ~= nil) then Healium.ShowAllFrame = show end
+
+	if Healium.ShowAllFrame then
+		AllFrame:Show()
+	else
+		AllFrame:Hide()
 	end
 end
 
@@ -895,6 +933,11 @@ function Healium_CreateUnitFrames()
 		TanksFrame:Show()
 	end
 
+	AllFrame = CreateAllUnitFrame("HealiumAllFrame", "All")
+	if Healium.ShowAllFrame then
+		AllFrame:Show()
+	end
+
 	TargetFrame = CreateTargetUnitFrame("HealiumTargetFrame", "Target")
 	if Healium.ShowTargetFrame then
 		TargetFrame:Show()
@@ -923,7 +966,7 @@ function Healium_SetScale()
 	DamagersFrame:SetScale(Scale)
 	HealersFrame:SetScale(Scale)
 	TanksFrame:SetScale(Scale)
-	TargetFrame:SetScale(Scale)
+	AllFrame:SetScale(Scale)
 	FocusFrame:SetScale(Scale)
 
 	for i,j in ipairs(GroupFrames) do
