@@ -231,14 +231,18 @@ function Healium_UpdatePercentageVisibility()
 end
 
 -- Sets the health bar color based on the unit's health ONLY
-local function UpdateHealthBar(HPPercent, frame)
+local function UpdateHealthBar(HPPercent, frame, UnitName)
 	if (HPPercent > LowHP) then
-		frame.HealthBar:SetStatusBarColor(0,1,0,1)
-	end
-	if (HPPercent < LowHP) then
+		if Healium.UseClassColors then
+			local class = select(2, UnitClass(UnitName)) or "WARRIOR"
+			local color = RAID_CLASS_COLORS[class]
+			frame.HealthBar:SetStatusBarColor(color.r, color.g, color.b)
+		else
+			frame.HealthBar:SetStatusBarColor(0,1,0,1)
+		end
+	elseif (HPPercent < LowHP) then
 		frame.HealthBar:SetStatusBarColor(1,0.9,0,1)
-	end
-	if (HPPercent < VeryLowHP) then
+	elseif (HPPercent < VeryLowHP) then
 		frame.HealthBar:SetStatusBarColor(1,0,0,1)
 	end
 end
@@ -247,16 +251,10 @@ function Healium_UpdateClassColors()
 	for _, k in ipairs(Healium_Frames) do
 		if (k.TargetUnit) then
 			if not UnitExists(k.TargetUnit) then return end
-			if Healium.UseClassColors then
-				local class = select(2, UnitClass(k.TargetUnit)) or "WARRIOR"
-				local color = RAID_CLASS_COLORS[class]
-				k.HealthBar:SetStatusBarColor(color.r, color.g, color.b)
-			else
-				local Health = UnitHealth(k.TargetUnit)
-				local MaxHealth = UnitHealthMax(k.TargetUnit)
-				HPPercent =  Health / MaxHealth
-				UpdateHealthBar(HPPercent, k)
-			end
+			local Health = UnitHealth(k.TargetUnit)
+			local MaxHealth = UnitHealthMax(k.TargetUnit)
+			HPPercent =  Health / MaxHealth
+			UpdateHealthBar(HPPercent, k, k.TargetUnit)
 		end
 	end
 end
@@ -318,14 +316,10 @@ function Healium_UpdateUnitHealth(UnitName, NamePlate)
 
 	if Healium.EnableDebufs and Healium.EnableDebufHealthbarColoring and NamePlate.hasDebuf then
 		NamePlate.HealthBar:SetStatusBarColor(NamePlate.debuffColor.r, NamePlate.debuffColor.g, NamePlate.debuffColor.b)
-	elseif Healium.UseClassColors then
-		local class = select(2, UnitClass(UnitName)) or "WARRIOR"
-		local color = RAID_CLASS_COLORS[class]
-		NamePlate.HealthBar:SetStatusBarColor(color.r, color.g, color.b)
 	else
-		UpdateHealthBar(HPPercent, NamePlate)
+		UpdateHealthBar(HPPercent, NamePlate, UnitName)
 	end
-	Healium_UpdateIncomingHealth(UnitGUID(UnitName))
+		Healium_UpdateIncomingHealth(UnitGUID(UnitName))
 
 end
 
@@ -865,8 +859,8 @@ end
 function Healium_RangeCheckButton(button)
 	local Profile = Healium_GetProfile()
 
-	if (Profile.SpellTypes[button.index] == nil) or (Profile.SpellTypes[button.index] == Healium_Type_Spell) then
-		if (button.id) then
+	if (Profile.SpellTypes[button.index] == nil) or (Profile.SpellTypes[button.index] == Healium_Type_Spell) or (Profile.SpellTypes[button.index] == Healium_Type_Macro) then
+		if (button.spellID) then
 			local isUsable, noMana = IsUsableSpell(button.spellID, BOOKTYPE_SPELL)
 
 			if noMana then
