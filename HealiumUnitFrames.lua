@@ -123,7 +123,7 @@ local function SetHeaderAttributes(frame)
 	frame:SetAttribute("point", "TOP")
 	frame:SetAttribute("template", "HealiumUnitFrames_ButtonTemplate")
 	frame:SetAttribute("templateType", "Button")
-	frame:SetAttribute("unitsPerColumn", 5)
+	frame:SetAttribute("unitsPerColumn", 40)
 end
 
 local function CreateHeader(TemplateName, FrameName, ParentFrame)
@@ -967,6 +967,7 @@ function Healium_SetScale()
 	HealersFrame:SetScale(Scale)
 	TanksFrame:SetScale(Scale)
 	AllFrame:SetScale(Scale)
+	TargetFrame:SetScale(Scale)
 	FocusFrame:SetScale(Scale)
 
 	for i,j in ipairs(GroupFrames) do
