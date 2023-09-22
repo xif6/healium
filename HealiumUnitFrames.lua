@@ -60,11 +60,11 @@ function Healium_GetSoundPath(sound)
 end
 
 function Healium_InitDebuffSound()
-	DebuffSoundPath = Healium_GetSoundPath(Healium.DebufAudioFile)
+	DebuffSoundPath = Healium_GetSoundPath(Healium_GetProfile().DebufAudioFile)
 
 	if DebuffSoundPath == nil then
-		Healium.DebufAudioFile = "Horde Bell"
-		DebuffSoundPath = Healium_GetSoundPath(Healium.DebufAudioFile)
+		Healium_GetProfile().DebufAudioFile = "Horde Bell"
+		DebuffSoundPath = Healium_GetSoundPath(Healium_GetProfile().DebufAudioFile)
 	end
 end
 
@@ -137,7 +137,7 @@ end
 local function UpdateCloseButton(frame)
 	-- Hide close button if set to
 	if not InCombatLockdown() then
-		if Healium.HideCloseButton then
+		if Healium_GetProfile().HideCloseButton then
 			frame.CaptionBar.CloseButton:Hide()
 		else
 			frame.CaptionBar.CloseButton:Show()
@@ -146,7 +146,7 @@ local function UpdateCloseButton(frame)
 end
 
 local function UpdateHideCaption(frame)
-	if Healium.HideCaptions then
+	if Healium_GetProfile().HideCaptions then
 		frame.CaptionBar:SetAlpha(0)
 	else
 		frame.CaptionBar:SetAlpha(1)
@@ -338,13 +338,13 @@ function HealiumUnitFrames_OnEnter(self)
 end
 
 function HealiumUnitFrames_OnLeave(self)
-	if Healium.HideCaptions then
+	if Healium_GetProfile().HideCaptions then
 		self:SetAlpha(0)
 	end
 end
 
 function HealiumUnitFrames_OnMouseDown(self, button)
-	if button == "LeftButton" and not Healium.LockFrames then
+	if button == "LeftButton" and not Healium_GetProfile().LockFrames then
 		self:StartMoving()
 	end
 
@@ -365,59 +365,59 @@ end
 
 function HealiumUnitFrames_ShowHideFrame(self, show)
 	if self == PartyFrame then
-		Healium.ShowPartyFrame = show
-		Healium_ShowPartyCheck:SetChecked(Healium.ShowPartyFrame)
+		Healium_GetProfile().ShowPartyFrame = show
+		Healium_ShowPartyCheck:SetChecked(Healium_GetProfile().ShowPartyFrame)
 		return
 	end
 
 	if self == PetsFrame then
-		Healium.ShowPetsFrame = show
-		Healium_ShowPetsCheck:SetChecked(Healium.ShowPetsFrame)
+		Healium_GetProfile().ShowPetsFrame = show
+		Healium_ShowPetsCheck:SetChecked(Healium_GetProfile().ShowPetsFrame)
 		return
 	end
 
 	if self == MeFrame then
-		Healium.ShowMeFrame = show
-		Healium_ShowMeCheck:SetChecked(Healium.ShowMeFrame)
+		Healium_GetProfile().ShowMeFrame = show
+		Healium_ShowMeCheck:SetChecked(Healium_GetProfile().ShowMeFrame)
 		return
 	end
 
 	if self == FriendsFrame then
-		Healium.ShowFriendsFrame = show
-		Healium_ShowFriendsCheck:SetChecked(Healium.ShowFriendsFrame)
+		Healium_GetProfile().ShowFriendsFrame = show
+		Healium_ShowFriendsCheck:SetChecked(Healium_GetProfile().ShowFriendsFrame)
 		return
 	end
 
 	if self == DamagersFrame then
-		Healium.ShowDamagersFrame = show
+		Healium_GetProfile().ShowDamagersFrame = show
 -- TODO DAMAGERS/HEALERS frame
---		Healium_ShowDamagersCheck:SetChecked(Healium.ShowDamagersFrame)
+--		Healium_ShowDamagersCheck:SetChecked(Healium_GetProfile().ShowDamagersFrame)
 		return
 	end
 
 	if self == HealersFrame then
-		Healium.ShowHealersFrame = show
+		Healium_GetProfile().ShowHealersFrame = show
 -- TODO DAMAGERS/HEALERS frame
---		Healium_ShowHealersCheck:SetChecked(Healium.ShowHealersFrame)
+--		Healium_ShowHealersCheck:SetChecked(Healium_GetProfile().ShowHealersFrame)
 		return
 	end
 
 	if self == TanksFrame then
-		Healium.ShowTanksFrame = show
-		Healium_ShowTanksCheck:SetChecked(Healium.ShowTanksFrame)
+		Healium_GetProfile().ShowTanksFrame = show
+		Healium_ShowTanksCheck:SetChecked(Healium_GetProfile().ShowTanksFrame)
 		return
 	end
 
 	if self == AllFrame then
-		Healium.ShowAllFrame = show
-		Healium_ShowAllCheck:SetChecked(Healium.ShowAllFrame)
+		Healium_GetProfile().ShowAllFrame = show
+		Healium_ShowAllCheck:SetChecked(Healium_GetProfile().ShowAllFrame)
 		return
 	end
 
 	if self == TargetFrame then
 		Healium_DebugPrint("ShowHide Target Frame")
-		Healium.ShowTargetFrame = show
-		Healium_ShowTargetCheck:SetChecked(Healium.ShowTargetFrame)
+		Healium_GetProfile().ShowTargetFrame = show
+		Healium_ShowTargetCheck:SetChecked(Healium_GetProfile().ShowTargetFrame)
 		Healium_UpdateShowTargetFrame()
 		Healium_UpdateTargetFrame()
 		return
@@ -425,8 +425,8 @@ function HealiumUnitFrames_ShowHideFrame(self, show)
 
 	if self == FocusFrame then
 		Healium_DebugPrint("ShowHide Focus Frame")
-		Healium.ShowFocusFrame = show
-		Healium_ShowFocusCheck:SetChecked(Healium.ShowFocusFrame)
+		Healium_GetProfile().ShowFocusFrame = show
+		Healium_ShowFocusCheck:SetChecked(Healium_GetProfile().ShowFocusFrame)
 		Healium_UpdateShowFocusFrame()
 		Healium_UpdateFocusFrame()
 		return
@@ -435,15 +435,15 @@ function HealiumUnitFrames_ShowHideFrame(self, show)
 
 	for i,j in ipairs(GroupFrames) do
 		if self == j then
-			Healium.ShowGroupFrames[i] = show
-			Healium_ShowGroup1Check:SetChecked(Healium.ShowGroupFrames[1])
-			Healium_ShowGroup2Check:SetChecked(Healium.ShowGroupFrames[2])
-			Healium_ShowGroup3Check:SetChecked(Healium.ShowGroupFrames[3])
-			Healium_ShowGroup4Check:SetChecked(Healium.ShowGroupFrames[4])
-			Healium_ShowGroup5Check:SetChecked(Healium.ShowGroupFrames[5])
-			Healium_ShowGroup6Check:SetChecked(Healium.ShowGroupFrames[6])
-			Healium_ShowGroup7Check:SetChecked(Healium.ShowGroupFrames[7])
-			Healium_ShowGroup8Check:SetChecked(Healium.ShowGroupFrames[8])
+			Healium_GetProfile().ShowGroupFrames[i] = show
+			Healium_ShowGroup1Check:SetChecked(Healium_GetProfile().ShowGroupFrames[1])
+			Healium_ShowGroup2Check:SetChecked(Healium_GetProfile().ShowGroupFrames[2])
+			Healium_ShowGroup3Check:SetChecked(Healium_GetProfile().ShowGroupFrames[3])
+			Healium_ShowGroup4Check:SetChecked(Healium_GetProfile().ShowGroupFrames[4])
+			Healium_ShowGroup5Check:SetChecked(Healium_GetProfile().ShowGroupFrames[5])
+			Healium_ShowGroup6Check:SetChecked(Healium_GetProfile().ShowGroupFrames[6])
+			Healium_ShowGroup7Check:SetChecked(Healium_GetProfile().ShowGroupFrames[7])
+			Healium_ShowGroup8Check:SetChecked(Healium_GetProfile().ShowGroupFrames[8])
 			return
 		end
 	end
@@ -455,7 +455,7 @@ function HealiumUnitFrames_Button_OnLoad(self)
 
 	table.insert(Healium_Frames, self)
 
-	if Healium.EnableClique then
+	if Healium_GetProfile().EnableClique then
 		ClickCastFrames[self] = true
 	end
 
@@ -479,7 +479,7 @@ function HealiumUnitFrames_Button_OnLoad(self)
 		table.insert(Healium_FixNameplates, self)
 		Healium_DebugPrint("Unit frame created during combat. Its buttons will not be available until combat ends.")
 	else
-		if (not Healium.ShowPercentage) then self.HPText:Hide() end
+		if (not Healium_GetProfile().ShowPercentage) then self.HPText:Hide() end
 		Healium_CreateButtonsForNameplate(self)
 	end
 
@@ -506,7 +506,7 @@ end
 
 function HealiumUnitFames_CheckPowerType(UnitName, NamePlate)
 	local _, powerType = UnitPowerType(UnitName)
-	if  (Healium.ShowMana == false) or (UnitExists(UnitName) == nil) or (powerType ~= "MANA") then
+	if  (Healium_GetProfile().ShowMana == false) or (UnitExists(UnitName) == nil) or (powerType ~= "MANA") then
 --	if  UnitManaMax(UnitName) == nil then
 		NamePlate.ManaBar:SetStatusBarColor( .5, .5, .5 )
 		NamePlate.ManaBar:SetMinMaxValues(0,1)
@@ -603,7 +603,7 @@ function HealiumUnitFrames_Button_OnAttributeChanged(self, name, value)
 end
 
 function HealiumUnitFrames_Button_OnMouseDown(self, button)
-	if button == "RightButton" and not Healium.LockFrames then
+	if button == "RightButton" and not Healium_GetProfile().LockFrames then
 		local parent = self:GetParent()
 
 		if not self.isCustom then
@@ -742,9 +742,12 @@ end
 
 function Healium_ShowHidePartyFrame(show)
 	if InCombatLockdown() then return end
-	if (show ~= nil) then Healium.ShowPartyFrame = show end
+	if (show ~= nil) then Healium_GetProfile().ShowPartyFrame = show end
 
-	if Healium.ShowPartyFrame then
+	PartyFrame:ClearAllPoints()
+	PartyFrame:SetPoint("CENTER", 500, 100)
+
+	if Healium_GetProfile().ShowPartyFrame then
 		PartyFrame:Show()
 	else
 		PartyFrame:Hide()
@@ -753,9 +756,9 @@ end
 
 function Healium_ShowHidePetsFrame(show)
 	if InCombatLockdown() then return end
-	if (show ~= nil) then Healium.ShowPetsFrame = show end
+	if (show ~= nil) then Healium_GetProfile().ShowPetsFrame = show end
 
-	if Healium.ShowPetsFrame then
+	if Healium_GetProfile().ShowPetsFrame then
 		PetsFrame:Show()
 	else
 		PetsFrame:Hide()
@@ -764,9 +767,9 @@ end
 
 function Healium_ShowHideMeFrame(show)
 	if InCombatLockdown() then return end
-	if (show ~= nil) then Healium.ShowMeFrame = show end
+	if (show ~= nil) then Healium_GetProfile().ShowMeFrame = show end
 
-	if Healium.ShowMeFrame then
+	if Healium_GetProfile().ShowMeFrame then
 		MeFrame:Show()
 	else
 		MeFrame:Hide()
@@ -775,9 +778,9 @@ end
 
 function Healium_ShowHideFriendsFrame(show)
 	if InCombatLockdown() then return end
-	if (show ~= nil) then Healium.ShowFriendsFrame = show end
+	if (show ~= nil) then Healium_GetProfile().ShowFriendsFrame = show end
 
-	if Healium.ShowFriendsFrame then
+	if Healium_GetProfile().ShowFriendsFrame then
 		FriendsFrame:Show()
 	else
 		FriendsFrame:Hide()
@@ -786,9 +789,9 @@ end
 
 function Healium_ShowHideDamagersFrame(show)
 	if InCombatLockdown() then return end
-	if (show ~= nil) then Healium.ShowDamagersFrame = show end
+	if (show ~= nil) then Healium_GetProfile().ShowDamagersFrame = show end
 
-	if Healium.ShowDamagersFrame then
+	if Healium_GetProfile().ShowDamagersFrame then
 		DamagersFrame:Show()
 	else
 		DamagersFrame:Hide()
@@ -797,9 +800,9 @@ end
 
 function Healium_ShowHideHealersFrame(show)
 	if InCombatLockdown() then return end
-	if (show ~= nil) then Healium.ShowHealersFrame = show end
+	if (show ~= nil) then Healium_GetProfile().ShowHealersFrame = show end
 
-	if Healium.ShowHealersFrame then
+	if Healium_GetProfile().ShowHealersFrame then
 		HealersFrame:Show()
 	else
 		HealersFrame:Hide()
@@ -808,9 +811,9 @@ end
 
 function Healium_ShowHideTanksFrame(show)
 	if InCombatLockdown() then return end
-	if (show ~= nil) then Healium.ShowTanksFrame = show end
+	if (show ~= nil) then Healium_GetProfile().ShowTanksFrame = show end
 
-	if Healium.ShowTanksFrame then
+	if Healium_GetProfile().ShowTanksFrame then
 		TanksFrame:Show()
 	else
 		TanksFrame:Hide()
@@ -819,9 +822,9 @@ end
 
 function Healium_ShowHideAllFrame(show)
 	if InCombatLockdown() then return end
-	if (show ~= nil) then Healium.ShowAllFrame = show end
+	if (show ~= nil) then Healium_GetProfile().ShowAllFrame = show end
 
-	if Healium.ShowAllFrame then
+	if Healium_GetProfile().ShowAllFrame then
 		AllFrame:Show()
 	else
 		AllFrame:Hide()
@@ -830,9 +833,9 @@ end
 
 function Healium_ShowHideTargetFrame(show)
 	if InCombatLockdown() then return end
-	if (show ~= nil) then Healium.ShowTargetFrame = show end
+	if (show ~= nil) then Healium_GetProfile().ShowTargetFrame = show end
 
-	if Healium.ShowTargetFrame then
+	if Healium_GetProfile().ShowTargetFrame then
 		TargetFrame:Show()
 	else
 		TargetFrame:Hide()
@@ -843,9 +846,9 @@ end
 
 function Healium_ShowHideFocusFrame(show)
 	if InCombatLockdown() then return end
-	if (show ~= nil) then Healium.ShowFocusFrame = show end
+	if (show ~= nil) then Healium_GetProfile().ShowFocusFrame = show end
 
-	if Healium.ShowFocusFrame then
+	if Healium_GetProfile().ShowFocusFrame then
 		FocusFrame:Show()
 	else
 		FocusFrame:Hide()
@@ -856,9 +859,9 @@ end
 
 function Healium_ShowHideGroupFrame(group, show)
 	if InCombatLockdown() then return end
-	if (show ~= nil) then Healium.ShowGroupFrames[group] = show end
+	if (show ~= nil) then Healium_GetProfile().ShowGroupFrames[group] = show end
 
-	if Healium.ShowGroupFrames[group] then
+	if Healium_GetProfile().ShowGroupFrames[group] then
 		GroupFrames[group]:Show()
 	else
 		GroupFrames[group]:Hide()
@@ -899,9 +902,10 @@ end
 function Healium_CreateUnitFrames()
 	PartyFrame = CreatePartyUnitFrame("HealiumPartyFrame", "Party")
 
-	if Healium.ShowPartyFrame then
-		PartyFrame:Show()
-	end
+	--if Healium_GetProfile().ShowPartyFrame then
+	--	PartyFrame:Show()
+	--end
+	Healium_ShowHidePartyFrame()
 
 	PetsFrame = CreatePetUnitFrame("HealiumPetFrame", "Pets")
 	if Healium.ShowPetsFrame then
@@ -957,7 +961,7 @@ end
 
 
 function Healium_SetScale()
-	local Scale = Healium.Scale
+	local Scale = Healium_GetProfile().Scale
 
 	PartyFrame:SetScale(Scale)
 	PetsFrame:SetScale(Scale)
@@ -980,7 +984,7 @@ function Healium_UpdateUnitBuffs(unit, frame)
 	local buffIndex = 1
 	local Profile = Healium_GetProfile()
 
-	if Healium.ShowBuffs then
+	if Healium_GetProfile().ShowBuffs then
 		for i=1, 100, 1 do
 			local name, rank, icon, count, debuffType, duration, expirationTime, source, isStealable = UnitBuff(unit, i)
 			if name  then
@@ -1036,7 +1040,7 @@ function Healium_UpdateUnitBuffs(unit, frame)
 	end
 
 	-- Handle affliction notification
-	if Healium.EnableDebufs then
+	if Healium_GetProfile().EnableDebufs then
 
 		local foundDebuff = false
 		local debuffTypes = { }
@@ -1056,12 +1060,12 @@ function Healium_UpdateUnitBuffs(unit, frame)
 					frame.hasDebuf = true
 					frame.debuffColor = debuffColor
 
-					if Healium.EnableDebufHealthbarHighlighting then
+					if Healium_GetProfile().EnableDebufHealthbarHighlighting then
 						frame.CurseBar:SetBackdropBorderColor(debuffColor.r, debuffColor.g, debuffColor.b)
 						frame.CurseBar:SetAlpha(1)
 					end
 
-					if Healium.EnableDebufAudio then
+					if Healium_GetProfile().EnableDebufAudio then
 						local now = GetTime()
 
 						if UnitInRange(unit) then
@@ -1080,7 +1084,7 @@ function Healium_UpdateUnitBuffs(unit, frame)
 			frame.hasDebuf = nil
 		end
 
-		if Healium.EnableDebufButtonHighlighting then
+		if Healium_GetProfile().EnableDebufButtonHighlighting then
 			Healium_ShowDebuffButtons(Profile, frame, debuffTypes)
 		end
 
@@ -1122,7 +1126,7 @@ end
 
 function Healium_UpdateEnableClique()
 	for _,k in ipairs(Healium_Frames) do
-		if Healium.EnableClique then
+		if Healium_GetProfile().EnableClique then
 			ClickCastFrames[k] = true
 		else
 			ClickCastFrames[k] = nil

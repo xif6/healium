@@ -6,17 +6,17 @@ function Healium_HealButton_OnLoad(self)
 end
 
 function Healium_HealButton_OnUpdate(self, elapsed)
-	if ( not Healium.DoRangeChecks ) then return 0 end
+	if ( not Healium_GetProfile().DoRangeChecks ) then return 0 end
 	self.TimeSinceLastUpdate = self.TimeSinceLastUpdate + elapsed
 
-	if (self.TimeSinceLastUpdate > Healium.RangeCheckPeriod) then
+	if (self.TimeSinceLastUpdate > Healium_GetProfile().RangeCheckPeriod) then
 		Healium_RangeCheckButton(self)
 		self.TimeSinceLastUpdate = 0
 	end
 end
 
 function Healium_HealButton_OnEnter(frame, motion)
-		if (not Healium.ShowToolTips) then return end
+		if (not Healium_GetProfile().ShowToolTips) then return end
     GameTooltip:SetOwner(frame, "ANCHOR_RIGHT", -30, 5)
 	local stype = frame:GetAttribute("type")
 

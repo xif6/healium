@@ -31,7 +31,7 @@ local RejuvinationName = GetSpellInfo(774) -- Rejuvenation
 local RegrowthName = GetSpellInfo(8936) -- Regrowth
 
 -- Healium holds per character settings
-Healium = {
+HealiumDefault = {
   Scale = 1.0,									-- Scale of frames
   DoRangeChecks = true,							-- Whether or not to do range checks on buttons
   RangeCheckPeriod = .5,						-- Time period between range checks
@@ -69,6 +69,9 @@ Healium = {
   ShowRaidIcons = true,							-- Whether or not to show raid icons
   UppercaseNames = true,						-- Whether or not to show names in UPPERCASE
 }
+Healium = {}
+Healium[1] = HealiumDefault
+Healium[2] = HealiumDefault
 
 -- HealiumGlobal is the variable that holds all Healium settings that are not character specific
 HealiumGlobal = {
@@ -133,7 +136,7 @@ function Healium_Warn(msg)
 end
 
 function Healium_GetProfile()
-	return Healium.Profiles[GetActiveTalentGroup()] -- this has been debugged and works fine
+	return Healium[GetActiveTalentGroup()] -- this has been debugged and works fine
 end
 
 function Healium_SetProfileSpell(profile, index, spellName, spellID, spellIcon)
@@ -187,7 +190,7 @@ function Healium_OnLoad(self)
 end
 
 local function Healium_ShowHidePercentage(frame)
-	if Healium.ShowPercentage then
+	if Healium_GetProfile().ShowPercentage then
 		frame.HPText:Show()
 	else
 		frame.HPText:Hide()
@@ -234,7 +237,7 @@ end
 -- Sets the health bar color based on the unit's health ONLY
 local function UpdateHealthBar(HPPercent, frame, UnitName)
 	if (HPPercent > LowHP) then
-		if Healium.UseClassColors then
+		if Healium_GetProfile().UseClassColors then
 			local class = select(2, UnitClass(UnitName)) or "WARRIOR"
 			local color = RAID_CLASS_COLORS[class]
 			frame.HealthBar:SetStatusBarColor(color.r, color.g, color.b)
@@ -266,7 +269,7 @@ function Healium_UpdateUnitName(unitName, NamePlate)
 
 	local playerName = UnitName(unitName)
 
-	if playerName ~= nil and Healium.UppercaseNames then
+	if playerName ~= nil and Healium_GetProfile().UppercaseNames then
 		playerName = strupper(playerName)
 	end
 
@@ -315,7 +318,7 @@ function Healium_UpdateUnitHealth(UnitName, NamePlate)
 	NamePlate.HealthBar:SetMinMaxValues(0,MaxHealth)
 	NamePlate.HealthBar:SetValue(Health)
 
-	if Healium.EnableDebufs and Healium.EnableDebufHealthbarColoring and NamePlate.hasDebuf then
+	if Healium_GetProfile().EnableDebufs and Healium_GetProfile().EnableDebufHealthbarColoring and NamePlate.hasDebuf then
 		NamePlate.HealthBar:SetStatusBarColor(NamePlate.debuffColor.r, NamePlate.debuffColor.g, NamePlate.debuffColor.b)
 	else
 		UpdateHealthBar(HPPercent, NamePlate, UnitName)
@@ -342,7 +345,7 @@ function Healium_UpdateUnitMana(UnitName, NamePlate)
 end
 
 function Healium_UpdateShowMana()
-	if Healium.ShowMana then
+	if Healium_GetProfile().ShowMana then
 		HealiumFrame:RegisterEvent("UNIT_MANA")
 		HealiumFrame:RegisterEvent("UNIT_DISPLAYPOWER")
 	else
@@ -365,7 +368,7 @@ function Healium_UpdateShowMana()
 end
 
 function Healium_UpdateManaBarVisibility(frame)
-	if Healium.ShowMana then
+	if Healium_GetProfile().ShowMana then
 		frame.ManaBar:Show()
 		frame.HealthBar:SetWidth(141)
 		frame.HealthBar:SetPoint("CENTER", 3, 0)
@@ -384,7 +387,7 @@ function Healium_UpdateManaBarVisibility(frame)
 end
 
 function Healium_UpdateShowBuffs()
---	if Healium.ShowBuffs then
+--	if Healium_GetProfile().ShowBuffs then
 --		HealiumFrame:RegisterEvent("UNIT_AURA")
 --	else
 --		HealiumFrame:UnregisterEvent("UNIT_AURA")
@@ -401,7 +404,7 @@ function Healium_UpdateUnitThreat(UnitName, NamePlate)
 	if not NamePlate then return end
 	if not UnitExists(UnitName) then return end
 
-	if Healium.ShowThreat == nil then
+	if Healium_GetProfile().ShowThreat == nil then
 		NamePlate.AggroBar:SetAlpha(0)
 		return
 	end
@@ -413,7 +416,7 @@ function Healium_UpdateUnitThreat(UnitName, NamePlate)
 end
 
 function Healium_UpdateShowThreat()
-	if Healium.ShowThreat then
+	if Healium_GetProfile().ShowThreat then
 		HealiumFrame:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE")
 	else
 		HealiumFrame:UnregisterEvent("UNIT_THREAT_SITUATION_UPDATE")
@@ -421,7 +424,7 @@ function Healium_UpdateShowThreat()
 
 	for _, k in ipairs(Healium_Frames) do
 		if (k.TargetUnit) then
-			if Healium.ShowThreat then
+			if Healium_GetProfile().ShowThreat then
 				Healium_UpdateUnitThreat(k.TargetUnit, k)
 			else
 				k.AggroBar:SetAlpha(0)
@@ -437,7 +440,7 @@ function Healium_UpdateUnitRole(UnitName, NamePlate)
 	local icon = NamePlate.HealthBar.RoleIcon
 	local name = NamePlate.name
 
-	if not Healium.ShowRole then
+	if not Healium_GetProfile().ShowRole then
 		name:SetPoint("TOPLEFT", 10, 0)
 		icon:Hide()
 		NamePlate.HasRole = nil
@@ -482,7 +485,7 @@ local function Healium_UpdateRoles()
 end
 
 function Healium_UpdateShowRole()
-	if Healium.ShowRole then
+	if Healium_GetProfile().ShowRole then
 		HealiumFrame:RegisterEvent("PARTY_MEMBERS_CHANGED")
 	else
 		HealiumFrame:UnregisterEvent("PARTY_MEMBERS_CHANGED")
@@ -492,14 +495,14 @@ function Healium_UpdateShowRole()
 end
 
 function Healium_UpdateShowIncomingHeals()
-	if Healium.ShowIncomingHeals then
+	if Healium_GetProfile().ShowIncomingHeals then
 		HealiumFrame:RegisterEvent("UNIT_HEAL_PREDICTION")
 	else
 		HealiumFrame:UnregisterEvent("UNIT_HEAL_PREDICTION")
 	end
 
 	for _, k in ipairs(Healium_Frames) do
-		if Healium.ShowIncomingHeals then
+		if Healium_GetProfile().ShowIncomingHeals then
 			k.PredictBar:Show()
 		else
 			k.PredictBar:Hide()
@@ -514,7 +517,7 @@ local function Healium_UpdateRaidIcons()
 end
 
 function Healium_UpdateShowRaidIcons()
-	if Healium.ShowRaidIcons then
+	if Healium_GetProfile().ShowRaidIcons then
 		HealiumFrame:RegisterEvent("RAID_TARGET_UPDATE")
 	else
 		HealiumFrame:UnregisterEvent("RAID_TARGET_UPDATE")
@@ -524,7 +527,7 @@ function Healium_UpdateShowRaidIcons()
 end
 
 function Healium_UpdateShowTargetFrame()
-	if Healium.ShowTargetFrame then
+	if Healium_GetProfile().ShowTargetFrame then
 		Healium_DebugPrint("registering PLAYER_TARGET_CHANGED")
 		HealiumFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 	else
@@ -534,7 +537,7 @@ function Healium_UpdateShowTargetFrame()
 end
 
 function Healium_UpdateShowFocusFrame()
-	if Healium.ShowFocusFrame then
+	if Healium_GetProfile().ShowFocusFrame then
 		Healium_DebugPrint("registering PLAYER_FOCUS_CHANGED")
 		HealiumFrame:RegisterEvent("PLAYER_FOCUS_CHANGED")
 	else
@@ -917,7 +920,7 @@ function Healium_UpdateRaidTargetIcon(self)
 	if (self.TargetUnit) then
 		if not UnitExists(self.TargetUnit) then return end
 		local index = GetRaidTargetIndex(self.TargetUnit);
-		if ( index  and Healium.ShowRaidIcons ) then
+		if ( index  and Healium_GetProfile().ShowRaidIcons ) then
 			SetRaidTargetIconTexture(self.raidTargetIcon, index);
 			self.raidTargetIcon:Show();
 		else
@@ -929,149 +932,149 @@ end
 
 -- Sets persisted variables to their default, if they do not exist.
 local function InitVariables()
-	if (not Healium.RaidScale) then
-		Healium.RaidScale = 1.0
+	if (not Healium_GetProfile().RaidScale) then
+		Healium_GetProfile().RaidScale = 1.0
 	end
 
-	if (not Healium.RangeCheckPeriod) then
-		Healium.RangeCheckPeriod = DefaultRangeCheckPeriod
+	if (not Healium_GetProfile().RangeCheckPeriod) then
+		Healium_GetProfile().RangeCheckPeriod = DefaultRangeCheckPeriod
 	end
 
-	if (Healium.RangeCheckPeriod > MaxRangeCheckPeriod or Healium.RangeCheckPeriod < MinRangeCheckPeriod) then
-		Healium.RangeCheckPeriod = DefaultRangeCheckPeriod
+	if (Healium_GetProfile().RangeCheckPeriod > MaxRangeCheckPeriod or Healium_GetProfile().RangeCheckPeriod < MinRangeCheckPeriod) then
+		Healium_GetProfile().RangeCheckPeriod = DefaultRangeCheckPeriod
 	end
 
-	if Healium.ShowGroupFrames == nil then
-		Healium.ShowGroupFrames = { }
+	if Healium_GetProfile().ShowGroupFrames == nil then
+		Healium_GetProfile().ShowGroupFrames = { }
 	end
 
-	if Healium.ShowToolTips == nil then
-		Healium.ShowToolTips = true
+	if Healium_GetProfile().ShowToolTips == nil then
+		Healium_GetProfile().ShowToolTips = true
 	end
 
-	if Healium.ShowMana == nil then
-		Healium.ShowMana = true
+	if Healium_GetProfile().ShowMana == nil then
+		Healium_GetProfile().ShowMana = true
 	end
 
-	if Healium.ShowThreat == nil then
-		Healium.ShowThreat = true
+	if Healium_GetProfile().ShowThreat == nil then
+		Healium_GetProfile().ShowThreat = true
 	end
 
-	if Healium.ShowRole == nil then
-		Healium.ShowRole = true
+	if Healium_GetProfile().ShowRole == nil then
+		Healium_GetProfile().ShowRole = true
 	end
 
-	if Healium.ShowIncomingHeals == nil then
-		Healium.ShowIncomingHeals = true
+	if Healium_GetProfile().ShowIncomingHeals == nil then
+		Healium_GetProfile().ShowIncomingHeals = true
 	end
 
-	if Healium.ShowRaidIcons == nil then
-		Healium.ShowRaidIcons = true
+	if Healium_GetProfile().ShowRaidIcons == nil then
+		Healium_GetProfile().ShowRaidIcons = true
 	end
 
-	if Healium.ShowPercentage == nil then
-		Healium.ShowPercentage = true
+	if Healium_GetProfile().ShowPercentage == nil then
+		Healium_GetProfile().ShowPercentage = true
 	end
 
-	if Healium.UseClassColors == nil then
-		Healium.UseClassColors = false
+	if Healium_GetProfile().UseClassColors == nil then
+		Healium_GetProfile().UseClassColors = false
 	end
 
-	if Healium.ShowBuffs == nil then
-		Healium.ShowBuffs = true
+	if Healium_GetProfile().ShowBuffs == nil then
+		Healium_GetProfile().ShowBuffs = true
 	end
 
-	if Healium.ShowDefaultPartyFrames == nil then
-		Healium.ShowDefaultPartyFrames = false
+	if Healium_GetProfile().ShowDefaultPartyFrames == nil then
+		Healium_GetProfile().ShowDefaultPartyFrames = false
 	end
 
-	if Healium.ShowPartyFrame == nil then
-		Healium.ShowPartyFrame = true
+	if Healium_GetProfile().ShowPartyFrame == nil then
+		Healium_GetProfile().ShowPartyFrame = true
 	end
 
-	if Healium.ShowPetsFrame == nil then
-		Healium.ShowPetsFrame = true
+	if Healium_GetProfile().ShowPetsFrame == nil then
+		Healium_GetProfile().ShowPetsFrame = true
 	end
 
-	if Healium.ShowMeFrame == nil then
-		Healium.ShowMeFrame = false
+	if Healium_GetProfile().ShowMeFrame == nil then
+		Healium_GetProfile().ShowMeFrame = false
 	end
 
-	if Healium.ShowTanksFrame == nil then
-		Healium.ShowTanksFrame = false
+	if Healium_GetProfile().ShowTanksFrame == nil then
+		Healium_GetProfile().ShowTanksFrame = false
 	end
 
-	if Healium.ShowAllFrame == nil then
-		Healium.ShowAllFrame = false
+	if Healium_GetProfile().ShowAllFrame == nil then
+		Healium_GetProfile().ShowAllFrame = false
 	end
 
-	if Healium.ShowDamagersFrame == nil then
-		Healium.ShowDamagersFrame = false
+	if Healium_GetProfile().ShowDamagersFrame == nil then
+		Healium_GetProfile().ShowDamagersFrame = false
 	end
 
-	if Healium.ShowHealersFrame == nil then
-		Healium.ShowHealersFrame = false
+	if Healium_GetProfile().ShowHealersFrame == nil then
+		Healium_GetProfile().ShowHealersFrame = false
 	end
 
-	if Healium.ShowTargetFrame == nil then
-		Healium.ShowTargetFrame = false
+	if Healium_GetProfile().ShowTargetFrame == nil then
+		Healium_GetProfile().ShowTargetFrame = false
 	end
 
-	if Healium.ShowFocusFrame == nil then
-		Healium.ShowFocusFrame = false
+	if Healium_GetProfile().ShowFocusFrame == nil then
+		Healium_GetProfile().ShowFocusFrame = false
 	end
 
-	if Healium.ShowFriendsFrame == nil then
-		Healium.ShowFriendsFrame = false
+	if Healium_GetProfile().ShowFriendsFrame == nil then
+		Healium_GetProfile().ShowFriendsFrame = false
 	end
 
-	if Healium.HideCloseButton == nil then
-		Healium.HideCloseButton = false
+	if Healium_GetProfile().HideCloseButton == nil then
+		Healium_GetProfile().HideCloseButton = false
 	end
 
-	if Healium.HideCaptions == nil then
-		Healium.HideCaptions = false
+	if Healium_GetProfile().HideCaptions == nil then
+		Healium_GetProfile().HideCaptions = false
 	end
 
-	if Healium.LockFrames == nil then
-		Healium.LockFrames = false
+	if Healium_GetProfile().LockFrames == nil then
+		Healium_GetProfile().LockFrames = false
 	end
 
-	if Healium.EnableDebufs == nil then
-		Healium.EnableDebufs = true
+	if Healium_GetProfile().EnableDebufs == nil then
+		Healium_GetProfile().EnableDebufs = true
 	end
 
-	if Healium.EnableClique == nil then
-		Healium.EnableClique = false
+	if Healium_GetProfile().EnableClique == nil then
+		Healium_GetProfile().EnableClique = false
 	end
 
-	if Healium.EnableDebufAudio == nil then
-		Healium.EnableDebufAudio = true
+	if Healium_GetProfile().EnableDebufAudio == nil then
+		Healium_GetProfile().EnableDebufAudio = true
 	end
 
-	if Healium.EnableDebufHealthbarHighlighting == nil then
-		Healium.EnableDebufHealthbarHighlighting = true
+	if Healium_GetProfile().EnableDebufHealthbarHighlighting == nil then
+		Healium_GetProfile().EnableDebufHealthbarHighlighting = true
 	end
 
-	if Healium.EnableDebufButtonHighlighting == nil then
-		Healium.EnableDebufButtonHighlighting = true
+	if Healium_GetProfile().EnableDebufButtonHighlighting == nil then
+		Healium_GetProfile().EnableDebufButtonHighlighting = true
 	end
 
-	if Healium.EnableDebufHealthbarColoring == nil then
-		Healium.EnableDebufHealthbarColoring = false
+	if Healium_GetProfile().EnableDebufHealthbarColoring == nil then
+		Healium_GetProfile().EnableDebufHealthbarColoring = false
 	end
 
-	if Healium.UppercaseNames == nil then
-		Healium.UppercaseNames = true
+	if Healium_GetProfile().UppercaseNames == nil then
+		Healium_GetProfile().UppercaseNames = true
 	end
 
 	if HealiumGlobal.Friends == nil then
 		HealiumGlobal.Friends = { }
 	end
-
-	if Healium.Profiles == nil then
-		Healium.Profiles = { }
-	end
+	--
+	--if Healium.Profiles == nil then
+	--	Healium.Profiles = { }
+	--end
 
 	-- Healium.Profiles may exist at this point, but may not be fully inited
 	local DefaultProfile = {
@@ -1082,30 +1085,56 @@ local function InitVariables()
 		IDs = { },
 	}
 
-	if Healium.Profiles[1] == nil then
-		Healium.Profiles[1] = Healium_DeepCopy(DefaultProfile)
+	if Healium[1] == nil then
+		--Healium[1] = Healium_DeepCopy(DefaultProfile)
+		Healium[1] = Healium
 	end
 
-	if Healium.Profiles[2] == nil then
-		Healium.Profiles[2] = Healium_DeepCopy(DefaultProfile)
+	if Healium[2] == nil then
+		--Healium[2] = Healium_DeepCopy(DefaultProfile)
+		Healium[2] = Healium
+	end
+
+	if Healium[1].ButtonCount == nil then
+		Healium[1].ButtonCount = DefaultButtonCount
+	end
+
+	if Healium[2].ButtonCount == nil then
+		Healium[2].ButtonCount = DefaultButtonCount
+	end
+
+	if Healium[1].SpellNames == nil then
+		Healium[1].SpellNames = {}
+	end
+
+	if Healium[2].SpellNames == nil then
+		Healium[2].SpellNames = {}
+	end
+
+	if Healium[1].SpellIcons == nil then
+		Healium[1].SpellIcons = {}
+	end
+
+	if Healium[2].SpellIcons == nil then
+		Healium[2].SpellIcons = {}
 	end
 
 	-- SpellTypes was added in 2.0
-	if Healium.Profiles[1].SpellTypes == nil then
-		Healium.Profiles[1].SpellTypes = {}
+	if Healium[1].SpellTypes == nil then
+		Healium[1].SpellTypes = {}
 	end
 
-	if Healium.Profiles[2].SpellTypes == nil then
-		Healium.Profiles[2].SpellTypes = {}
+	if Healium[2].SpellTypes == nil then
+		Healium[2].SpellTypes = {}
 	end
 
 	-- IDs was added in 2.0
-	if Healium.Profiles[1].IDs == nil then
-		Healium.Profiles[1].IDs = {}
+	if Healium[1].IDs == nil then
+		Healium[1].IDs = {}
 	end
 
-	if Healium.Profiles[2].IDs == nil then
-		Healium.Profiles[2].IDs = {}
+	if Healium[2].IDs == nil then
+		Healium[2].IDs = {}
 	end
 
 
@@ -1144,7 +1173,7 @@ function Healium_OnEvent(self, event, ...)
 	if event == "UNIT_AURA" then
 		if Healium_Units[arg1] then
 			for _,v  in pairs(Healium_Units[arg1]) do
-				if Healium.ShowBuffs then
+				if Healium_GetProfile().ShowBuffs then
 					Healium_UpdateUnitBuffs(arg1, v)
 				end
 				Healium_UpdateSpecialBuffs(arg1)
@@ -1153,7 +1182,7 @@ function Healium_OnEvent(self, event, ...)
 		return
 	end
 
-	if (event == "UNIT_THREAT_SITUATION_UPDATE") and Healium.ShowThreat then
+	if (event == "UNIT_THREAT_SITUATION_UPDATE") and Healium_GetProfile().ShowThreat then
 		if Healium_Units[arg1] then
 			for _,v  in pairs(Healium_Units[arg1]) do
 				Healium_UpdateUnitThreat(arg1, v)
@@ -1162,7 +1191,7 @@ function Healium_OnEvent(self, event, ...)
 		return
 	end
 
-	if (event == "SPELL_UPDATE_COOLDOWN") and Healium.EnableCooldowns then
+	if (event == "SPELL_UPDATE_COOLDOWN") and Healium_GetProfile().EnableCooldowns then
 		Healium_UpdateButtonCooldowns()
 		return
 	end
@@ -1203,9 +1232,10 @@ function Healium_OnEvent(self, event, ...)
 		Healium_DebugPrint("PLAYER_TALENT_UPDATE")
 		self.Respecing = nil
 
-		Healium_UpdateSpells()
-		Healium_UpdateButtons()
-		Healium_Update_ConfigPanel()
+		Healium_OnInit()
+		--Healium_UpdateSpells()
+		--Healium_UpdateButtons()
+		--Healium_Update_ConfigPanel()
 		return
 	end
 
@@ -1245,7 +1275,7 @@ function Healium_OnEvent(self, event, ...)
 		return
 	end
 
-	if (event == "RAID_TARGET_UPDATE") and Healium.ShowRaidIcons then
+	if (event == "RAID_TARGET_UPDATE") and Healium_GetProfile().ShowRaidIcons then
 		Healium_UpdateRaidIcons()
 		return
 	end
@@ -1260,18 +1290,18 @@ function Healium_OnEvent(self, event, ...)
 		return
 	end
 
-	if (event == "PARTY_MEMBERS_CHANGED") and Healium.ShowRole then
+	if (event == "PARTY_MEMBERS_CHANGED") and Healium_GetProfile().ShowRole then
 		Healium_UpdateRoles()
 		return
 	end
 
-	if (event == "PLAYER_TARGET_CHANGED") and Healium.ShowTargetFrame then
+	if (event == "PLAYER_TARGET_CHANGED") and Healium_GetProfile().ShowTargetFrame then
 		Healium_DebugPrint("PLAYER_TARGET_CHANGED")
 		Healium_UpdateTargetFrame()
 		return
 	end
 
-	if (event == "PLAYER_FOCUS_CHANGED") and Healium.ShowFocusFrame then
+	if (event == "PLAYER_FOCUS_CHANGED") and Healium_GetProfile().ShowFocusFrame then
 		Healium_DebugPrint("PLAYER_FOCUS_CHANGED")
 		Healium_UpdateFocusFrame()
 		return
@@ -1283,43 +1313,47 @@ function Healium_OnEvent(self, event, ...)
 	if ((event == "ADDON_LOADED") and (string.lower(arg1) == string.lower(Healium_AddonName))) then
 		Healium_DebugPrint("ADDON_LOADED")
 
-		InitVariables()
 		Healium_InitSpells(HealiumClass, HealiumRace)
-		Healium_InitDebuffSound()
+		Healium_CreateUnitFrames()
 		Healium_CreateMiniMapButton()
 		Healium_CreateConfigPanel(HealiumClass, AddonVersion)
 		Healium_InitSlashCommands()
 		Healium_InitMenu()
-		Healium_CreateUnitFrames()
-		Healium_SetScale()
-		Healium_UpdatePercentageVisibility()
-		Healium_UpdateClassColors()
-		Healium_ShowHidePartyFrame()
-		Healium_ShowHidePetsFrame()
-		Healium_ShowHideMeFrame()
-		Healium_ShowHideDamagersFrame()
-		Healium_ShowHideHealersFrame()
-		Healium_ShowHideTanksFrame()
-		Healium_ShowHideAllFrame()
-		Healium_ShowHideFriendsFrame()
-		Healium_ShowHideTargetFrame()
-		Healium_ShowHideFocusFrame()
-		Healium_UpdateShowMana()
-		Healium_UpdateShowBuffs()
-		Healium_UpdateFriends()
-		Healium_UpdateShowThreat()
-		Healium_UpdateShowRole()
-		Healium_UpdateShowIncomingHeals()
-		Healium_UpdateShowRaidIcons()
-
-		for i=1, 8, 1 do
-			Healium_ShowHideGroupFrame(i)
-		end
-
-		Healium_UpdateButtons()
+		Healium_OnInit()
 
 		return
 	end
+end
+
+function Healium_OnInit()
+	InitVariables()
+	Healium_InitDebuffSound()
+	Healium_SetScale()
+	Healium_UpdatePercentageVisibility()
+	Healium_UpdateClassColors()
+	Healium_ShowHidePartyFrame()
+	Healium_ShowHidePetsFrame()
+	Healium_ShowHideMeFrame()
+	Healium_ShowHideDamagersFrame()
+	Healium_ShowHideHealersFrame()
+	Healium_ShowHideTanksFrame()
+	Healium_ShowHideAllFrame()
+	Healium_ShowHideFriendsFrame()
+	Healium_ShowHideTargetFrame()
+	Healium_ShowHideFocusFrame()
+	Healium_UpdateShowMana()
+	Healium_UpdateShowBuffs()
+	Healium_UpdateFriends()
+	Healium_UpdateShowThreat()
+	Healium_UpdateShowRole()
+	Healium_UpdateShowIncomingHeals()
+	Healium_UpdateShowRaidIcons()
+
+	for i=1, 8, 1 do
+		Healium_ShowHideGroupFrame(i)
+	end
+
+	Healium_UpdateButtons()
 end
 
 function IsInGroup()

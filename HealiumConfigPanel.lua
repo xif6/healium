@@ -73,7 +73,7 @@ end
 
 local function SoundDropDownMenuItem_OnClick(dropdownbutton)
 	UIDropDownMenu_SetSelectedValue(dropdownbutton.owner, dropdownbutton.value)
-	Healium.DebufAudioFile = dropdownbutton.value
+	Healium_GetProfile().DebufAudioFile = dropdownbutton.value
 	Healium_InitDebuffSound()
 	Healium_PlayDebuffSound()
 end
@@ -115,78 +115,78 @@ local function MaxButtonSlider_Update(self)
 end
 
 local function TooltipsCheck_OnClick(self)
-	Healium.ShowToolTips = self:GetChecked() or false
+	Healium_GetProfile().ShowToolTips = self:GetChecked() or false
 end
 
 local function PercentageCheck_OnClick(self)
-	Healium.ShowPercentage = self:GetChecked() or false
+	Healium_GetProfile().ShowPercentage = self:GetChecked() or false
 	Healium_UpdatePercentageVisibility()
 end
 
 local function ClassColorCheck_OnClick(self)
-	Healium.UseClassColors = self:GetChecked() or false
+	Healium_GetProfile().UseClassColors = self:GetChecked() or false
 	Healium_UpdateClassColors()
 end
 
 local function ShowBuffsCheck_OnClick(self)
-	Healium.ShowBuffs = self:GetChecked() or false
+	Healium_GetProfile().ShowBuffs = self:GetChecked() or false
 	Healium_UpdateShowBuffs()
 end
 
 local function RangeCheckCheck_OnClick(self)
-	Healium.DoRangeChecks = self:GetChecked() or false
+	Healium_GetProfile().DoRangeChecks = self:GetChecked() or false
 end
 
 local function EnableCooldownsCheck_OnClick(self)
-	Healium.EnableCooldowns = self:GetChecked() or false
+	Healium_GetProfile().EnableCooldowns = self:GetChecked() or false
 end
 
 local function HideCloseButtonCheck_OnClick(self)
-	Healium.HideCloseButton = self:GetChecked() or false
+	Healium_GetProfile().HideCloseButton = self:GetChecked() or false
 	Healium_UpdateCloseButtons()
 end
 
 local function HideCaptionsCheck_OnClick(self)
-	Healium.HideCaptions = self:GetChecked() or false
+	Healium_GetProfile().HideCaptions = self:GetChecked() or false
 	Healium_UpdateHideCaptions()
 end
 
 local function LockFramePositionsCheck_OnClick(self)
-	Healium.LockFrames = self:GetChecked() or false
+	Healium_GetProfile().LockFrames = self:GetChecked() or false
 end
 
 local function EnableCliqueCheck_OnClick(self)
-	Healium.EnableClique = self:GetChecked() or false
+	Healium_GetProfile().EnableClique = self:GetChecked() or false
 	Healium_UpdateEnableClique()
 end
 
 local function ShowManaCheck_OnClick(self)
-	Healium.ShowMana = self:GetChecked() or false
+	Healium_GetProfile().ShowMana = self:GetChecked() or false
 	Healium_UpdateShowMana()
 end
 
 local function ShowThreatCheck_OnClick(self)
-	Healium.ShowThreat = self:GetChecked() or false
+	Healium_GetProfile().ShowThreat = self:GetChecked() or false
 	Healium_UpdateShowThreat()
 end
 
 local function ShowRoleCheck_OnClick(self)
-	Healium.ShowRole = self:GetChecked() or false
+	Healium_GetProfile().ShowRole = self:GetChecked() or false
 	Healium_UpdateShowRole()
 end
 
 local function ShowIncomingHealsCheck_OnClick(self)
-	Healium.ShowIncomingHeals = self:GetChecked() or false
+	Healium_GetProfile().ShowIncomingHeals = self:GetChecked() or false
 	Healium_UpdateShowIncomingHeals()
 end
 
 local function ShowRaidIconsCheck_OnClick(self)
-	Healium.ShowRaidIcons = self:GetChecked() or false
+	Healium_GetProfile().ShowRaidIcons = self:GetChecked() or false
 	Healium_UpdateShowRaidIcons()
 end
 
 local function UppercaseNamesCheck_OnClick(self)
-	Healium.UppercaseNames = self:GetChecked() or false
+	Healium_GetProfile().UppercaseNames = self:GetChecked() or false
 	Healium_UpdateUnitNames()
 end
 
@@ -205,37 +205,37 @@ end
 
 local function EnableDebuffsCheck_OnClick(self)
 	UpdateEnableDebuffsControls(self)
-	Healium.EnableDebufs = self:GetChecked() or false
+	Healium_GetProfile().EnableDebufs = self:GetChecked() or false
 	Healium_UpdateEnableDebuffs()
 end
 
 local function EnableDebuffAudioCheck_OnClick(self)
-	Healium.EnableDebufAudio = self:GetChecked() or false
+	Healium_GetProfile().EnableDebufAudio = self:GetChecked() or false
 end
 
 local function EnableDebuffHealthbarHighlightingCheck_OnClick(self)
-	Healium.EnableDebufHealthbarHighlighting = self:GetChecked() or false
+	Healium_GetProfile().EnableDebufHealthbarHighlighting = self:GetChecked() or false
 	Healium_UpdateEnableDebuffs()
 end
 
 local function EnableDebuffButtonHighlightingCheck_OnClick(self)
-	Healium.EnableDebufButtonHighlighting = self:GetChecked() or false
+	Healium_GetProfile().EnableDebufButtonHighlighting = self:GetChecked() or false
 	Healium_UpdateEnableDebuffs()
 end
 
 local function EnableDebuffHealthbarColoringCheck_OnClick(self)
-	Healium.EnableDebufHealthbarColoring = self:GetChecked() or false
+	Healium_GetProfile().EnableDebufHealthbarColoring = self:GetChecked() or false
 	Healium_UpdateEnableDebuffs()
 end
 
 local function ScaleSlider_OnValueChanged(self)
-	Healium.Scale = self:GetValue()
+	Healium_GetProfile().Scale = self:GetValue()
 	Healium_SetScale()
-	self.Text:SetText("Scale: |cFFFFFFFF".. format("%.1f",Healium.Scale))
+	self.Text:SetText("Scale: |cFFFFFFFF".. format("%.1f",Healium_GetProfile().Scale))
 end
 
 local function RangeCheckSlider_OnValueChanged(self)
-	Healium.RangeCheckPeriod = 1.0 / self:GetValue()
+	Healium_GetProfile().RangeCheckPeriod = 1.0 / self:GetValue()
 	UpdateRangeCheckSliderText(self)
 end
 
@@ -458,7 +458,7 @@ function Healium_CreateConfigPanel(Class, Version)
 
     ScaleSlider:SetMinMaxValues(0.6,1.5)
     ScaleSlider:SetValueStep(0.1)
-    ScaleSlider:SetValue(Healium.Scale)
+    ScaleSlider:SetValue(Healium_GetProfile().Scale)
 
     ScaleSlider:SetPoint("TOPLEFT", HealiumMaxButtonSlider, "BOTTOMLEFT", 0, -30)
 
@@ -490,7 +490,7 @@ function Healium_CreateConfigPanel(Class, Version)
     Healium_ShowPartyCheck.Text:SetText("Party")
 
     Healium_ShowPartyCheck:SetScript("OnClick",function()
-        Healium.ShowPartyFrame = Healium_ShowPartyCheck:GetChecked() or false
+        Healium_GetProfile().ShowPartyFrame = Healium_ShowPartyCheck:GetChecked() or false
 		Healium_ShowHidePartyFrame()
     end)
 
@@ -498,7 +498,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	Healium_ShowPetsCheck = CreateCheck("$parentShowPetsCheckButton",scrollchild,Healium_ShowPartyCheck, "Shows the Pets " .. Healium_AddonColoredName .. " frame.", "Pets")
 
     Healium_ShowPetsCheck:SetScript("OnClick",function()
-        Healium.ShowPetsFrame = Healium_ShowPetsCheck:GetChecked() or false
+        Healium_GetProfile().ShowPetsFrame = Healium_ShowPetsCheck:GetChecked() or false
 		Healium_ShowHidePetsFrame()
     end)
 
@@ -506,7 +506,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	Healium_ShowMeCheck = CreateCheck("$parentShowMeCheckButton",scrollchild,Healium_ShowPetsCheck, "Shows the Me " .. Healium_AddonColoredName .. " frame.", "Me")
 
     Healium_ShowMeCheck:SetScript("OnClick",function()
-        Healium.ShowMeFrame = Healium_ShowMeCheck:GetChecked() or false
+        Healium_GetProfile().ShowMeFrame = Healium_ShowMeCheck:GetChecked() or false
 		Healium_ShowHideMeFrame()
     end)
 
@@ -514,7 +514,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	Healium_ShowFriendsCheck = CreateCheck("$parentShowFriendsCheckButton",scrollchild,Healium_ShowMeCheck, "Shows the Friends " .. Healium_AddonColoredName .. " frame.", "Friends")
 
     Healium_ShowFriendsCheck:SetScript("OnClick",function()
-        Healium.ShowFriendsFrame = Healium_ShowFriendsCheck:GetChecked() or false
+        Healium_GetProfile().ShowFriendsFrame = Healium_ShowFriendsCheck:GetChecked() or false
 		Healium_ShowHideFriendsFrame()
     end)
 
@@ -522,7 +522,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	Healium_ShowTargetCheck = CreateCheck("$parentShowFocusCheckButton",scrollchild,Healium_ShowFriendsCheck, "Shows the Target " .. Healium_AddonColoredName .. " frame.", "Target")
 
     Healium_ShowTargetCheck:SetScript("OnClick",function()
-        Healium.ShowTargetFrame = Healium_ShowTargetCheck:GetChecked() or false
+        Healium_GetProfile().ShowTargetFrame = Healium_ShowTargetCheck:GetChecked() or false
 		Healium_ShowHideTargetFrame()
     end)
 
@@ -530,7 +530,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	Healium_ShowFocusCheck = CreateCheck("$parentShowFocusCheckButton",scrollchild,Healium_ShowTargetCheck, "Shows the Focus " .. Healium_AddonColoredName .. " frame.", "Focus")
 
     Healium_ShowFocusCheck:SetScript("OnClick",function()
-        Healium.ShowFocusFrame = Healium_ShowFocusCheck:GetChecked() or false
+        Healium_GetProfile().ShowFocusFrame = Healium_ShowFocusCheck:GetChecked() or false
 		Healium_ShowHideFocusFrame()
     end)
 
@@ -538,7 +538,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	Healium_ShowGroup1Check = CreateCheck("$parentShowGroup1CheckButton",scrollchild,Healium_ShowFocusCheck, "Shows the Group 1 " .. Healium_AddonColoredName .. " frame.", "Group 1")
 
     Healium_ShowGroup1Check:SetScript("OnClick",function()
-        Healium.ShowGroupFrames[1] = Healium_ShowGroup1Check:GetChecked() or false
+        Healium_GetProfile().ShowGroupFrames[1] = Healium_ShowGroup1Check:GetChecked() or false
 		Healium_ShowHideGroupFrame(1)
     end)
 
@@ -546,7 +546,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	Healium_ShowGroup2Check = CreateCheck("$parentShowGroup2CheckButton",scrollchild,Healium_ShowGroup1Check, "Shows the Group 2 " .. Healium_AddonColoredName .. " frame.", "Group 2")
 
     Healium_ShowGroup2Check:SetScript("OnClick",function()
-        Healium.ShowGroupFrames[2] = Healium_ShowGroup2Check:GetChecked() or false
+        Healium_GetProfile().ShowGroupFrames[2] = Healium_ShowGroup2Check:GetChecked() or false
 		Healium_ShowHideGroupFrame(2)
     end)
 
@@ -554,7 +554,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	Healium_ShowGroup3Check = CreateCheck("$parentShowGroup3CheckButton",scrollchild,Healium_ShowGroup2Check, "Shows the Group 3 " .. Healium_AddonColoredName .. " frame.", "Group 3")
 
     Healium_ShowGroup3Check:SetScript("OnClick",function()
-        Healium.ShowGroupFrames[3] = Healium_ShowGroup3Check:GetChecked() or false
+        Healium_GetProfile().ShowGroupFrames[3] = Healium_ShowGroup3Check:GetChecked() or false
 		Healium_ShowHideGroupFrame(3)
     end)
 
@@ -562,7 +562,7 @@ function Healium_CreateConfigPanel(Class, Version)
 	Healium_ShowGroup4Check = CreateCheck("$parentShowGroup4CheckButton",scrollchild,Healium_ShowGroup3Check, "Shows the Group 4 " .. Healium_AddonColoredName .. " frame.", "Group 4")
 
     Healium_ShowGroup4Check:SetScript("OnClick",function()
-        Healium.ShowGroupFrames[4]= Healium_ShowGroup4Check:GetChecked() or false
+        Healium_GetProfile().ShowGroupFrames[4]= Healium_ShowGroup4Check:GetChecked() or false
 		Healium_ShowHideGroupFrame(4)
     end)
 
@@ -570,7 +570,7 @@ function Healium_CreateConfigPanel(Class, Version)
     Healium_ShowGroup5Check = CreateCheck("$parentShowGroup5CheckButton",scrollchild,Healium_ShowGroup4Check, "Shows the Group 5 " .. Healium_AddonColoredName .. " frame.", "Group 5")
 
     Healium_ShowGroup5Check:SetScript("OnClick",function()
-        Healium.ShowGroupFrames[5] = Healium_ShowGroup5Check:GetChecked() or false
+        Healium_GetProfile().ShowGroupFrames[5] = Healium_ShowGroup5Check:GetChecked() or false
 		Healium_ShowHideGroupFrame(5)
     end)
 
@@ -578,7 +578,7 @@ function Healium_CreateConfigPanel(Class, Version)
     Healium_ShowGroup6Check = CreateCheck("$parentShowGroup6CheckButton",scrollchild,Healium_ShowGroup5Check, "Shows the Group 6 " .. Healium_AddonColoredName .. " frame.", "Group 6")
 
     Healium_ShowGroup6Check:SetScript("OnClick",function()
-        Healium.ShowGroupFrames[6] = Healium_ShowGroup6Check:GetChecked() or false
+        Healium_GetProfile().ShowGroupFrames[6] = Healium_ShowGroup6Check:GetChecked() or false
 		Healium_ShowHideGroupFrame(6)
     end)
 
@@ -586,7 +586,7 @@ function Healium_CreateConfigPanel(Class, Version)
     Healium_ShowGroup7Check = CreateCheck("$parentShowGroup7CheckButton",scrollchild,Healium_ShowGroup6Check, "Shows the Group 7 " .. Healium_AddonColoredName .. " frame.", "Group 7")
 
     Healium_ShowGroup7Check:SetScript("OnClick",function()
-        Healium.ShowGroupFrames[7] = Healium_ShowGroup7Check:GetChecked() or false
+        Healium_GetProfile().ShowGroupFrames[7] = Healium_ShowGroup7Check:GetChecked() or false
 		Healium_ShowHideGroupFrame(7)
     end)
 
@@ -594,7 +594,7 @@ function Healium_CreateConfigPanel(Class, Version)
     Healium_ShowGroup8Check = CreateCheck("$parentShowGroup8CheckButton",scrollchild,Healium_ShowGroup7Check, "Shows the Group 8 " .. Healium_AddonColoredName .. " frame.", "Group 8")
 
     Healium_ShowGroup8Check:SetScript("OnClick",function()
-        Healium.ShowGroupFrames[8] = Healium_ShowGroup8Check:GetChecked() or false
+        Healium_GetProfile().ShowGroupFrames[8] = Healium_ShowGroup8Check:GetChecked() or false
 		Healium_ShowHideGroupFrame(8)
     end)
 -- TODO DAMAGERS/HEALERS frame
@@ -603,7 +603,7 @@ function Healium_CreateConfigPanel(Class, Version)
     Healium_ShowDamagersCheck = CreateCheck("$parentShowDamagersCheckButton",scrollchild,Healium_ShowGroup8Check, "Shows the Damagers " .. Healium_AddonColoredName .. " frame.", "Damagers")
 
     Healium_ShowDamagersCheck:SetScript("OnClick",function()
-        Healium.ShowDamagersFrame = Healium_ShowDamagersCheck:GetChecked() or false
+        Healium_GetProfile().ShowDamagersFrame = Healium_ShowDamagersCheck:GetChecked() or false
 		Healium_ShowHideDamagersFrame()
     end)
 
@@ -611,7 +611,7 @@ function Healium_CreateConfigPanel(Class, Version)
     Healium_ShowHealersCheck = CreateCheck("$parentShowHealersCheckButton",scrollchild,Healium_ShowDamagersCheck, "Shows the Healers " .. Healium_AddonColoredName .. " frame.", "Healers")
 
     Healium_ShowHealersCheck:SetScript("OnClick",function()
-        Healium.ShowHealersFrame = Healium_ShowHealersCheck:GetChecked() or false
+        Healium_GetProfile().ShowHealersFrame = Healium_ShowHealersCheck:GetChecked() or false
 		Healium_ShowHideHealersFrame()
     end)
 --]]
@@ -619,15 +619,15 @@ function Healium_CreateConfigPanel(Class, Version)
     Healium_ShowTanksCheck = CreateCheck("$parentShowTanksCheckButton",scrollchild,Healium_ShowGroup8Check, "Shows the Tanks " .. Healium_AddonColoredName .. " frame.", "Tanks")
 
     Healium_ShowTanksCheck:SetScript("OnClick",function()
-        Healium.ShowTanksFrame = Healium_ShowTanksCheck:GetChecked() or false
+        Healium_GetProfile().ShowTanksFrame = Healium_ShowTanksCheck:GetChecked() or false
 		Healium_ShowHideTanksFrame()
     end)
 
 	-- Show All Check
-    Healium_ShowAllCheck = CreateCheck("$parentShowAllCheckButton",scrollchild,Healium_ShowAllCheck, "Shows the All " .. Healium_AddonColoredName .. " frame.", "All")
+    Healium_ShowAllCheck = CreateCheck("$parentShowAllCheckButton",scrollchild,Healium_ShowTanksCheck, "Shows the All " .. Healium_AddonColoredName .. " frame.", "All")
 
     Healium_ShowAllCheck:SetScript("OnClick",function()
-        Healium.ShowAllFrame = Healium_ShowAllCheck:GetChecked() or false
+        Healium_GetProfile().ShowAllFrame = Healium_ShowAllCheck:GetChecked() or false
 		Healium_ShowHideAllFrame()
     end)
 
@@ -767,7 +767,7 @@ function Healium_CreateConfigPanel(Class, Version)
 
     RangeCheckSlider:SetMinMaxValues(.5,5.0)
     RangeCheckSlider:SetValueStep(0.1)
-    RangeCheckSlider:SetValue(1.0/Healium.RangeCheckPeriod)
+    RangeCheckSlider:SetValue(1.0/Healium_GetProfile().RangeCheckPeriod)
 
     RangeCheckSlider:SetPoint("TOPLEFT", RangeCheckCheck.Text, "TOPRIGHT", 15, 0)
     RangeCheckSlider.tooltipText = "Controls how often to do range cheks.  The further to the right, the more often range checks are performed and the more CPU it will use."
@@ -821,55 +821,55 @@ function Healium_CreateConfigPanel(Class, Version)
 
 	Healium_Update_ConfigPanel()
 
-	TooltipsCheck:SetChecked(Healium.ShowToolTips)
-	ShowManaCheck:SetChecked(Healium.ShowMana)
-	PercentageCheck:SetChecked(Healium.ShowPercentage)
-	ClassColorCheck:SetChecked(Healium.UseClassColors)
-	ShowBuffsCheck:SetChecked(Healium.ShowBuffs)
-	RangeCheckCheck:SetChecked(Healium.DoRangeChecks)
-	EnableCooldownsCheck:SetChecked(Healium.EnableCooldowns)
-	HideCloseButtonCheck:SetChecked(Healium.HideCloseButton)
-	HideCaptionsCheck:SetChecked(Healium.HideCaptions)
-	LockFramePositionsCheck:SetChecked(Healium.LockFrames)
-	EnableDebuffsCheck:SetChecked(Healium.EnableDebufs)
-	EnableCliqueCheck:SetChecked(Healium.EnableClique)
-	ShowThreatCheck:SetChecked(Healium.ShowThreat)
-	ShowRoleCheck:SetChecked(Healium.ShowRole)
-	ShowIncomingHealsCheck:SetChecked(Healium.ShowIncomingHeals)
-	ShowRaidIconsCheck:SetChecked(Healium.ShowRaidIcons)
-	UppercaseNamesCheck:SetChecked(Healium.UppercaseNames)
-	EnableDebuffAudioCheck:SetChecked(Healium.EnableDebufAudio)
-	EnableDebuffHealthbarHighlightingCheck:SetChecked(Healium.EnableDebufHealthbarHighlighting)
-	EnableDebuffButtonHighlightingCheck:SetChecked(Healium.EnableDebufButtonHighlighting)
-	EnableDebufHealthbarColoringCheck:SetChecked(Healium.EnableDebufHealthbarColoring)
+	TooltipsCheck:SetChecked(Healium_GetProfile().ShowToolTips)
+	ShowManaCheck:SetChecked(Healium_GetProfile().ShowMana)
+	PercentageCheck:SetChecked(Healium_GetProfile().ShowPercentage)
+	ClassColorCheck:SetChecked(Healium_GetProfile().UseClassColors)
+	ShowBuffsCheck:SetChecked(Healium_GetProfile().ShowBuffs)
+	RangeCheckCheck:SetChecked(Healium_GetProfile().DoRangeChecks)
+	EnableCooldownsCheck:SetChecked(Healium_GetProfile().EnableCooldowns)
+	HideCloseButtonCheck:SetChecked(Healium_GetProfile().HideCloseButton)
+	HideCaptionsCheck:SetChecked(Healium_GetProfile().HideCaptions)
+	LockFramePositionsCheck:SetChecked(Healium_GetProfile().LockFrames)
+	EnableDebuffsCheck:SetChecked(Healium_GetProfile().EnableDebufs)
+	EnableCliqueCheck:SetChecked(Healium_GetProfile().EnableClique)
+	ShowThreatCheck:SetChecked(Healium_GetProfile().ShowThreat)
+	ShowRoleCheck:SetChecked(Healium_GetProfile().ShowRole)
+	ShowIncomingHealsCheck:SetChecked(Healium_GetProfile().ShowIncomingHeals)
+	ShowRaidIconsCheck:SetChecked(Healium_GetProfile().ShowRaidIcons)
+	UppercaseNamesCheck:SetChecked(Healium_GetProfile().UppercaseNames)
+	EnableDebuffAudioCheck:SetChecked(Healium_GetProfile().EnableDebufAudio)
+	EnableDebuffHealthbarHighlightingCheck:SetChecked(Healium_GetProfile().EnableDebufHealthbarHighlighting)
+	EnableDebuffButtonHighlightingCheck:SetChecked(Healium_GetProfile().EnableDebufButtonHighlighting)
+	EnableDebufHealthbarColoringCheck:SetChecked(Healium_GetProfile().EnableDebufHealthbarColoring)
 
-	UIDropDownMenu_SetText(SoundDropDown, Healium.DebufAudioFile)
+	UIDropDownMenu_SetText(SoundDropDown, Healium_GetProfile().DebufAudioFile)
 
-	Healium_ShowPartyCheck:SetChecked(Healium.ShowPartyFrame)
-	Healium_ShowPetsCheck:SetChecked(Healium.ShowPetsFrame)
-	Healium_ShowMeCheck:SetChecked(Healium.ShowMeFrame)
-	Healium_ShowFriendsCheck:SetChecked(Healium.ShowFriendsFrame)
+	Healium_ShowPartyCheck:SetChecked(Healium_GetProfile().ShowPartyFrame)
+	Healium_ShowPetsCheck:SetChecked(Healium_GetProfile().ShowPetsFrame)
+	Healium_ShowMeCheck:SetChecked(Healium_GetProfile().ShowMeFrame)
+	Healium_ShowFriendsCheck:SetChecked(Healium_GetProfile().ShowFriendsFrame)
 
 -- TODO DAMAGERS/HEALERS frame
 --[[
-	Healium_ShowDamagersCheck:SetChecked(Healium.ShowDamagersFrame)
-	Healium_ShowHealersCheck:SetChecked(Healium.ShowHealersFrame)
+	Healium_ShowDamagersCheck:SetChecked(Healium_GetProfile().ShowDamagersFrame)
+	Healium_ShowHealersCheck:SetChecked(Healium_GetProfile().ShowHealersFrame)
 --]]
-	Healium_ShowTanksCheck:SetChecked(Healium.ShowTanksFrame)
-	Healium_ShowAllCheck:SetChecked(Healium.ShowAllFrame)
-	Healium_ShowTargetCheck:SetChecked(Healium.ShowTargetFrame)
-	Healium_ShowFocusCheck:SetChecked(Healium.ShowFocusFrame)
-	Healium_ShowGroup1Check:SetChecked(Healium.ShowGroupFrames[1])
-	Healium_ShowGroup2Check:SetChecked(Healium.ShowGroupFrames[2])
-	Healium_ShowGroup3Check:SetChecked(Healium.ShowGroupFrames[3])
-	Healium_ShowGroup4Check:SetChecked(Healium.ShowGroupFrames[4])
-	Healium_ShowGroup5Check:SetChecked(Healium.ShowGroupFrames[5])
-	Healium_ShowGroup6Check:SetChecked(Healium.ShowGroupFrames[6])
-	Healium_ShowGroup7Check:SetChecked(Healium.ShowGroupFrames[7])
-	Healium_ShowGroup8Check:SetChecked(Healium.ShowGroupFrames[8])
+	Healium_ShowTanksCheck:SetChecked(Healium_GetProfile().ShowTanksFrame)
+	Healium_ShowAllCheck:SetChecked(Healium_GetProfile().ShowAllFrame)
+	Healium_ShowTargetCheck:SetChecked(Healium_GetProfile().ShowTargetFrame)
+	Healium_ShowFocusCheck:SetChecked(Healium_GetProfile().ShowFocusFrame)
+	Healium_ShowGroup1Check:SetChecked(Healium_GetProfile().ShowGroupFrames[1])
+	Healium_ShowGroup2Check:SetChecked(Healium_GetProfile().ShowGroupFrames[2])
+	Healium_ShowGroup3Check:SetChecked(Healium_GetProfile().ShowGroupFrames[3])
+	Healium_ShowGroup4Check:SetChecked(Healium_GetProfile().ShowGroupFrames[4])
+	Healium_ShowGroup5Check:SetChecked(Healium_GetProfile().ShowGroupFrames[5])
+	Healium_ShowGroup6Check:SetChecked(Healium_GetProfile().ShowGroupFrames[6])
+	Healium_ShowGroup7Check:SetChecked(Healium_GetProfile().ShowGroupFrames[7])
+	Healium_ShowGroup8Check:SetChecked(Healium_GetProfile().ShowGroupFrames[8])
 
-	ScaleSlider:SetValue(Healium.Scale)
-	RangeCheckSlider:SetValue(1.0/Healium.RangeCheckPeriod)
+	ScaleSlider:SetValue(Healium_GetProfile().Scale)
+	RangeCheckSlider:SetValue(1.0/Healium_GetProfile().RangeCheckPeriod)
 
 	UpdateEnableDebuffsControls(EnableDebuffsCheck)
 
