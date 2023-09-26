@@ -115,6 +115,11 @@ Healium_Spell = {
   Icon = {},
   ID = {}
 }
+Healium_Buff = {
+  Name = {},
+  Icon = {},
+  ID = {}
+}
 
 local HealiumFrame = nil
 
@@ -1285,6 +1290,7 @@ function Healium_OnEvent(self, event, ...)
 
 		InitVariables()
 		Healium_InitSpells(HealiumClass, HealiumRace)
+		Healium_InitBuffs()
 		Healium_InitDebuffSound()
 		Healium_CreateMiniMapButton()
 		Healium_CreateConfigPanel(HealiumClass, AddonVersion)

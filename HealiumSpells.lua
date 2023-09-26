@@ -16,6 +16,11 @@ local function AddSpell(spellID)
 	table.insert(Healium_Spell.Name, name)
 end
 
+local function AddBuff(spellID)
+	local name = SpellName(spellID)
+	table.insert(Healium_Buff.Name, name)
+end
+
 local function Count(tab)
 	local cnt = 0
 
@@ -132,7 +137,100 @@ function Healium_InitSpells(class, race)
 		AddSpell(59547)		-- Gift of the Naaru
 	end
 
+
 	CuresCount = Count(Cures)
+end
+
+function Healium_InitBuffs()
+	-- All buff
+	AddBuff(59547) -- Gift of the Naaru
+	AddBuff(64413) -- Protection of Ancient Kings
+	AddBuff(71864) -- Fountain of Light
+
+
+	-- druid buff
+	AddBuff(33763) -- Lifebloom
+	AddBuff(8936) -- Regrowth
+	AddBuff(774) -- Rejuvenation
+	AddBuff(48496) -- Living Seed
+	AddBuff(740) -- Tranquility
+	AddBuff(48438) -- Wild Growth
+	AddBuff(2893) -- Abolish Poison
+	AddBuff(22812) -- Barkskin
+	AddBuff(61336) -- Survival Instincts
+	AddBuff(22842) -- Frenzied Regeneration
+	AddBuff(17116) -- Nature's Swiftness
+	AddBuff(467) -- Thorns
+	AddBuff(1126) -- Mark of the Wild
+	AddBuff(21849) -- Gift of the Wild
+
+	-- priest buff
+	AddBuff(33076) -- Prayer of Mending
+	AddBuff(139) -- Renew
+	AddBuff(14751) -- Inner Focus
+	AddBuff(63730) -- Serendipity
+	AddBuff(552) -- Abolish Disease
+	AddBuff(47788) -- Guardian Spirit
+	AddBuff(6346) -- Fear Ward
+	AddBuff(70772) -- Blessed Healing
+	AddBuff(33206) -- Pain Suppression
+	AddBuff(10060) -- Power Infusion
+	AddBuff(17) -- Power Word:Shield
+	AddBuff(47509) -- Divine Aegis
+	AddBuff(47516) -- Grace
+	AddBuff(7001) -- Lightwell Renew
+	AddBuff(14892) -- Inspiration
+
+	-- shaman buff
+	AddBuff(29206) -- Healing Way
+	AddBuff(16237) -- Ancestral Fortitude
+	AddBuff(51730) -- Earthliving Weapon
+	AddBuff(974) -- Earth Shield
+	AddBuff(324) -- Lightning Shield
+	AddBuff(52127) -- Water Shield
+	AddBuff(71220) -- Energized
+	AddBuff(70809) -- Chain Heal
+	AddBuff(51562) -- Tidal Waves
+	AddBuff(55198) -- Tidal Force
+	AddBuff(61295) -- Riptide
+	AddBuff(51730) -- Earthliving Weapon
+
+	-- paladin buff
+	AddBuff(27154) -- Lay on Hands | Improved didnt show icon - Aura has 'Lay On Hands' and id 27154 works.  Improved is GetSpellInfo(20234)
+	AddBuff(1038) -- Hand of Salvation
+	AddBuff(642) -- Divine Shield
+	AddBuff(6940) -- Hand of Sacrifice
+	AddBuff(71192) -- Blessed
+	AddBuff(53569) -- Infusion of Light
+	AddBuff(53563) -- Beacon of Light
+	AddBuff(1022) -- Hand of Protection
+	AddBuff(19750) -- Flash of Light
+	AddBuff(53651) -- Light Beacon
+	AddBuff(53601) -- Sacred Shield
+	AddBuff(1044) -- Hand of Freedom
+	AddBuff(53551) -- Sacred Cleansing
+	AddBuff(33154) -- Surge of Light
+	AddBuff(498) -- Divine Protection
+
+	-- hunter buff
+	AddBuff(136) -- Mend Pet
+
+	-- warrior buff
+	AddBuff(50720) -- Vigilance
+	AddBuff(12975) -- Last Stand
+	AddBuff(871) -- Shield Wall
+	AddBuff(2565) -- Shield Block
+	AddBuff(55694) -- Enraged Regeneration
+
+	-- deathnight buff
+	AddBuff(48792) -- Icebound Fortitude
+	AddBuff(48707) -- Antimagic Shell
+	AddBuff(42650) -- Army of the Dead
+	AddBuff(49039) -- Lichborne
+	AddBuff(51052) -- Antimagic Zone
+	AddBuff(55233) -- Vampiric Blood
+	AddBuff(51271) -- Unbreakable Armor
+	AddBuff(49222) -- Bone Shield
 end
 
 function Healium_UpdateCures()

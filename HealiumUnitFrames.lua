@@ -123,7 +123,7 @@ local function SetHeaderAttributes(frame)
 	frame:SetAttribute("point", "TOP")
 	frame:SetAttribute("template", "HealiumUnitFrames_ButtonTemplate")
 	frame:SetAttribute("templateType", "Button")
-	frame:SetAttribute("unitsPerColumn", 40)
+	frame:SetAttribute("unitsPerColumn", 5)
 end
 
 local function CreateHeader(TemplateName, FrameName, ParentFrame)
@@ -212,6 +212,7 @@ end
 
 local function CreateAllHeader(FrameName, ParentFrame)
 	local h = CreateHeader("SecureGroupHeaderTemplate", FrameName, ParentFrame)
+	h:SetAttribute("unitsPerColumn", 40)
 	h:SetAttribute("showSolo", "true")
 	h:SetAttribute("showParty", "true")
 	h:SetAttribute("showRaid", "true")
@@ -984,45 +985,43 @@ function Healium_UpdateUnitBuffs(unit, frame)
 		for i=1, 100, 1 do
 			local name, rank, icon, count, debuffType, duration, expirationTime, source, isStealable = UnitBuff(unit, i)
 			if name  then
-				if (duration > 0) and (source == "player") then
 
-					local armed = false
+				local armed = false
 
-					for j=1, Profile.ButtonCount, 1 do
-						if Profile.SpellNames[j] == name then
-							armed = true
-							break
-						end
+				for _,j in pairs(Healium_Buff.Name) do
+					if j == name then
+						armed = true
+						break
+					end
+				end
+
+				if armed == true then
+					local buffFrame = frame.buffs[buffIndex]
+
+					buffFrame:SetID(i)
+					buffFrame.icon:SetTexture(icon)
+
+					if count > 1 then
+						buffFrame.count:SetText(count)
+						buffFrame.count:Show()
+					else
+						buffFrame.count:Hide()
 					end
 
-					if armed == true then
-						local buffFrame = frame.buffs[buffIndex]
-
-						buffFrame:SetID(i)
-						buffFrame.icon:SetTexture(icon)
-
-						if count > 1 then
-							buffFrame.count:SetText(count)
-							buffFrame.count:Show()
-						else
-							buffFrame.count:Hide()
-						end
-
-						if duration and duration > 0 then
-							local startTime = expirationTime - duration
-							buffFrame.cooldown:SetCooldown(startTime, duration)
-							buffFrame.cooldown:Show()
-						else
-							buffFrame.cooldown:Hide()
-						end
-
-						buffFrame:Show()
-						buffIndex = buffIndex + 1
-						if buffIndex > MaxBuffs then
-							break
-						end
-
+					if duration and duration > 0 then
+						local startTime = expirationTime - duration
+						buffFrame.cooldown:SetCooldown(startTime, duration)
+						buffFrame.cooldown:Show()
+					else
+						buffFrame.cooldown:Hide()
 					end
+
+					buffFrame:Show()
+					buffIndex = buffIndex + 1
+					if buffIndex > MaxBuffs then
+						break
+					end
+
 				end
 			else
 				break
