@@ -219,9 +219,17 @@ local function CreateAllHeader(FrameName, ParentFrame)
 	return h
 end
 
+-- https://wowpedia.fandom.com/wiki/SecureGroupHeaderTemplate
 local function CreatePartyHeader(FrameName, ParentFrame)
 	local h = CreateHeader("SecureGroupHeaderTemplate", FrameName, ParentFrame)
+	h:SetAttribute("unitsPerColumn", 40)
 	h:SetAttribute("showSolo", "true")
+	h:SetAttribute("showRaid", "true")
+	h:SetAttribute("showParty", "true")
+	h:SetAttribute("groupBy", "GROUP") -- pre-sort by "GROUP", "CLASS", "ROLE", or "ASSIGNEDROLE" before regular sorting (Default: nil)
+	h:SetAttribute("sortMethod", "INDEX") -- sort by "INDEX", "NAME" or "NAMELIST" (Default: "INDEX")
+	h:SetAttribute("sortDir", "ASC")
+	h:SetAttribute("groupingOrder", "1,2,3,4,5,6,7,8") -- specifies the order of the groupings (ie. "1,2,3,4,5,6,7,8")
 	h:Show()
 	return h
 end
