@@ -231,21 +231,40 @@ function Healium_UpdatePercentageVisibility()
 	end
 end
 
+function UpdateAlphaUnitFrame(UnitName, NamePlate)
+
+	local curse = NamePlate.CurseBar:GetAlpha()
+	local aggro = UnitThreatSituation(UnitName)
+
+	local HPPercent = UnitHealth(UnitName) / UnitHealthMax(UnitName)
+	local alpha = 1
+
+	if HPPercent == 1 and curse == 0 then
+		if aggro ~= nil and aggro >= 1 then
+			alpha = .8
+		else
+			alpha = .5
+		end
+	end
+	--NamePlate.HealthBar:SetAlpha(alpha)
+end
+
 -- Sets the health bar color based on the unit's health ONLY
 local function UpdateHealthBar(HPPercent, frame, UnitName)
-	if (HPPercent > LowHP) then
-		if Healium.UseClassColors then
-			local class = select(2, UnitClass(UnitName)) or "WARRIOR"
-			local color = RAID_CLASS_COLORS[class]
-			frame.HealthBar:SetStatusBarColor(color.r, color.g, color.b)
-		else
-			frame.HealthBar:SetStatusBarColor(0,1,0,1)
+	if Healium.UseClassColors then
+		local class = select(2, UnitClass(UnitName)) or "WARRIOR"
+		local color = RAID_CLASS_COLORS[class]
+		frame.HealthBar:SetStatusBarColor(color.r, color.g, color.b)
+	else
+		if (HPPercent > LowHP) then
+			frame.HealthBar:SetStatusBarColor(0, 1, 0)
+		elseif (HPPercent <= LowHP and HPPercent > VeryLowHP) then
+			frame.HealthBar:SetStatusBarColor(1, 0.9, 0)
+		elseif (HPPercent <= VeryLowHP) then
+			frame.HealthBar:SetStatusBarColor(1, 0, 0)
 		end
-	elseif (HPPercent < LowHP) then
-		frame.HealthBar:SetStatusBarColor(1,0.9,0,1)
-	elseif (HPPercent < VeryLowHP) then
-		frame.HealthBar:SetStatusBarColor(1,0,0,1)
 	end
+	UpdateAlphaUnitFrame(UnitName, frame.HealthBar:GetParent())
 end
 
 function Healium_UpdateClassColors()
@@ -410,6 +429,7 @@ function Healium_UpdateUnitThreat(UnitName, NamePlate)
 
 	local r, g, b = GetThreatStatusColor(status)
 	NamePlate.AggroBar:SetBackdropBorderColor(r,g,b,1)
+	UpdateAlphaUnitFrame(UnitName, NamePlate)
 end
 
 function Healium_UpdateShowThreat()
@@ -818,9 +838,9 @@ function Healium_UpdateButtonAttributes()
 end
 
 local function UpdateButtonVisibility(frame)
-	if InCombatLockdown() then
-		return
-	end
+	--if InCombatLockdown() then
+	--	return
+	--end
 
 	-- Hide all buttons
 	for i=1, Healium_MaxButtons, 1 do
@@ -1129,19 +1149,13 @@ function Healium_OnEvent(self, event, ...)
 				Healium_UpdateUnitHealth(arg1, v)
 			end
 		end
-		return
-	end
-
-    if event == "UNIT_MANA" then
+	elseif event == "UNIT_MANA" then
 		if Healium_Units[arg1] then
 			for _,v  in pairs(Healium_Units[arg1]) do
 				Healium_UpdateUnitMana(arg1, v)
 			end
 		end
-		return
-	end
-
-	if event == "UNIT_AURA" then
+	elseif event == "UNIT_AURA" then
 		if Healium_Units[arg1] then
 			for _,v  in pairs(Healium_Units[arg1]) do
 				if Healium.ShowBuffs then
@@ -1150,24 +1164,15 @@ function Healium_OnEvent(self, event, ...)
 				Healium_UpdateSpecialBuffs(arg1)
 			end
 		end
-		return
-	end
-
-	if (event == "UNIT_THREAT_SITUATION_UPDATE") and Healium.ShowThreat then
+	elseif (event == "UNIT_THREAT_SITUATION_UPDATE") and Healium.ShowThreat then
 		if Healium_Units[arg1] then
 			for _,v  in pairs(Healium_Units[arg1]) do
 				Healium_UpdateUnitThreat(arg1, v)
 			end
 		end
-		return
-	end
-
-	if (event == "SPELL_UPDATE_COOLDOWN") and Healium.EnableCooldowns then
+	elseif (event == "SPELL_UPDATE_COOLDOWN") and Healium.EnableCooldowns then
 		Healium_UpdateButtonCooldowns()
-		return
-	end
-
-	if event == "PLAYER_REGEN_ENABLED" then
+	elseif event == "PLAYER_REGEN_ENABLED" then
 		for _,v in ipairs(Healium_FixNameplates) do
 			Healium_ShowHidePercentage(v)
 
@@ -1184,103 +1189,67 @@ function Healium_OnEvent(self, event, ...)
 		end
 
 		Healium_FixNameplates = {}
-		return
-	end
-
-	if ((event == "UNIT_SPELLCAST_SENT") and ( (arg2 == ActivatePrimarySpecSpellName) or (arg2 == ActivateSecondarySpecSpellName))  ) then
+	elseif ((event == "UNIT_SPELLCAST_SENT") and ( (arg2 == ActivatePrimarySpecSpellName) or (arg2 == ActivateSecondarySpecSpellName))  ) then
 --		DEFAULT_CHAT_FRAME:AddMessage("Healium Debug: Respecing Start")
 		self.Respecing = true
-		return
-	end
-
-	if ( ((event == "UNIT_SPELLCAST_INTERRUPTED") or (event == "UNIT_SPELLCAST_SUCCEEDED")) and (arg1 == "player") and ( (arg2 == ActivatePrimarySpecSpellName) or (arg2 == ActivateSecondarySpecSpellName))  ) then
+	elseif ( ((event == "UNIT_SPELLCAST_INTERRUPTED") or (event == "UNIT_SPELLCAST_SUCCEEDED")) and (arg1 == "player") and ( (arg2 == ActivatePrimarySpecSpellName) or (arg2 == ActivateSecondarySpecSpellName))  ) then
 --		DEFAULT_CHAT_FRAME:AddMessage("Healium Debug: Respecing Interrupt or succeeded")
 		self.Respecing = nil
-	end
-
-	-- This is not sent during initialization during a reload
-	if (event == "PLAYER_TALENT_UPDATE") then
+	elseif (event == "PLAYER_TALENT_UPDATE") then
+		-- This is not sent during initialization during a reload
 		Healium_DebugPrint("PLAYER_TALENT_UPDATE")
 		self.Respecing = nil
 
 		Healium_UpdateSpells()
 		Healium_UpdateButtons()
 		Healium_Update_ConfigPanel()
-		return
-	end
-
-
-	if ((event == "SPELLS_CHANGED") and (not self.Respecing)) then
+	elseif ((event == "SPELLS_CHANGED") and (not self.Respecing)) then
 		Healium_DebugPrint("SPELLS_CHANGED")
 		-- Populate the Healium_Spell Table with ID and Icon data.
 		Healium_UpdateSpells()
-	end
-
-	if ((event == "PLAYER_ENTERING_WORLD") and (not self.Respecing)) then
+	elseif ((event == "PLAYER_ENTERING_WORLD") and (not self.Respecing)) then
 		Healium_DebugPrint("PLAYER_ENTERING_WORLD")
 		-- Populate the Healium_Spell Table with ID and Icon data.
 		Healium_UpdateSpells()
-	end
 
 		-- Do not use this event for anything meaningful (see comment above ADDON_LOADED for reason)
 --[[
-	if (event == "VARIABLES_LOADED") then
+	elseif (event == "VARIABLES_LOADED") then
 		Healium_DebugPrint("VARIABLES_LOADED")
 		return
-	end
-
-	if (event == "PLAYER_ALIVE") then
+	elseif (event == "PLAYER_ALIVE") then
 		Healium_DebugPrint("PLAYER_ALIVE")
 		return
-	end
 --]]
 
-	if event == "UNIT_DISPLAYPOWER" then
+	elseif event == "UNIT_DISPLAYPOWER" then
 		if Healium_Units[arg1] then
 			for i,v  in pairs(Healium_Units[arg1]) do
 				HealiumUnitFames_CheckPowerType(arg1, v)
 			end
 		end
 
-		return
-	end
-
-	if (event == "RAID_TARGET_UPDATE") and Healium.ShowRaidIcons then
+	elseif (event == "RAID_TARGET_UPDATE") and Healium.ShowRaidIcons then
 		Healium_UpdateRaidIcons()
-		return
-	end
-
-	if event == "UNIT_NAME_UPDATE" then
+	elseif event == "UNIT_NAME_UPDATE" then
 		if Healium_Units[arg1] then
 			local name = strupper(UnitName(arg1))
 			for _,v  in pairs(Healium_Units[arg1]) do
 					v.name:SetText(name)
 			end
 		end
-		return
-	end
-
-	if (event == "PARTY_MEMBERS_CHANGED") and Healium.ShowRole then
+	elseif (event == "PARTY_MEMBERS_CHANGED") and Healium.ShowRole then
 		Healium_UpdateRoles()
-		return
-	end
-
-	if (event == "PLAYER_TARGET_CHANGED") and Healium.ShowTargetFrame then
+	elseif (event == "PLAYER_TARGET_CHANGED") and Healium.ShowTargetFrame then
 		Healium_DebugPrint("PLAYER_TARGET_CHANGED")
 		Healium_UpdateTargetFrame()
-		return
-	end
-
-	if (event == "PLAYER_FOCUS_CHANGED") and Healium.ShowFocusFrame then
+	elseif (event == "PLAYER_FOCUS_CHANGED") and Healium.ShowFocusFrame then
 		Healium_DebugPrint("PLAYER_FOCUS_CHANGED")
 		Healium_UpdateFocusFrame()
-		return
-	end
-
-	-- Use this ADDON_LOADED event instead of VARIABLES_LOADED.
-	-- ADDON_LOADED will not be called until the variables are loaded.
-	-- VARIABLES_LOADED's order can no longer be relied upon. (it kind of seems random to me)
-	if ((event == "ADDON_LOADED") and (string.lower(arg1) == string.lower(Healium_AddonName))) then
+	elseif ((event == "ADDON_LOADED") and (string.lower(arg1) == string.lower(Healium_AddonName))) then
+		-- Use this ADDON_LOADED event instead of VARIABLES_LOADED.
+		-- ADDON_LOADED will not be called until the variables are loaded.
+		-- VARIABLES_LOADED's order can no longer be relied upon. (it kind of seems random to me)
 		Healium_DebugPrint("ADDON_LOADED")
 
 		InitVariables()

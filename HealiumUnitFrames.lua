@@ -984,11 +984,11 @@ function Healium_UpdateUnitBuffs(unit, frame)
 		for i=1, 100, 1 do
 			local name, rank, icon, count, debuffType, duration, expirationTime, source, isStealable = UnitBuff(unit, i)
 			if name  then
-				if (duration > 0) and (source == "player") then
+				--if (duration > 0) and (source == "player") then
 
 					local armed = false
 
-					for j=1, Profile.ButtonCount, 1 do
+					for j=1, Healium_MaxButtons, 1 do
 						if Profile.SpellNames[j] == name then
 							armed = true
 							break
@@ -1023,7 +1023,7 @@ function Healium_UpdateUnitBuffs(unit, frame)
 						end
 
 					end
-				end
+				--end
 			else
 				break
 			end
@@ -1059,6 +1059,7 @@ function Healium_UpdateUnitBuffs(unit, frame)
 					if Healium.EnableDebufHealthbarHighlighting then
 						frame.CurseBar:SetBackdropBorderColor(debuffColor.r, debuffColor.g, debuffColor.b)
 						frame.CurseBar:SetAlpha(1)
+						UpdateAlphaUnitFrame(unit, frame)
 					end
 
 					if Healium.EnableDebufAudio then

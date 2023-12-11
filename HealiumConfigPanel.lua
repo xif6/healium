@@ -54,6 +54,17 @@ local function DropDownMenu_Init(self,level)
 	UIDropDownMenu_SetSelectedValue(DropDown , nil)
 	local spell = UIDropDownMenu_GetText(DropDown)
 
+	info.text = ""
+	info.value = #Healium_Spell.Name
+	info.func = DropDownMenuItem_OnClick
+	info.owner = DropDown
+	info.checked = nil
+	info.icon = "Interface/Icons/INV_Misc_QuestionMark"
+	UIDropDownMenu_AddButton(info, level)
+	if spell == nil then
+		UIDropDownMenu_SetSelectedValue(DropDown , #Healium_Spell.Name)
+	end
+
 	for k, v in ipairs (Healium_Spell.Name) do
 		info.text = Healium_Spell.Name[k]
 		info.value = k-1
