@@ -451,6 +451,7 @@ function Healium_UpdateShowThreat()
 end
 
 function Healium_UpdateUnitRole(UnitName, NamePlate)
+	Healium_DebugPrint("Healium_UpdateUnitRole " .. UnitName)
 	if not NamePlate then return end
 	if not UnitExists(UnitName) then return end
 
@@ -465,7 +466,7 @@ function Healium_UpdateUnitRole(UnitName, NamePlate)
 		return
 	end
 
-	if (IsInGroup()) then
+	if (IsInGroup() and UserIsInGroup(UnitName)) then
 		local tank, heal, lead = UnitGroupRolesAssigned(UnitName);
 
 		if (tank or GetPartyAssignment("MAINTANK", UnitName)) then
@@ -1293,4 +1294,8 @@ end
 
 function IsInGroup()
 	return GetNumPartyMembers() > 0 or GetNumRaidMembers() > 0
+end
+
+function UserIsInGroup(UnitName)
+	return UnitInParty(UnitName) or UnitInRaid(UnitName)
 end
